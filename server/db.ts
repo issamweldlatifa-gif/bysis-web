@@ -143,12 +143,6 @@ export async function searchOrdersByCustomerName(name: string): Promise<Order[]>
   return await db.select().from(orders).where(like(orders.customerName, `%${name}%`)).orderBy(desc(orders.createdAt));
 }
 
-export async function searchOrdersByPhone(phone: string): Promise<Order[]> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return await db.select().from(orders).where(like(orders.customerPhone, `%${phone}%`)).orderBy(desc(orders.createdAt));
-}
-
 // ===== Chat Helpers =====
 
 export async function getOrCreateConversation(sessionId: string): Promise<ChatConversation> {
@@ -231,6 +225,12 @@ export async function setSetting(key: string, value: string): Promise<void> {
     .onDuplicateKeyUpdate({ set: { value } });
 }
 
+export async function searchOrdersByPhone(phone: string): Promise<Order[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(orders).where(like(orders.customerPhone, `%${phone}%`)).orderBy(desc(orders.createdAt));
+}
+
 // ===== Arrivage Helpers =====
 
 export async function getAllArrivageItems(): Promise<ArrivageItem[]> {
@@ -266,6 +266,7 @@ export async function deleteArrivageItem(id: number): Promise<void> {
 export async function getArrivageItems(): Promise<ArrivageItem[]> {
   return getAvailableArrivageItems();
 }
+
 
 // ===== Calculation History Helpers =====
 

@@ -3,24 +3,143 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
-import * as db from "./db";
-import { nanoid } from "nanoid";
-import { TRPCError } from "@trpc/server";
+import {
+  createOrder, getAllOrders, getOrderById, updateOrderStatus, updateOrderNotes,
+  getOrderByTrackingCode,
+  searchOrdersByCustomerName, searchOrdersByPhone,
+  getOrCreateConversation, addChatMessage, updateConversationCustomer,
+  markConversationHasOrder, getAllConversations, getConversationMessages,
+  getSetting, setSetting,
+  getAllArrivageItems, getAvailableArrivageItems, createArrivageItem, updateArrivageItem, deleteArrivageItem,
+  saveCalculation, getCalculationHistory, getCalculationHistoryBySession,
+  getCalculationHistoryByDevice, deleteCalculationById,
+} from "./db";
 import { invokeLLM } from "./_core/llm";
-import { storagePut } from "./storage";
 import { notifyOwner } from "./_core/notification";
+import { transcribeAudio } from "./_core/voiceTranscription";
+import { TRPCError } from "@trpc/server";
+import { storagePut, storageGetSignedUrl } from "./storage";
+import { parse as parseCookieHeader } from "cookie";
+import crypto from "crypto";
+import { savePushSubscription, sendPushToPhone } from "./pushNotifications";
 
-// ===== Admin Procedure =====
-const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (ctx.user.role !== 'admin') {
-    throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+// Admin session cookie name (separate from Manus OAuth)
+const ADMIN_COOKIE_NAME = "admin_session";
+
+function getAdminSecret(): string {
+  return process.env.JWT_SECRET || "bysis-fallback-secret";
+}
+
+function generateAdminToken(): string {
+  const payload = `admin:${Date.now()}`;
+  const hmac = crypto.createHmac("sha256", getAdminSecret()).update(payload).digest("hex");
+  return `${Buffer.from(payload).toString("base64")}.${hmac}`;
+}
+
+function verifyAdminToken(token: string): boolean {
+  if (!token || !token.includes(".")) return false;
+  const [payloadB64, signature] = token.split(".");
+  if (!payloadB64 || !signature) return false;
+  try {
+    const payload = Buffer.from(payloadB64, "base64").toString();
+    if (!payload.startsWith("admin:")) return false;
+    const expectedHmac = crypto.createHmac("sha256", getAdminSecret()).update(payload).digest("hex");
+    return crypto.timingSafeEqual(Buffer.from(signature, "hex"), Buffer.from(expectedHmac, "hex"));
+  } catch {
+    return false;
+  }
+}
+
+const customAdminProcedure = publicProcedure.use(({ ctx, next }) => {
+  const cookieHeader = ctx.req.headers.cookie;
+  const cookies = cookieHeader ? parseCookieHeader(cookieHeader) : {};
+  const adminCookie = cookies[ADMIN_COOKIE_NAME] || "";
+  if (!verifyAdminToken(adminCookie)) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
   }
   return next({ ctx });
 });
 
+// ===== Chatbot System Prompt v5 (Algerian dialect, simplified order flow) =====
+function buildSystemPrompt(arrivageInfo: string, arrivageItems?: { name: string; priceTnd: number; platform: string; description?: string | null }[]): string {
+  return `أنت "سيسي" — المساعدة الذكية لـ bysis، خدمة وسيط شراء تونسية من Shein وAliExpress وTemu.
+شخصيتك: تونسية أصيلة، ودودة، ذكية، خفيفة الدم، مباشرة. ما تطولش في الكلام — ردودك قصيرة وواضحة.
+
+🏪 معلومات bysis:
+- bysis تعاون التوانسة يشريو من Shein وAliExpress وTemu بسهولة وبأسعار معقولة
+- التوصيل في كل ولايات تونس
+- إنستغرام: @sheinbysis2
+- الدفع: Virement bancaire UIB (RIB: 12067000013314111448 — Nermin Mejrissi) أو Mandat minute La Poste
+
+💰 حساب السعر — القاعدة الوحيدة:
+- سعر بالدينار = سعر بالأورو × 4
+- مثال: 10€ = 40 دينار | 15€ = 60 دينار | 25€ = 100 دينار | 50€ = 200 دينار
+- لو السعر بالدولار ($): حوله لأورو (1$ ≈ 0.92€) ثم × 4
+- لو السعر باليوان (¥): حوله لأورو (1¥ ≈ 0.13€) ثم × 4
+- دائماً اذكر السعر بالأورو والدينار معاً
+
+📦 معلومات الأريفاج:
+${arrivageItems && arrivageItems.length > 0
+  ? arrivageItems.map(i => `- ${i.name} (${i.platform}) — ${i.priceTnd} دينار${i.description ? ` — ${i.description}` : ""}`).join("\n")
+  : arrivageInfo || "ما عندناش معلومات أريفاج حالياً. تابع على إنستغرام @sheinbysis2"
+}
+
+🗣️ قواعد التحدث:
+- احكي بالتونسي دائماً — مزيج عربي تونسي وفرنسي طبيعي
+- ردودك قصيرة (3-5 أسطر max) — ما تطولش
+- استعمل إيموجي باعتدال (1-2 بالرسالة)
+- ما تكتبش بالفصحى أبداً
+- تقبل الرسائل بالعربي والفرنسي والإنجليزي — رد دائماً بالتونسي
+- لو العميل يكتب بالفرنسي، رد بالتونسي مع كلمات فرنسية طبيعية
+
+📋 كلمات تونسية:
+أريفاج=arrivage | كومند=commande | خلص=payer | قداش=combien | لينك=lien | برشا=beaucoup | باهي=d'accord | يزي=ça suffit | واش=est-ce que | نجم=je peux | بالصح=exactement | يعيشك=merci | حاجة=chose | مليحة=bien/belle
+
+🛒 لو العميل يحب يعدي كومند — اجمع هذي المعلومات بالترتيب (سؤال سؤال):
+1. الاسم الكامل (الاسم + اللقب)
+2. رقم التلفون (+216...)
+3. الولاية (من: أريانة، باجة، بن عروس، بنزرت، قابس، قفصة، جندوبة، القيروان، القصرين، قبلي، الكاف، المهدية، منوبة، مدنين، المنستير، نابل، صفاقس، سيدي بوزيد، سليانة، سوسة، تطاوين، توزر، تونس، زغوان)
+4. العنوان الكامل للتوصيل
+5. لينك المنتوج (رابط من Shein أو AliExpress أو Temu)
+
+⚠️ مهم:
+- ما تسألش على اللون، الحجم، الكمية في مرحلة جمع البيانات
+- لما تجمع الاسم + التلفون + الولاية + العنوان + اللينك، رد بهذا الفورمات في آخر الرسالة:
+[ORDER_DATA]{"name":"الاسم الكامل","phone":"الرقم","address":"الولاية — العنوان","link":"اللينك"}[/ORDER_DATA]
+- بعد [ORDER_DATA] أكد للعميل وقوله كود التتبع متاعه سيجيه في رسالة تأكيد
+
+💳 لو العميل يسأل على طريقة الدفع:
+- عندنا طريقتين:
+  1. **Virement bancaire UIB**: RIB 12067000013314111448 — Nermin Mejrissi (اذكر اسمك ورقم كومندتك في الوصف)
+  2. **Mandat minute La Poste**: في أي مكتب بريد تونسي، باسم Nermin Mejrissi
+- بعد الدفع ارفع صورة الوصل في صفحة الكومند
+
+📸 لو العميل يرفع صورة منتوج — قواعد قراءة السعر بالترتيب:
+1. **السعر المشطوب** (مشطوب عليه بخط): هذا هو السعر الأصلي — خذه
+2. **Retail Price / Prix original / السعر الأسود الكبير**: خذه
+3. **لو في سعرين**: خذ الأكبر دائماً (مثال: 5,13€ و7,86€ → خذ 7,86€)
+4. **لو السعر بعد تخفيض فقط** (مثال: -30%): احسب السعر الأصلي = سعر التخفيض ÷ (1 - نسبة التخفيض)
+5. **لو ما شفتش سعر واضح**: قول "ما نجمتش نقرأ السعر، ارسلي صورة أوضح"
+
+بعد ما تحدد السعر الصح:
+- حوله لأورو لو بدولار أو يوان
+- احسب: سعر بالدينار = سعر بالأورو × 4
+- رد قصير: "هذا المنتوج بـ X€ (السعر الأصلي)، يعني ~Y دينار 👌 تحب تعدي كومند؟"
+
+🔍 لو العميل يسأل على كومندته:
+- قوله يعطيك اسمه الكامل أو رقم تلفونه
+- لو أعطاك الاسم: [TRACK_NAME]الاسم[/TRACK_NAME]
+- لو أعطاك التلفون: [TRACK_PHONE]الرقم[/TRACK_PHONE]
+
+🕐 لو يسأل على الأريفاج:
+- رد بالمعلومات الموجودة أعلاه
+- لو ما عندكش معلومة: "تابع على إنستغرام @sheinbysis2 باش تعرف آخر الأخبار 📲"
+
+❌ ما تخترعش معلومات — لو ما تعرفش: "ما نعرفش بالضبط، تواصل معنا على إنستغرام @sheinbysis2"`;
+}
+
 export const appRouter = router({
   system: systemRouter,
-  
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
     logout: publicProcedure.mutation(({ ctx }) => {
@@ -30,307 +149,688 @@ export const appRouter = router({
     }),
   }),
 
-  // ===== Orders Router =====
-  orders: router({
-    create: publicProcedure
-      .input(z.object({
-        customerName: z.string().min(1),
-        customerPhone: z.string().optional(),
-        customerEmail: z.string().email().optional(),
-        sourceUrl: z.string().optional(),
-        sourcePrice: z.string().optional(),
-        quantity: z.number().int().positive().default(1),
-        customerNotes: z.string().optional(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        const trackingCode = `BYS-${Date.now()}-${nanoid(6)}`;
-        const userId = ctx.user?.id || null;
-        
-        const order = await db.createOrder({
-          userId: userId as number,
-          trackingCode,
-          customerName: input.customerName,
-          customerPhone: input.customerPhone || null,
-          customerEmail: input.customerEmail || null,
-          sourceUrl: input.sourceUrl || null,
-          sourcePrice: input.sourcePrice || null,
-          quantity: input.quantity,
-          customerNotes: input.customerNotes || null,
-          status: 'new',
-        });
-
-        // Notify owner
-        await notifyOwner({
-          title: 'Nouvelle commande',
-          content: `Nouvelle commande de ${input.customerName} (${trackingCode})`,
-        }).catch(err => console.error('Notification failed:', err));
-
-        return order;
-      }),
-
-    getByTrackingCode: publicProcedure
-      .input(z.object({ trackingCode: z.string() }))
-      .query(async ({ input }) => {
-        return await db.getOrderByTrackingCode(input.trackingCode);
-      }),
-
-    list: adminProcedure.query(async () => {
-      return await db.getAllOrders();
-    }),
-
-    getById: adminProcedure
-      .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => {
-        return await db.getOrderById(input.id);
-      }),
-
-    updateStatus: adminProcedure
-      .input(z.object({
-        id: z.number(),
-        status: z.enum(['new', 'processing', 'waiting_payment', 'shipped', 'arrived', 'completed', 'cancelled']),
-      }))
-      .mutation(async ({ input }) => {
-        await db.updateOrderStatus(input.id, input.status);
-        return { success: true };
-      }),
-
-    updateNotes: adminProcedure
-      .input(z.object({
-        id: z.number(),
-        adminNotes: z.string(),
-      }))
-      .mutation(async ({ input }) => {
-        await db.updateOrderNotes(input.id, input.adminNotes);
-        return { success: true };
-      }),
-
-    search: adminProcedure
-      .input(z.object({
-        query: z.string(),
-        type: z.enum(['name', 'phone']).default('name'),
-      }))
-      .query(async ({ input }) => {
-        if (input.type === 'phone') {
-          return await db.searchOrdersByPhone(input.query);
+  // Custom admin authentication
+  adminAuth: router({
+    login: publicProcedure
+      .input(z.object({ username: z.string(), password: z.string() }))
+      .mutation(({ input, ctx }) => {
+        const validUsername = process.env.ADMIN_USERNAME;
+        const validPassword = process.env.ADMIN_PASSWORD;
+        if (!validUsername || !validPassword) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Admin credentials not configured" });
         }
-        return await db.searchOrdersByCustomerName(input.query);
+        if (input.username !== validUsername || input.password !== validPassword) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Nom d'utilisateur ou mot de passe incorrect" });
+        }
+        const token = generateAdminToken();
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(ADMIN_COOKIE_NAME, token, { ...cookieOptions, maxAge: 1000 * 60 * 60 * 24 * 365 });
+        return { success: true };
       }),
-
-    getUserOrders: protectedProcedure.query(async ({ ctx }) => {
-      return await db.getOrdersByUserId(ctx.user.id);
+    logout: publicProcedure.mutation(({ ctx }) => {
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.clearCookie(ADMIN_COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      return { success: true };
+    }),
+    check: publicProcedure.query(({ ctx }) => {
+      const cookieHeader = ctx.req.headers.cookie;
+      const cookies = cookieHeader ? parseCookieHeader(cookieHeader) : {};
+      const adminCookie = cookies[ADMIN_COOKIE_NAME] || "";
+      return { isAdmin: verifyAdminToken(adminCookie) };
     }),
   }),
 
-  // ===== Price Calculator Router =====
+  // Calculator
   calculator: router({
-    analyzeImage: publicProcedure
-      .input(z.object({
-        imageUrl: z.string(),
-        sourcePrice: z.string().optional(),
-      }))
-      .mutation(async ({ input, ctx }) => {
+    extractPrice: publicProcedure
+      .input(z.object({ imageBase64: z.string(), model: z.string().default("auto"), deviceId: z.string().optional() }))
+      .mutation(async ({ input }) => {
+        const { imageBase64 } = input;
+        const systemPrompt = `You are a price extraction assistant for Shein, AliExpress, and Temu screenshots.
+
+Your ONLY job: find the ORIGINAL / RETAIL price — the LARGEST number shown, whether strikethrough or not.
+
+Rules:
+1. If there are TWO prices (e.g. $8.46 and $9.00): ALWAYS pick the LARGER one ($9.00) — that is the retail/original price
+2. If there is a "Retail Price" label, use that value
+3. If there is only ONE price, use it
+4. NEVER pick the discounted/sale/promotional price (the smaller colored price)
+5. Convert the chosen price to EUROS (EUR):
+   - USD ($): multiply by 0.92
+   - EUR (€): keep as-is
+   - CNY/RMB (¥): multiply by 0.13
+   - GBP (£): multiply by 1.17
+   - MAD: multiply by 0.092
+
+detected_model:
+- model1: two prices found — used the LARGER (retail) one
+- model2: only one price visible
+- model3: used labeled "Retail Price" or "Original Price"
+
+IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already converted to EUR.`;
         try {
-          // Use LLM to analyze product from image
           const response = await invokeLLM({
             messages: [
-              {
-                role: 'system',
-                content: 'You are an expert product analyst. Analyze the product image and identify: 1) Product type (e.g., clothing, electronics, accessories), 2) Product category (e.g., shirt, phone case, shoes), 3) Estimated quality level (basic, standard, premium). Return JSON format: {productType, productCategory, qualityLevel}',
-              },
-              {
-                role: 'user',
-                content: `Please analyze this product image: ${input.imageUrl}`,
-              },
+              { role: "system", content: systemPrompt },
+              { role: "user", content: [{ type: "image_url", image_url: { url: imageBase64, detail: "high" } }, { type: "text", text: "Extract the current selling price and convert it to EUR." }] },
             ],
             response_format: {
-              type: 'json_schema',
+              type: "json_schema",
               json_schema: {
-                name: 'product_analysis',
-                strict: true,
+                name: "price_extraction", strict: true,
                 schema: {
-                  type: 'object',
+                  type: "object",
                   properties: {
-                    productType: { type: 'string' },
-                    productCategory: { type: 'string' },
-                    qualityLevel: { type: 'string', enum: ['basic', 'standard', 'premium'] },
+                    price_in_eur: { type: "number" },
+                    original_price: { type: "number" },
+                    original_currency: { type: "string" },
+                    confidence: { type: "string" },
+                    detected_model: { type: "string" },
                   },
-                  required: ['productType', 'productCategory', 'qualityLevel'],
+                  required: ["price_in_eur", "original_price", "original_currency", "confidence", "detected_model"],
                   additionalProperties: false,
                 },
               },
             },
           });
-
-          const analysisText = response.choices[0]?.message?.content;
-          const analysis = JSON.parse(typeof analysisText === 'string' ? analysisText : '{}');
-
-          // Calculate price based on analysis
-          const sourcePrice = input.sourcePrice ? parseFloat(input.sourcePrice) : 0;
-          const markupMap: Record<string, number> = {
-            basic: 1.5,
-            standard: 2.0,
-            premium: 2.5,
-          };
-          const markup = markupMap[analysis.qualityLevel] || 2.0;
-
-          const calculatedPrice = sourcePrice * markup;
-
-          // Save to calculation history
-          const sessionId = (ctx.req.headers['x-session-id'] as string) || nanoid();
-          await db.saveCalculation({
-            sessionId,
-            userId: ctx.user?.id || null,
-            imageUrl: input.imageUrl,
-            imageKey: null,
-            productType: analysis.productType,
-            productCategory: analysis.productCategory,
-            sourcePrice: sourcePrice ? sourcePrice.toString() : null,
-            calculatedPrice: calculatedPrice.toString(),
-            analysisData: analysis,
-            deviceId: null,
-          });
-
-          return {
-            productType: analysis.productType,
-            productCategory: analysis.productCategory,
-            qualityLevel: analysis.qualityLevel,
-            sourcePrice,
-            calculatedPrice,
-            markup,
-          };
+          const rawContent = response.choices[0]?.message?.content;
+          if (!rawContent) throw new Error("No response from AI");
+          const contentStr = typeof rawContent === "string" ? rawContent :
+            Array.isArray(rawContent) ? rawContent.filter((p: any) => p.type === "text").map((p: any) => p.text).join("") : String(rawContent);
+          const parsed = JSON.parse(contentStr);
+          const priceInEuro = parsed.price_in_eur;
+          const priceInTND = Math.round(priceInEuro * 4 * 100) / 100; // DZD rate
+          const validModels = ["model1", "model2", "model3"];
+          const detectedModel = validModels.includes(parsed.detected_model) ? parsed.detected_model : "model1";
+          
+          // Upload image to S3 (store URL, not base64 in DB)
+          try {
+            let savedImageUrl = "";
+            try {
+              const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+              const buffer = Buffer.from(base64Data, "base64");
+              const ext = imageBase64.startsWith("data:image/png") ? "png" : "jpg";
+              const uploadResult = await storagePut(`calculator/scan-${Date.now()}.${ext}`, buffer, `image/${ext}`);
+              savedImageUrl = uploadResult.url;
+            } catch (uploadErr) {
+              console.warn("[Calculator] S3 upload failed, skipping history save:", uploadErr);
+            }
+            if (savedImageUrl) {
+              await saveCalculation({
+                imageUrl: savedImageUrl,
+                originalPrice: parsed.original_price.toString(),
+                originalCurrency: parsed.original_currency,
+                priceEur: priceInEuro.toString(),
+                priceTnd: priceInTND.toString(),
+                deviceId: input.deviceId || null,
+              });
+            }
+          } catch (err) {
+            console.warn("[Calculator] Failed to save calculation:", err);
+          }
+          
+          return { originalPrice: parsed.original_price, originalCurrency: parsed.original_currency, priceInTND, confidence: parsed.confidence, model: detectedModel };
+        } catch (error: any) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to extract price: " + (error.message || "Unknown error") });
+        }
+      }),
+    getHistory: publicProcedure
+      .input(z.object({ deviceId: z.string().optional() }))
+      .query(async ({ input }) => {
+        try {
+          if (input.deviceId) {
+            return await getCalculationHistoryByDevice(input.deviceId, 50);
+          }
+          return await getCalculationHistory(50);
         } catch (error) {
-          console.error('Image analysis failed:', error);
-          throw new TRPCError({
-            code: 'INTERNAL_SERVER_ERROR',
-            message: 'Failed to analyze image',
+          console.warn("[Calculator] Failed to get history:", error);
+          return [];
+        }
+      }),
+    deleteHistory: publicProcedure
+      .input(z.object({ id: z.number(), deviceId: z.string() }))
+      .mutation(async ({ input }) => {
+        try {
+          await deleteCalculationById(input.id, input.deviceId);
+          return { success: true };
+        } catch (error) {
+          console.warn("[Calculator] Failed to delete history:", error);
+          return { success: false };
+        }
+      }),
+  }),
+
+  // Orders
+  orders: router({
+    create: publicProcedure
+      .input(z.object({
+        customerName: z.string().min(2),
+        customerPhone: z.string().optional(),
+        customerAddress: z.string().optional(),
+        gouvernorat: z.string().optional(),
+        productLink: z.string().url(),
+        quantity: z.number().int().min(1).default(1),
+        notes: z.string().optional(),
+        screenshotBase64: z.string().optional(),
+        paymentReceiptBase64: z.string().optional(),
+        paymentMethod: z.enum(["bank", "mandat"]).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        let screenshotUrl: string | null = null;
+        let paymentReceiptUrl: string | null = null;
+        if (input.paymentReceiptBase64) {
+          try {
+            const base64Data = input.paymentReceiptBase64.replace(/^data:image\/\w+;base64,/, "");
+            const buffer = Buffer.from(base64Data, "base64");
+            const ext = input.paymentReceiptBase64.startsWith("data:image/png") ? "png" : "jpg";
+            const result = await storagePut(`orders/receipt-${Date.now()}.${ext}`, buffer, `image/${ext}`);
+            paymentReceiptUrl = result.url;
+          } catch (e) { console.error("[Storage] Receipt upload failed:", e); }
+        }
+        if (input.screenshotBase64) {
+          try {
+            const base64Data = input.screenshotBase64.replace(/^data:image\/\w+;base64,/, "");
+            const buffer = Buffer.from(base64Data, "base64");
+            const ext = input.screenshotBase64.startsWith("data:image/png") ? "png" : "jpg";
+            const result = await storagePut(`orders/screenshot-${Date.now()}.${ext}`, buffer, `image/${ext}`);
+            screenshotUrl = result.url;
+          } catch (e) { console.error("[Storage] Screenshot upload failed:", e); }
+        }
+        // Generate unique tracking code: BSS-XXXXXXXX
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let code = 'BSS-';
+        for (let i = 0; i < 8; i++) code += chars[Math.floor(Math.random() * chars.length)];
+        const created = await createOrder({
+          customerName: input.customerName,
+          customerPhone: input.customerPhone || null,
+          trackingCode: code,
+          customerAddress: input.customerAddress || null,
+          gouvernorat: input.gouvernorat || null,
+          productLink: input.productLink,
+          quantity: input.quantity,
+          size: null, color: null,
+          notes: input.notes || null,
+          screenshotUrl,
+          paymentReceiptUrl,
+          paymentMethod: input.paymentMethod || null,
+          userId: ctx.user?.id || null,
+        });
+        try {
+          await notifyOwner({
+            title: "🛒 Nouvelle commande bysis",
+            content: `Client: ${input.customerName}\nTel: ${input.customerPhone || "—"}\nGouvernorat: ${input.gouvernorat || "—"}\nAdresse: ${input.customerAddress || "—"}\nProduit: ${input.productLink}\nQté: ${input.quantity}\nCode: ${code}${input.notes ? `\nNotes: ${input.notes}` : ""}`,
           });
+        } catch (e) { console.error("[Notification] Failed:", e); }
+        return { success: true, trackingCode: code, orderId: created?.id };
+      }),
+    getByTrackingCode: publicProcedure
+      .input(z.object({ trackingCode: z.string() }))
+      .query(async ({ input }) => {
+        const order = await getOrderByTrackingCode(input.trackingCode.toUpperCase());
+        if (!order) return null;
+        return {
+          id: order.id,
+          trackingCode: order.trackingCode,
+          customerName: order.customerName,
+          status: order.status,
+          gouvernorat: order.gouvernorat,
+          createdAt: order.createdAt,
+          updatedAt: order.updatedAt,
+        };
+      }),
+    list: customAdminProcedure.query(async () => getAllOrders()),
+    getById: customAdminProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
+      const order = await getOrderById(input.id);
+      if (!order) throw new TRPCError({ code: "NOT_FOUND" });
+      return order;
+    }),
+    updateStatus: customAdminProcedure
+      .input(z.object({ id: z.number(), status: z.enum(["new", "processing", "waiting_payment", "shipped", "arrived", "completed", "cancelled"]) }))
+      .mutation(async ({ input }) => {
+        await updateOrderStatus(input.id, input.status);
+        // Send push notification to customer if they have a subscription
+        const order = await getOrderById(input.id);
+        if (order?.customerPhone) {
+          const statusLabels: Record<string, string> = {
+            new: "📥 كومندتك وصلتنا!",
+            processing: "⚙️ كومندتك قيد المعالجة",
+            waiting_payment: "💳 كومندتك تنتظر الدفع",
+            shipped: "🚚 كومندتك في الطريق!",
+            arrived: "📦 كومندتك وصلت!",
+            completed: "✅ كومندتك اكتملت!",
+            cancelled: "❌ كومندتك تم إلغاؤها",
+          };
+          const statusMessages: Record<string, string> = {
+            new: "سنتواصل معك قريباً لتأكيد التفاصيل.",
+            processing: "نحن نعمل على تجهيز طلبك.",
+            waiting_payment: "يرجى التواصل معنا لإتمام الدفع.",
+            shipped: "طلبك في طريقه إليك. ترقب!",
+            arrived: "طلبك وصل المخزن. سنتواصل معك للتسليم.",
+            completed: "شكراً لثقتك في bysis! 🎉",
+            cancelled: "للاستفسار تواصل معنا عبر الشات.",
+          };
+          await sendPushToPhone(order.customerPhone, {
+            title: statusLabels[input.status] ?? "تحديث كومندتك",
+            body: statusMessages[input.status] ?? "تم تحديث حالة طلبك.",
+            icon: "/manus-storage/bysis-icon-192_ebf358be.png",
+            badge: "/manus-storage/bysis-icon-192_ebf358be.png",
+            url: "/track",
+            tag: `order-${input.id}`,
+          }).catch(() => {}); // don't fail if push fails
+        }
+        return { success: true };
+      }),
+    updateNotes: customAdminProcedure
+      .input(z.object({ id: z.number(), adminNotes: z.string() }))
+      .mutation(async ({ input }) => { await updateOrderNotes(input.id, input.adminNotes); return { success: true }; }),
+    track: publicProcedure
+      .input(z.object({ query: z.string().min(1) }))
+      .query(async ({ input }) => {
+        const results = await searchOrdersByCustomerName(input.query);
+        return results.map(o => ({
+          id: o.id,
+          status: o.status,
+          productUrl: o.productLink,
+          quantity: o.quantity,
+          createdAt: o.createdAt,
+          screenshotUrl: o.screenshotUrl || null,
+          customerName: o.customerName,
+          customerPhone: o.customerPhone || null,
+          customerAddress: o.customerAddress || null,
+        }));
+      }),
+    trackByPhone: publicProcedure
+      .input(z.object({ phone: z.string().min(1) }))
+      .query(async ({ input }) => {
+        const results = await searchOrdersByPhone(input.phone);
+        return results.map(o => ({
+          id: o.id,
+          status: o.status,
+          productUrl: o.productLink,
+          quantity: o.quantity,
+          createdAt: o.createdAt,
+          screenshotUrl: o.screenshotUrl || null,
+          customerName: o.customerName,
+          customerPhone: o.customerPhone || null,
+          customerAddress: o.customerAddress || null,
+        }));
+      }),
+  }),
+
+  // App settings (busy mode, arrivage info)
+  settings: router({
+    get: publicProcedure
+      .input(z.object({ key: z.string() }))
+      .query(async ({ input }) => {
+        const value = await getSetting(input.key);
+        return { value };
+      }),
+    set: customAdminProcedure
+      .input(z.object({ key: z.string(), value: z.string() }))
+      .mutation(async ({ input }) => {
+        await setSetting(input.key, input.value);
+        return { success: true };
+      }),
+  }),
+
+  // Chatbot v3 - Super upgrade
+  chatbot: router({
+    sendMessage: publicProcedure
+      .input(z.object({
+        sessionId: z.string().min(1),
+        messages: z.array(z.object({ role: z.enum(["user", "assistant"]), content: z.string() })),
+        imageBase64: z.string().optional(),
+        audioBase64: z.string().optional(),
+        fileBase64: z.string().optional(),
+        fileName: z.string().optional(),
+        isNewConversation: z.boolean().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const apiKey = process.env.ANTHROPIC_API_KEY;
+        if (!apiKey) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Chatbot non configuré" });
+
+        // Check busy mode
+        const busyMode = await getSetting("busy_mode");
+        if (busyMode === "true") {
+          const busyMsg = await getSetting("busy_message") || "مرحبا! bysis مشغولة حالياً. سنرد عليك قريباً إن شاء الله 🙏 تقدر تتواصل معنا على إنستغرام @sheinbysis2";
+          return { message: busyMsg, orderCreated: false, isBusy: true };
+        }
+
+        // Get arrivage info for context
+        const arrivageInfo = await getSetting("arrivage_info") || "";
+        let arrivageItemsList: { name: string; priceTnd: number; platform: string; description?: string | null }[] = [];
+        try {
+          arrivageItemsList = await getAvailableArrivageItems();
+        } catch (e) { console.error("[Chatbot] Failed to load arrivage items:", e); }
+
+        // Get or create conversation
+        let conversation;
+        try {
+          conversation = await getOrCreateConversation(input.sessionId);
+          // Notify admin on first message of new conversation
+          if (input.isNewConversation) {
+            notifyOwner({
+              title: "💬 محادثة جديدة في الشات",
+              content: `Session: ${input.sessionId.slice(0, 12)}...\nأول رسالة: ${input.messages[input.messages.length - 1]?.content?.slice(0, 100) || "—"}`,
+            }).catch(() => {});
+          }
+        } catch (e) { console.error("[Chatbot] DB error:", e); }
+
+        // Handle file uploads
+        let imageUrl: string | null = null;
+        let audioUrl: string | null = null;
+        let fileUrl: string | null = null;
+        let transcribedText: string | null = null;
+
+        if (input.imageBase64) {
+          try {
+            const base64Data = input.imageBase64.replace(/^data:image\/\w+;base64,/, "");
+            const buffer = Buffer.from(base64Data, "base64");
+            const ext = input.imageBase64.startsWith("data:image/png") ? "png" : "jpg";
+            const result = await storagePut(`chat/img-${Date.now()}.${ext}`, buffer, `image/${ext}`);
+            imageUrl = result.url;
+          } catch (e) { console.error("[Chatbot] Image upload error:", e); }
+        }
+
+        if (input.audioBase64) {
+          try {
+            const base64Data = input.audioBase64.replace(/^data:audio\/\w+;base64,/, "");
+            const buffer = Buffer.from(base64Data, "base64");
+            const result = await storagePut(`chat/audio-${Date.now()}.webm`, buffer, "audio/webm");
+            audioUrl = result.url;
+            // Transcribe audio — use signed S3 URL (storageGetSignedUrl returns an absolute URL)
+            try {
+              const signedAudioUrl = await storageGetSignedUrl(result.key);
+              const transcription = await transcribeAudio({
+                audioUrl: signedAudioUrl,
+                // No language lock — auto-detect supports Tunisian Arabic, French, English, and mixed speech
+                prompt: "Transcribe Tunisian dialect speech which may mix Arabic, French, and English words",
+              });
+              transcribedText = "text" in transcription ? transcription.text : "";
+            } catch (e) { console.error("[Chatbot] Transcription error:", e); }
+          } catch (e) { console.error("[Chatbot] Audio upload error:", e); }
+        }
+
+        if (input.fileBase64 && input.fileName) {
+          try {
+            const base64Data = input.fileBase64.replace(/^data:[^;]+;base64,/, "");
+            const buffer = Buffer.from(base64Data, "base64");
+            const result = await storagePut(`chat/file-${Date.now()}-${input.fileName}`, buffer, "application/octet-stream");
+            fileUrl = result.url;
+          } catch (e) { console.error("[Chatbot] File upload error:", e); }
+        }
+
+        // Store user message
+        const lastUserMsg = input.messages[input.messages.length - 1];
+        const userContent = transcribedText
+          ? `[رسالة صوتية]: ${transcribedText}`
+          : lastUserMsg?.content || "";
+
+        if (conversation && lastUserMsg?.role === "user") {
+          try {
+            await addChatMessage(conversation.id, "user", userContent, imageUrl, null, audioUrl, fileUrl);
+          } catch (e) { console.error("[Chatbot] Failed to store user message:", e); }
+        }
+
+        // Build messages for Claude
+        const claudeMessages: any[] = input.messages.map((m, i) => {
+          if (i === input.messages.length - 1 && m.role === "user" && input.imageBase64) {
+            return {
+              role: "user",
+              content: [
+                { type: "image", source: { type: "base64", media_type: input.imageBase64.startsWith("data:image/png") ? "image/png" : "image/jpeg", data: input.imageBase64.replace(/^data:image\/\w+;base64,/, "") } },
+                { type: "text", text: m.content || "شوف هذي الصورة واحسبلي السعر بالدينار" },
+              ],
+            };
+          }
+          // Replace last message content with transcribed text if audio
+          if (i === input.messages.length - 1 && transcribedText) {
+            return { role: m.role, content: `[رسالة صوتية]: ${transcribedText}` };
+          }
+          return { role: m.role, content: m.content };
+        });
+
+        try {
+          const response = await fetch("https://api.anthropic.com/v1/messages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
+            body: JSON.stringify({
+              model: "claude-sonnet-4-5",
+              max_tokens: 1500,
+              system: buildSystemPrompt(arrivageInfo, arrivageItemsList),
+              messages: claudeMessages,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error("[Chatbot] Claude API error:", response.status, errorText);
+            throw new Error(`Claude API error: ${response.status}`);
+          }
+
+          const data = await response.json() as any;
+          let assistantMessage = data.content?.[0]?.text || "معذرة، ما نجمتش نجاوبك. جرب مرة أخرى 🙏";
+
+          // Handle order creation
+          let orderCreated = false;
+          const orderMatch = assistantMessage.match(/\[ORDER_DATA\]([\s\S]*?)\[\/ORDER_DATA\]/);
+          if (orderMatch) {
+            try {
+              const orderData = JSON.parse(orderMatch[1]);
+              await createOrder({
+                customerName: orderData.name,
+                customerPhone: orderData.phone || null,
+                customerAddress: orderData.address || null,
+                productLink: orderData.link,
+                quantity: 1,
+                size: null, color: null,
+                notes: "كومند من الشات",
+                screenshotUrl: imageUrl,
+                userId: null,
+              });
+              orderCreated = true;
+              if (conversation) {
+                await markConversationHasOrder(conversation.id);
+                await updateConversationCustomer(conversation.id, orderData.name, orderData.phone);
+              }
+              notifyOwner({
+                title: "🛒 كومند جديدة من الشات",
+                content: `Client: ${orderData.name}\nTel: ${orderData.phone || "—"}\nAdresse: ${orderData.address || "—"}\nLien: ${orderData.link}`,
+              }).catch(() => {});
+            } catch (e) { console.error("[Chatbot] Order parse error:", e); }
+            assistantMessage = assistantMessage.replace(/\[ORDER_DATA\][\s\S]*?\[\/ORDER_DATA\]/, "").trim();
+          }
+
+          // Handle order tracking by name
+          const trackNameMatch = assistantMessage.match(/\[TRACK_NAME\](.*?)\[\/TRACK_NAME\]/);
+          if (trackNameMatch) {
+            const searchName = trackNameMatch[1].trim();
+            const foundOrders = await searchOrdersByCustomerName(searchName);
+            let trackInfo = "";
+            if (foundOrders.length === 0) {
+              trackInfo = `ما لقيناش كومند باسم "${searchName}". تأكد من الاسم ولا تواصل معنا على إنستغرام.`;
+            } else {
+              const statusMap: Record<string, string> = {
+                new: "🆕 جديدة — في الانتظار",
+                processing: "⚙️ في المعالجة",
+                waiting_payment: "💳 تستنى الدفع",
+                shipped: "🚢 في الطريق",
+                arrived: "📦 وصلت للمخزن",
+                completed: "✅ تسلمت",
+                cancelled: "❌ ملغية",
+              };
+              trackInfo = foundOrders.slice(0, 3).map(o =>
+                `📋 كومند #${o.id}: ${statusMap[o.status] || o.status}`
+              ).join("\n");
+            }
+            assistantMessage = assistantMessage.replace(/\[TRACK_NAME\].*?\[\/TRACK_NAME\]/, trackInfo).trim();
+          }
+
+          // Handle order tracking by phone
+          const trackPhoneMatch = assistantMessage.match(/\[TRACK_PHONE\](.*?)\[\/TRACK_PHONE\]/);
+          if (trackPhoneMatch) {
+            const searchPhone = trackPhoneMatch[1].trim();
+            const foundOrders = await searchOrdersByPhone(searchPhone);
+            let trackInfo = "";
+            if (foundOrders.length === 0) {
+              trackInfo = `ما لقيناش كومند بهذا الرقم "${searchPhone}". تأكد من الرقم ولا تواصل معنا على إنستغرام.`;
+            } else {
+              const statusMap: Record<string, string> = {
+                new: "🆕 جديدة", processing: "⚙️ في المعالجة", waiting_payment: "💳 تستنى الدفع",
+                shipped: "🚢 في الطريق", arrived: "📦 وصلت للمخزن", completed: "✅ تسلمت", cancelled: "❌ ملغية",
+              };
+              trackInfo = foundOrders.slice(0, 3).map(o =>
+                `📋 كومند #${o.id}: ${statusMap[o.status] || o.status}`
+              ).join("\n");
+            }
+            assistantMessage = assistantMessage.replace(/\[TRACK_PHONE\].*?\[\/TRACK_PHONE\]/, trackInfo).trim();
+          }
+
+          // Store assistant message
+          if (conversation) {
+            try {
+              await addChatMessage(conversation.id, "assistant", assistantMessage);
+            } catch (e) { console.error("[Chatbot] Failed to store assistant message:", e); }
+          }
+
+          return { message: assistantMessage, orderCreated, isBusy: false };
+        } catch (error: any) {
+          console.error("[Chatbot] Error:", error);
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Erreur du chatbot: " + (error.message || "Erreur inconnue") });
         }
       }),
 
-    getHistory: publicProcedure.query(async ({ ctx }) => {
-      const sessionId = ctx.req.headers['x-session-id'] as string;
-      if (!sessionId) {
-        return [];
-      }
-      return await db.getCalculationHistoryBySession(sessionId);
-    }),
+    // Transcribe audio only (for voice messages)
+    transcribeAudio: publicProcedure
+      .input(z.object({ audioBase64: z.string() }))
+      .mutation(async ({ input }) => {
+        try {
+          const base64Data = input.audioBase64.replace(/^data:audio\/\w+;base64,/, "");
+          const buffer = Buffer.from(base64Data, "base64");
+          const result = await storagePut(`chat/audio-${Date.now()}.webm`, buffer, "audio/webm");
+          const signedUrl = await storageGetSignedUrl(result.key);
+          const transcription = await transcribeAudio({
+            audioUrl: signedUrl,
+            // No language lock — auto-detect supports Tunisian Arabic, French, English, and mixed speech
+            prompt: "Transcribe Tunisian dialect speech which may mix Arabic, French, and English words",
+          });
+          return { text: "text" in transcription ? transcription.text : "" };
+        } catch (error: any) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Transcription failed: " + error.message });
+        }
+      }),
+
+    // Admin - list all conversations
+    listConversations: customAdminProcedure.query(async () => getAllConversations()),
+
+    // Admin - get messages for a conversation
+    getMessages: customAdminProcedure
+      .input(z.object({ conversationId: z.number() }))
+      .query(async ({ input }) => getConversationMessages(input.conversationId)),
   }),
 
-  // ===== Arrivage Router =====
+  // ===== Arrivage =====
   arrivage: router({
-    list: publicProcedure.query(async () => {
-      return await db.getAvailableArrivageItems();
-    }),
+    // Public: list available items
+    list: publicProcedure.query(async () => getAvailableArrivageItems()),
 
-    listAll: adminProcedure.query(async () => {
-      return await db.getAllArrivageItems();
-    }),
+    // Admin: list all items (including unavailable)
+    listAll: customAdminProcedure.query(async () => getAllArrivageItems()),
 
-    create: adminProcedure
+    // Admin: create item with optional image upload
+    create: customAdminProcedure
       .input(z.object({
         name: z.string().min(1),
         description: z.string().optional(),
-        category: z.string().optional(),
-        price: z.string(),
-        quantity: z.number().int().positive(),
-        available: z.number().int().optional(),
+        priceTnd: z.number().int().min(1),
+        priceEur: z.number().int().optional(),
+        platform: z.enum(["shein", "aliexpress", "temu"]).default("shein"),
+        available: z.number().int().default(1),
+        productLink: z.string().optional(),
+        imageBase64: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        await db.createArrivageItem({
+        let imageUrl: string | null = null;
+        if (input.imageBase64) {
+          try {
+            const base64Data = input.imageBase64.replace(/^data:image\/\w+;base64,/, "");
+            const buffer = Buffer.from(base64Data, "base64");
+            const ext = input.imageBase64.startsWith("data:image/png") ? "png" : "jpg";
+            const result = await storagePut(`arrivage/img-${Date.now()}.${ext}`, buffer, `image/${ext}`);
+            imageUrl = result.url;
+          } catch (e) { console.error("[Arrivage] Image upload error:", e); }
+        }
+        await createArrivageItem({
           name: input.name,
           description: input.description || null,
-          category: input.category || null,
-          price: input.price,
-          quantity: input.quantity,
-          available: (input.available || 1) as number,
-          imageUrl: null,
-          imageKey: null,
+          priceTnd: input.priceTnd,
+          priceEur: input.priceEur || null,
+          platform: input.platform,
+          available: input.available,
+          productLink: input.productLink || null,
+          imageUrl,
         });
         return { success: true };
       }),
 
-    update: adminProcedure
+    // Admin: update item
+    update: customAdminProcedure
       .input(z.object({
         id: z.number(),
-        name: z.string().optional(),
+        name: z.string().min(1).optional(),
         description: z.string().optional(),
-        category: z.string().optional(),
-        price: z.string().optional(),
-        quantity: z.number().int().optional(),
+        priceTnd: z.number().int().min(1).optional(),
+        priceEur: z.number().int().optional(),
+        platform: z.enum(["shein", "aliexpress", "temu"]).optional(),
         available: z.number().int().optional(),
+        productLink: z.string().optional(),
+        imageBase64: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        const { id, ...updates } = input;
-        const updateData: any = {};
-        if (updates.name) updateData.name = updates.name;
-        if (updates.description) updateData.description = updates.description;
-        if (updates.category) updateData.category = updates.category;
-        if (updates.price) updateData.price = updates.price;
-        if (updates.quantity !== undefined) updateData.quantity = updates.quantity as number;
-        if (updates.available !== undefined) updateData.available = updates.available as number;
-        
-        await db.updateArrivageItem(id, updateData);
+        const { id, imageBase64, ...rest } = input;
+        const updates: any = { ...rest };
+        if (imageBase64) {
+          try {
+            const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+            const buffer = Buffer.from(base64Data, "base64");
+            const ext = imageBase64.startsWith("data:image/png") ? "png" : "jpg";
+            const result = await storagePut(`arrivage/img-${Date.now()}.${ext}`, buffer, `image/${ext}`);
+            updates.imageUrl = result.url;
+          } catch (e) { console.error("[Arrivage] Image upload error:", e); }
+        }
+        await updateArrivageItem(id, updates);
         return { success: true };
       }),
 
-    delete: adminProcedure
+    // Admin: delete item
+    delete: customAdminProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
-        await db.deleteArrivageItem(input.id);
+        await deleteArrivageItem(input.id);
         return { success: true };
       }),
   }),
 
-  // ===== Chat Router =====
-  chat: router({
-    getOrCreateConversation: publicProcedure
-      .input(z.object({ sessionId: z.string() }))
-      .query(async ({ input }) => {
-        return await db.getOrCreateConversation(input.sessionId);
-      }),
-
-    addMessage: publicProcedure
+  // ===== Push Notifications =====
+  push: router({
+    // Subscribe to push notifications
+    subscribe: publicProcedure
       .input(z.object({
-        conversationId: z.number(),
-        role: z.enum(['user', 'assistant']),
-        content: z.string(),
-        imageUrl: z.string().optional(),
+        endpoint: z.string().url(),
+        p256dh: z.string(),
+        auth: z.string(),
+        customerPhone: z.string().optional(),
+        sessionId: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
-        await db.addChatMessage(
-          input.conversationId,
-          input.role,
-          input.content,
-          input.imageUrl || null
-        );
+        await savePushSubscription(input);
         return { success: true };
       }),
 
-    getMessages: publicProcedure
-      .input(z.object({ conversationId: z.number() }))
-      .query(async ({ input }) => {
-        return await db.getConversationMessages(input.conversationId);
-      }),
-
-    listConversations: adminProcedure.query(async () => {
-      return await db.getAllConversations();
+    // Get VAPID public key for frontend
+    getVapidKey: publicProcedure.query(() => {
+      return { publicKey: process.env.VAPID_PUBLIC_KEY ?? process.env.VITE_VAPID_PUBLIC_KEY ?? "" };
     }),
-  }),
-
-  // ===== Settings Router =====
-  settings: router({
-    get: adminProcedure
-      .input(z.object({ key: z.string() }))
-      .query(async ({ input }) => {
-        return await db.getSetting(input.key);
-      }),
-
-    set: adminProcedure
-      .input(z.object({ key: z.string(), value: z.string() }))
-      .mutation(async ({ input }) => {
-        await db.setSetting(input.key, input.value);
-        return { success: true };
-      }),
   }),
 });
 
