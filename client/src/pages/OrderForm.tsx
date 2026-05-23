@@ -3,6 +3,8 @@ import AppLayout from "@/components/AppLayout";
 import { useChatContext } from "@/App";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
+import AuthGateModal from "@/components/AuthGateModal";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { Loader2 } from "lucide-react";
 import {
   ShoppingCart,
@@ -82,6 +84,8 @@ function FieldLabel({ children, required }: { children: React.ReactNode; require
 export default function OrderForm() {
   const [, navigate] = useLocation();
   const { openChat } = useChatContext();
+  const { isAuthenticated } = useAuth();
+  const [showAuthGate, setShowAuthGate] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
@@ -148,6 +152,11 @@ export default function OrderForm() {
     if (!form.customerSurname.trim()) { toast.error("Veuillez entrer votre prénom"); return; }
     if (!form.productLink.trim()) { toast.error("Veuillez entrer le lien du produit"); return; }
     if (!form.customerAddress.trim()) { toast.error("Veuillez entrer votre adresse"); return; }
+    // Show auth gate if not authenticated
+    if (!isAuthenticated) {
+      setShowAuthGate(true);
+      return;
+    }
     createOrder.mutate({
       customerName: `${form.customerSurname} ${form.customerName}`,
       customerPhone: form.customerPhone || undefined,
@@ -489,6 +498,14 @@ export default function OrderForm() {
           </button>
         </div>
       </div>
+
+      {/* Auth Gate Modal — shown when unauthenticated user tries to submit */}
+      <AuthGateModal
+        open={showAuthGate}
+        onClose={() => setShowAuthGate(false)}
+        action="order"
+        returnPath="/order"
+      />
     </AppLayout>
   );
 }

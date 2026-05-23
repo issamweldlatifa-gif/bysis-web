@@ -24,6 +24,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import PushNotificationBanner from "./PushNotificationBanner";
 import CalculatorModal from "./CalculatorModal";
+import AuthGateModal from "./AuthGateModal";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
 
 interface Message {
@@ -189,6 +191,8 @@ export default function FloatingChat({
   const [showPushBanner, setShowPushBanner] = useState(false);
   const [lastOrderPhone] = useState<string | undefined>();
   const [isCalculatorModalOpen, setIsCalculatorModalOpen] = useState(false);
+  const [showAuthGate, setShowAuthGate] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -245,6 +249,13 @@ export default function FloatingChat({
       const text = textOverride ?? input.trim();
       if (!text && !imageBase64 && !pendingFile && !audioBase64) return;
       if (sendMessage.isPending) return;
+      // For order-related messages, require auth
+      const orderKeywords = ["نحب نعدي كومند", "commande", "order"];
+      const isOrderIntent = orderKeywords.some(k => (text || "").toLowerCase().includes(k.toLowerCase()));
+      if (isOrderIntent && !isAuthenticated) {
+        setShowAuthGate(true);
+        return;
+      }
 
       const userMsg: Message = {
         role: "user",
@@ -794,6 +805,14 @@ export default function FloatingChat({
       <CalculatorModal
         isOpen={isCalculatorModalOpen}
         onClose={() => setIsCalculatorModalOpen(false)}
+      />
+
+      {/* Auth Gate Modal — shown when unauthenticated user tries to place an order via chat */}
+      <AuthGateModal
+        open={showAuthGate}
+        onClose={() => setShowAuthGate(false)}
+        action="order"
+        returnPath="/"
       />
     </>
   );
