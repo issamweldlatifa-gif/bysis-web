@@ -53,8 +53,8 @@ export default function Home() {
             <Button size="lg" onClick={() => setLocation('/calculator')}>
               Commencer
             </Button>
-            <Button size="lg" variant="outline">
-              En savoir plus
+            <Button size="lg" variant="outline" onClick={() => setLocation('/chatbot')}>
+              Chat Support
             </Button>
           </div>
         </div>

@@ -8,15 +8,17 @@ import Home from "./pages/Home";
 import Calculator from "./pages/Calculator";
 import OrderTracking from "./pages/OrderTracking";
 import Admin from "./pages/Admin";
+import Chatbot from "./pages/Chatbot";
 
 function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Home} />
-      <Route path={"/calculator"} component={Calculator} />
-      <Route path={"/order-tracking/:trackingCode"} component={OrderTracking} />
-      <Route path={"/order-tracking"} component={OrderTracking} />
-      <Route path={"/admin"} component={Admin} />
+      <Route path={"calculator"} component={Calculator} />
+      <Route path={"order-tracking/:trackingCode"} component={OrderTracking} />
+      <Route path={"order-tracking"} component={OrderTracking} />
+      <Route path={"chatbot"} component={Chatbot} />
+      <Route path={"admin"} component={Admin} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
