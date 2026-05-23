@@ -157,3 +157,12 @@
 - [ ] Add calculation result caching
 - [ ] Build notification preferences management
 - [ ] Deploy to production (click Publish button in UI)
+
+## Admin Dashboard Redesign (ShipMaster)
+- [x] Build AdminLayout with professional sidebar (logo, nav items, user info, logout)
+- [x] Rebuild CRM/Clients page: searchable table + side panel with client profile, order history, ban/suspend buttons
+- [x] Rebuild Tableau de Bord: stats cards (revenue, orders, shipments, pending payment) + charts
+- [x] Rebuild Orders Management: advanced table with inline status update, verification flag, profit fields
+- [x] Add top header bar: search, notifications bell, admin user avatar
+- [x] Light theme matching reference mockup (white/blue/gray palette)
+- [x] Mobile hamburger menu support
