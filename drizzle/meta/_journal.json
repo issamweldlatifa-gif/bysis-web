@@ -1,5 +1,27 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1779567773846,
+      "tag": "0000_elite_doomsday",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1779567865698,
+      "tag": "0001_fast_eternity",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1779568205913,
+      "tag": "0002_eminent_vision",
+      "breakpoints": true
+    }
+  ]
 }
