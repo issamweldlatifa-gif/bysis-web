@@ -1,8 +1,11 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Menu, Settings, LogOut, Package as PackageIcon, User } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useAuth } from "@/_core/hooks/useAuth";
 import {
   ShoppingCart,
   Calculator,
@@ -17,6 +20,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     // Check if already installed (standalone mode)
@@ -112,6 +116,51 @@ export default function Navbar() {
               <DownloadSimple size={14} weight="bold" />
               ثبت التطبيق
             </button>
+          )}
+
+          {/* User Profile Avatar (desktop) */}
+          {isAuthenticated && user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="hidden md:flex items-center gap-2 px-2 py-1 rounded-xl hover:bg-white/10 transition-all duration-200 group">
+                  <Avatar className="h-8 w-8 ring-2 ring-cyan-500/30 group-hover:ring-cyan-500/60 transition-all">
+                    <AvatarImage src={(user as any).avatarUrl || ""} />
+                    <AvatarFallback className="bg-gradient-to-br from-cyan-500 to-blue-600 text-white text-xs font-bold">
+                      {(user.name || "?").charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-sm text-white/80 font-medium max-w-[100px] truncate">{user.name?.split(" ")[0]}</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-gray-900 border-gray-700 text-white">
+                <div className="px-3 py-2">
+                  <p className="text-sm font-semibold truncate">{user.name}</p>
+                  <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                </div>
+                <DropdownMenuSeparator className="bg-gray-700" />
+                <Link href="/orders">
+                  <DropdownMenuItem className="cursor-pointer hover:bg-gray-800 focus:bg-gray-800">
+                    <PackageIcon className="h-4 w-4 mr-2" /> Mes commandes
+                  </DropdownMenuItem>
+                </Link>
+                <Link href="/parametres">
+                  <DropdownMenuItem className="cursor-pointer hover:bg-gray-800 focus:bg-gray-800">
+                    <Settings className="h-4 w-4 mr-2" /> Paramètres
+                  </DropdownMenuItem>
+                </Link>
+                {user.role === "admin" && (
+                  <Link href="/admin/shipmaster">
+                    <DropdownMenuItem className="cursor-pointer hover:bg-gray-800 focus:bg-gray-800 text-pink-400">
+                      <User className="h-4 w-4 mr-2" /> ShipMaster Admin
+                    </DropdownMenuItem>
+                  </Link>
+                )}
+                <DropdownMenuSeparator className="bg-gray-700" />
+                <DropdownMenuItem onClick={() => logout()} className="cursor-pointer text-red-400 hover:bg-gray-800 focus:bg-gray-800">
+                  <LogOut className="h-4 w-4 mr-2" /> Déconnexion
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
           <Link href="/order" className="hidden md:block">

@@ -1,6 +1,14 @@
 import { and, desc, eq, like, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, orders, InsertOrder, Order, chatConversations, chatMessages, ChatConversation, ChatMessage, appSettings, arrivageItems, ArrivageItem, InsertArrivageItem, calculationHistory, CalculationHistory, InsertCalculationHistory } from "../drizzle/schema";
+import {
+  InsertUser, users,
+  orders, InsertOrder, Order,
+  clients, Client, InsertClient,
+  auditLogs, AuditLog, InsertAuditLog,
+  chatConversations, chatMessages, ChatConversation, ChatMessage,
+  appSettings, arrivageItems, ArrivageItem, InsertArrivageItem,
+  calculationHistory, CalculationHistory, InsertCalculationHistory
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -17,26 +25,17 @@ export async function getDb() {
   return _db;
 }
 
+// ===== User Helpers =====
+
 export async function upsertUser(user: InsertUser): Promise<void> {
-  if (!user.openId) {
-    throw new Error("User openId is required for upsert");
-  }
-
+  if (!user.openId) throw new Error("User openId is required for upsert");
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot upsert user: database not available");
-    return;
-  }
-
+  if (!db) { console.warn("[Database] Cannot upsert user: database not available"); return; }
   try {
-    const values: InsertUser = {
-      openId: user.openId,
-    };
+    const values: InsertUser = { openId: user.openId };
     const updateSet: Record<string, unknown> = {};
-
     const textFields = ["name", "email", "loginMethod"] as const;
     type TextField = (typeof textFields)[number];
-
     const assignNullable = (field: TextField) => {
       const value = user[field];
       if (value === undefined) return;
@@ -44,32 +43,13 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values[field] = normalized;
       updateSet[field] = normalized;
     };
-
     textFields.forEach(assignNullable);
-
-    if (user.lastSignedIn !== undefined) {
-      values.lastSignedIn = user.lastSignedIn;
-      updateSet.lastSignedIn = user.lastSignedIn;
-    }
-    if (user.role !== undefined) {
-      values.role = user.role;
-      updateSet.role = user.role;
-    } else if (user.openId === ENV.ownerOpenId) {
-      values.role = 'admin';
-      updateSet.role = 'admin';
-    }
-
-    if (!values.lastSignedIn) {
-      values.lastSignedIn = new Date();
-    }
-
-    if (Object.keys(updateSet).length === 0) {
-      updateSet.lastSignedIn = new Date();
-    }
-
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
-      set: updateSet,
-    });
+    if (user.lastSignedIn !== undefined) { values.lastSignedIn = user.lastSignedIn; updateSet.lastSignedIn = user.lastSignedIn; }
+    if (user.role !== undefined) { values.role = user.role; updateSet.role = user.role; }
+    else if (user.openId === ENV.ownerOpenId) { values.role = 'admin'; updateSet.role = 'admin'; }
+    if (!values.lastSignedIn) values.lastSignedIn = new Date();
+    if (Object.keys(updateSet).length === 0) updateSet.lastSignedIn = new Date();
+    await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updateSet });
   } catch (error) {
     console.error("[Database] Failed to upsert user:", error);
     throw error;
@@ -78,13 +58,8 @@ export async function upsertUser(user: InsertUser): Promise<void> {
 
 export async function getUserByOpenId(openId: string) {
   const db = await getDb();
-  if (!db) {
-    console.warn("[Database] Cannot get user: database not available");
-    return undefined;
-  }
-
+  if (!db) { console.warn("[Database] Cannot get user: database not available"); return undefined; }
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
-
   return result.length > 0 ? result[0] : undefined;
 }
 
@@ -119,10 +94,19 @@ export async function getOrderById(id: number): Promise<Order | undefined> {
   return result[0];
 }
 
-export async function updateOrderStatus(id: number, status: "new" | "processing" | "waiting_payment" | "shipped" | "arrived" | "completed" | "cancelled"): Promise<void> {
+export async function updateOrderStatus(
+  id: number,
+  status: "new" | "processing" | "waiting_payment" | "shipped" | "arrived" | "completed" | "cancelled"
+): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(orders).set({ status }).where(eq(orders.id, id));
+}
+
+export async function updateOrderFull(id: number, updates: Partial<InsertOrder>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(orders).set(updates).where(eq(orders.id, id));
 }
 
 export async function updateOrderNotes(id: number, adminNotes: string): Promise<void> {
@@ -137,10 +121,164 @@ export async function getOrdersByUserId(userId: number): Promise<Order[]> {
   return await db.select().from(orders).where(eq(orders.userId, userId)).orderBy(desc(orders.createdAt));
 }
 
+export async function getOrdersByClientId(clientId: number): Promise<Order[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(orders).where(eq(orders.clientId, clientId)).orderBy(desc(orders.createdAt));
+}
+
 export async function searchOrdersByCustomerName(name: string): Promise<Order[]> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   return await db.select().from(orders).where(like(orders.customerName, `%${name}%`)).orderBy(desc(orders.createdAt));
+}
+
+export async function searchOrdersByPhone(phone: string): Promise<Order[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(orders).where(like(orders.customerPhone, `%${phone}%`)).orderBy(desc(orders.createdAt));
+}
+
+// ===== Analytics Helpers =====
+
+export async function getOrderStats() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const allOrders = await db.select().from(orders).orderBy(desc(orders.createdAt));
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekStart = new Date(todayStart); weekStart.setDate(weekStart.getDate() - 7);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const todayOrders = allOrders.filter(o => new Date(o.createdAt) >= todayStart);
+  const weekOrders = allOrders.filter(o => new Date(o.createdAt) >= weekStart);
+  const monthOrders = allOrders.filter(o => new Date(o.createdAt) >= monthStart);
+
+  const activeStatuses = ["new", "processing", "waiting_payment", "shipped", "arrived"];
+  const activeShipments = allOrders.filter(o => activeStatuses.includes(o.status));
+  const completedOrders = allOrders.filter(o => o.status === "completed");
+
+  const totalRevenue = completedOrders.reduce((sum, o) => sum + (o.profitTnd || 0), 0);
+  const monthRevenue = monthOrders.filter(o => o.status === "completed").reduce((sum, o) => sum + (o.profitTnd || 0), 0);
+
+  // Daily breakdown for last 7 days
+  const dailyStats: { date: string; count: number; revenue: number }[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const day = new Date(todayStart); day.setDate(day.getDate() - i);
+    const nextDay = new Date(day); nextDay.setDate(nextDay.getDate() + 1);
+    const dayOrders = allOrders.filter(o => {
+      const d = new Date(o.createdAt);
+      return d >= day && d < nextDay;
+    });
+    dailyStats.push({
+      date: day.toISOString().split('T')[0],
+      count: dayOrders.length,
+      revenue: dayOrders.filter(o => o.status === "completed").reduce((s, o) => s + (o.profitTnd || 0), 0),
+    });
+  }
+
+  // Status breakdown
+  const statusBreakdown: Record<string, number> = {};
+  for (const o of allOrders) {
+    statusBreakdown[o.status] = (statusBreakdown[o.status] || 0) + 1;
+  }
+
+  return {
+    total: allOrders.length,
+    today: todayOrders.length,
+    thisWeek: weekOrders.length,
+    thisMonth: monthOrders.length,
+    activeShipments: activeShipments.length,
+    completed: completedOrders.length,
+    totalRevenue,
+    monthRevenue,
+    dailyStats,
+    statusBreakdown,
+  };
+}
+
+// ===== CRM / Clients Helpers =====
+
+export async function getAllClients(): Promise<Client[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(clients).orderBy(desc(clients.createdAt));
+}
+
+export async function getClientById(id: number): Promise<Client | undefined> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(clients).where(eq(clients.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getClientByPhone(phone: string): Promise<Client | undefined> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(clients).where(eq(clients.phone, phone)).limit(1);
+  return result[0];
+}
+
+export async function upsertClient(data: InsertClient): Promise<Client> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(clients).values(data).onDuplicateKeyUpdate({
+    set: { name: data.name, email: data.email, address: data.address, gouvernorat: data.gouvernorat }
+  });
+  const result = await db.select().from(clients).where(eq(clients.phone, data.phone)).limit(1);
+  return result[0];
+}
+
+export async function updateClientStatus(id: number, accountStatus: "active" | "banned" | "suspended"): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(clients).set({ accountStatus }).where(eq(clients.id, id));
+}
+
+export async function updateClientNotes(id: number, notes: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(clients).set({ notes }).where(eq(clients.id, id));
+}
+
+export async function incrementClientOrders(clientId: number, amount: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(clients).set({
+    totalOrders: sql`${clients.totalOrders} + 1`,
+    totalSpent: sql`${clients.totalSpent} + ${amount}`,
+  }).where(eq(clients.id, clientId));
+}
+
+export async function searchClients(query: string): Promise<Client[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(clients).where(
+    like(clients.name, `%${query}%`)
+  ).orderBy(desc(clients.createdAt)).limit(50);
+}
+
+// ===== Audit Log Helpers =====
+
+export async function createAuditLog(log: InsertAuditLog): Promise<void> {
+  const db = await getDb();
+  if (!db) { console.warn("[Audit] DB not available, skipping log"); return; }
+  await db.insert(auditLogs).values(log);
+}
+
+export async function getAuditLogs(limit: number = 100): Promise<AuditLog[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt)).limit(limit);
+}
+
+export async function getAuditLogsByEntity(entityType: string, entityId: number): Promise<AuditLog[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(auditLogs)
+    .where(and(eq(auditLogs.entityType, entityType), eq(auditLogs.entityId, entityId)))
+    .orderBy(desc(auditLogs.createdAt));
 }
 
 // ===== Chat Helpers =====
@@ -166,18 +304,8 @@ export async function addChatMessage(
 ): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.insert(chatMessages).values({
-    conversationId,
-    role,
-    content,
-    imageUrl: imageUrl || null,
-    audioUrl: audioUrl || null,
-    fileUrl: fileUrl || null,
-    orderId: orderId || null,
-  });
-  await db.update(chatConversations)
-    .set({ messageCount: sql`${chatConversations.messageCount} + 1` })
-    .where(eq(chatConversations.id, conversationId));
+  await db.insert(chatMessages).values({ conversationId, role, content, imageUrl: imageUrl || null, audioUrl: audioUrl || null, fileUrl: fileUrl || null, orderId: orderId || null });
+  await db.update(chatConversations).set({ messageCount: sql`${chatConversations.messageCount} + 1` }).where(eq(chatConversations.id, conversationId));
 }
 
 export async function updateConversationCustomer(conversationId: number, name?: string, phone?: string): Promise<void> {
@@ -186,9 +314,7 @@ export async function updateConversationCustomer(conversationId: number, name?: 
   const updates: any = {};
   if (name) updates.customerName = name;
   if (phone) updates.customerPhone = phone;
-  if (Object.keys(updates).length > 0) {
-    await db.update(chatConversations).set(updates).where(eq(chatConversations.id, conversationId));
-  }
+  if (Object.keys(updates).length > 0) await db.update(chatConversations).set(updates).where(eq(chatConversations.id, conversationId));
 }
 
 export async function markConversationHasOrder(conversationId: number): Promise<void> {
@@ -221,14 +347,7 @@ export async function getSetting(key: string): Promise<string | null> {
 export async function setSetting(key: string, value: string): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.insert(appSettings).values({ key, value })
-    .onDuplicateKeyUpdate({ set: { value } });
-}
-
-export async function searchOrdersByPhone(phone: string): Promise<Order[]> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  return await db.select().from(orders).where(like(orders.customerPhone, `%${phone}%`)).orderBy(desc(orders.createdAt));
+  await db.insert(appSettings).values({ key, value }).onDuplicateKeyUpdate({ set: { value } });
 }
 
 // ===== Arrivage Helpers =====
@@ -267,7 +386,6 @@ export async function getArrivageItems(): Promise<ArrivageItem[]> {
   return getAvailableArrivageItems();
 }
 
-
 // ===== Calculation History Helpers =====
 
 export async function saveCalculation(calc: InsertCalculationHistory): Promise<CalculationHistory> {
@@ -299,16 +417,11 @@ export async function getCalculationHistoryByUser(userId: number): Promise<Calcu
 export async function deleteCalculationById(id: number, deviceId: string): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  await db.delete(calculationHistory).where(
-    and(eq(calculationHistory.id, id), eq(calculationHistory.deviceId, deviceId))
-  );
+  await db.delete(calculationHistory).where(and(eq(calculationHistory.id, id), eq(calculationHistory.deviceId, deviceId)));
 }
 
 export async function getCalculationHistoryByDevice(deviceId: string, limit: number = 50): Promise<CalculationHistory[]> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  return await db.select().from(calculationHistory)
-    .where(eq(calculationHistory.deviceId, deviceId))
-    .orderBy(desc(calculationHistory.createdAt))
-    .limit(limit);
+  return await db.select().from(calculationHistory).where(eq(calculationHistory.deviceId, deviceId)).orderBy(desc(calculationHistory.createdAt)).limit(limit);
 }

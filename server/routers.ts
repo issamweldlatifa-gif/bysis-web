@@ -4,8 +4,8 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import {
-  createOrder, getAllOrders, getOrderById, updateOrderStatus, updateOrderNotes,
-  getOrderByTrackingCode,
+  createOrder, getAllOrders, getOrderById, updateOrderStatus, updateOrderNotes, updateOrderFull,
+  getOrderByTrackingCode, getOrdersByClientId, getOrdersByUserId,
   searchOrdersByCustomerName, searchOrdersByPhone,
   getOrCreateConversation, addChatMessage, updateConversationCustomer,
   markConversationHasOrder, getAllConversations, getConversationMessages,
@@ -13,6 +13,11 @@ import {
   getAllArrivageItems, getAvailableArrivageItems, createArrivageItem, updateArrivageItem, deleteArrivageItem,
   saveCalculation, getCalculationHistory, getCalculationHistoryBySession,
   getCalculationHistoryByDevice, deleteCalculationById,
+  getAllClients, getClientById, getClientByPhone, upsertClient, updateClientStatus, updateClientNotes, searchClients, incrementClientOrders,
+  getAuditLogs, getAuditLogsByEntity, createAuditLog,
+  getOrderStats,
+  getUserByOpenId,
+  getDb,
 } from "./db";
 import { invokeLLM } from "./_core/llm";
 import { notifyOwner } from "./_core/notification";
@@ -809,6 +814,193 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         await deleteArrivageItem(input.id);
         return { success: true };
       }),
+  }),
+
+  // ===== Analytics =====
+  analytics: router({
+    getStats: customAdminProcedure.query(async () => {
+      return await getOrderStats();
+    }),
+  }),
+
+  // ===== CRM - Clients =====
+  crm: router({
+    list: customAdminProcedure
+      .input(z.object({ search: z.string().optional() }).optional())
+      .query(async ({ input }) => {
+        if (input?.search) return await searchClients(input.search);
+        return await getAllClients();
+      }),
+    getById: customAdminProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const client = await getClientById(input.id);
+        if (!client) throw new TRPCError({ code: "NOT_FOUND" });
+        const orders = await getOrdersByClientId(input.id);
+        return { client, orders };
+      }),
+    updateStatus: customAdminProcedure
+      .input(z.object({ id: z.number(), status: z.enum(["active", "banned", "suspended"]), reason: z.string().optional() }))
+      .mutation(async ({ input }) => {
+        const client = await getClientById(input.id);
+        if (!client) throw new TRPCError({ code: "NOT_FOUND" });
+        await updateClientStatus(input.id, input.status);
+        await createAuditLog({
+          adminName: "Admin",
+          action: `client_${input.status}`,
+          entityType: "client",
+          entityId: input.id,
+          oldValue: client.accountStatus,
+          newValue: input.status,
+          description: input.reason || `Statut changé en ${input.status}`,
+        });
+        return { success: true };
+      }),
+    updateNotes: customAdminProcedure
+      .input(z.object({ id: z.number(), notes: z.string() }))
+      .mutation(async ({ input }) => {
+        await updateClientNotes(input.id, input.notes);
+        return { success: true };
+      }),
+    requestVerification: customAdminProcedure
+      .input(z.object({ clientId: z.number(), reason: z.string() }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+        const { clients } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        await db.update(clients).set({ requiresVerification: 1, verificationReason: input.reason }).where(eq(clients.id, input.clientId));
+        await createAuditLog({
+          adminName: "Admin",
+          action: "request_verification",
+          entityType: "client",
+          entityId: input.clientId,
+          newValue: input.reason,
+          description: `Vérification demandée: ${input.reason}`,
+        });
+        return { success: true };
+      }),
+  }),
+
+  // ===== Audit Logs =====
+  auditLog: router({
+    list: customAdminProcedure
+      .input(z.object({ limit: z.number().int().max(200).default(100) }).optional())
+      .query(async ({ input }) => await getAuditLogs(input?.limit ?? 100)),
+    getByEntity: customAdminProcedure
+      .input(z.object({ entityType: z.string(), entityId: z.number() }))
+      .query(async ({ input }) => await getAuditLogsByEntity(input.entityType, input.entityId)),
+  }),
+
+  // ===== User Profile (for logged-in clients) =====
+  userProfile: router({
+    get: protectedProcedure.query(async ({ ctx }) => {
+      const user = await getUserByOpenId(ctx.user.openId);
+      return user || null;
+    }),
+    update: protectedProcedure
+      .input(z.object({
+        name: z.string().optional(),
+        phone: z.string().optional(),
+        address: z.string().optional(),
+        gouvernorat: z.string().optional(),
+        avatarUrl: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const db = await (await import("./db")).getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+        const { users } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        const updates: Record<string, unknown> = {};
+        if (input.name !== undefined) updates.name = input.name;
+        if (input.phone !== undefined) updates.phone = input.phone;
+        if (input.address !== undefined) updates.address = input.address;
+        if (input.gouvernorat !== undefined) updates.gouvernorat = input.gouvernorat;
+        if (input.avatarUrl !== undefined) updates.avatarUrl = input.avatarUrl;
+        if (Object.keys(updates).length > 0) {
+          await db.update(users).set(updates).where(eq(users.openId, ctx.user.openId));
+        }
+        // Also upsert client record if phone provided
+        if (input.phone) {
+          await upsertClient({
+            name: input.name || ctx.user.name || "Client",
+            phone: input.phone,
+            email: ctx.user.email || undefined,
+            address: input.address || undefined,
+            gouvernorat: input.gouvernorat || undefined,
+            userId: ctx.user.id,
+          });
+        }
+        return { success: true };
+      }),
+    myOrders: protectedProcedure.query(async ({ ctx }) => {
+      const orders = await getOrdersByUserId(ctx.user.id);
+      return orders;
+    }),
+  }),
+
+  // ===== Orders - Extended admin actions =====
+  ordersAdmin: router({
+    updateFull: customAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["new", "processing", "waiting_payment", "shipped", "arrived", "completed", "cancelled"]).optional(),
+        adminNotes: z.string().optional(),
+        rejectionReason: z.string().optional(),
+        requiresVerification: z.number().int().optional(),
+        verificationReason: z.string().optional(),
+        costTnd: z.number().int().optional(),
+        profitTnd: z.number().int().optional(),
+        platform: z.enum(["shein", "aliexpress", "temu"]).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...updates } = input;
+        const order = await getOrderById(id);
+        if (!order) throw new TRPCError({ code: "NOT_FOUND" });
+        await updateOrderFull(id, updates as any);
+        // Log the action
+        if (updates.status && updates.status !== order.status) {
+          await createAuditLog({
+            adminName: "Admin",
+            action: "order_status_change",
+            entityType: "order",
+            entityId: id,
+            oldValue: order.status,
+            newValue: updates.status,
+            description: updates.rejectionReason ? `Raison: ${updates.rejectionReason}` : undefined,
+          });
+          // Send push notification
+          if (order.customerPhone) {
+            const statusLabels: Record<string, string> = {
+              new: "📥 كومندتك وصلتنا!", processing: "⚙️ كومندتك قيد المعالجة",
+              waiting_payment: "💳 كومندتك تنتظر الدفع", shipped: "🚚 كومندتك في الطريق!",
+              arrived: "📦 كومندتك وصلت!", completed: "✅ كومندتك اكتملت!",
+              cancelled: "❌ كومندتك تم إلغاؤها",
+            };
+            const { sendPushToPhone } = await import("./pushNotifications");
+            sendPushToPhone(order.customerPhone, {
+              title: statusLabels[updates.status] ?? "تحديث كومندتك",
+              body: updates.rejectionReason || "تم تحديث حالة طلبك.",
+              url: "/track",
+              tag: `order-${id}`,
+            }).catch(() => {});
+          }
+        }
+        if (updates.requiresVerification === 1) {
+          await createAuditLog({
+            adminName: "Admin",
+            action: "request_verification",
+            entityType: "order",
+            entityId: id,
+            newValue: updates.verificationReason || "Vérification requise",
+          });
+        }
+        return { success: true };
+      }),
+    newOrdersCount: customAdminProcedure.query(async () => {
+      const all = await getAllOrders();
+      return { count: all.filter(o => o.status === "new").length };
+    }),
   }),
 
   // ===== Push Notifications =====

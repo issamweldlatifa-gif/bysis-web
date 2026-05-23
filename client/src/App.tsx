@@ -29,6 +29,8 @@ const Orders = lazy(() => import("./pages/Orders"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Chat = lazy(() => import("./pages/Chat"));
 const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
+const ShipMasterDashboard = lazy(() => import("./pages/ShipMasterDashboard"));
+const Parametres = lazy(() => import("./pages/Parametres"));
 
 // Loading fallback — minimal spinner matching dark theme
 function PageLoader() {
@@ -65,6 +67,8 @@ function Router() {
           <Route path={"/confirmation"} component={OrderConfirmation} />
           <Route path={"/arrivage"} component={Arrivage} />
           <Route path={"/admin/arrivage"} component={AdminArrivage} />
+          <Route path={"/admin/shipmaster"} component={ShipMasterDashboard} />
+          <Route path={"/parametres"} component={Parametres} />
           <Route path={"/404"} component={NotFound} />
           <Route component={NotFound} />
         </Switch>
