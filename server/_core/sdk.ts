@@ -279,7 +279,13 @@ class SDKServer {
     const signedInAt = new Date();
     let user = await db.getUserByOpenId(sessionUserId);
 
-    // If user not in DB, sync from OAuth server automatically
+    // Google users are managed by googleAuth.ts - skip Manus OAuth sync
+    // If a Google user's session exists but they're not in DB, the session is stale
+    if (!user && sessionUserId.startsWith(GOOGLE_OPEN_ID_PREFIX)) {
+      throw ForbiddenError("Google user not found in database");
+    }
+
+    // If user not in DB, sync from OAuth server automatically (Manus OAuth users only)
     if (!user) {
       try {
         const userInfo = await this.getUserInfoWithJwt(sessionCookie ?? "");
@@ -311,6 +317,7 @@ class SDKServer {
 }
 
 const CRON_OPEN_ID_PREFIX = "cron_";
+const GOOGLE_OPEN_ID_PREFIX = "google_";
 
 /** Result of `sdk.authenticateRequest`. Cron callbacks set `isCron=true` and `taskUid`; see `references/periodic-updates.md`. */
 export type AuthenticatedUser = User & {

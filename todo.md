@@ -143,3 +143,13 @@
 - [ ] Orders Management: table with inline status dropdown, requiresVerification toggle, profit/cost fields, admin notes
 - [ ] Audit Log page: timeline of all admin actions with entity links and filters
 - [ ] Real-time polling in admin (every 15s) for new orders badge in sidebar
+
+## Google OAuth Integration
+- [x] Create server/googleAuth.ts with /api/auth/google and /api/auth/google/callback routes
+- [x] Add googleClientId and googleClientSecret to server/_core/env.ts
+- [x] Register Google auth routes in server/_core/index.ts
+- [x] Fix sdk.ts authenticateRequest to handle google_ prefix users (skip Manus OAuth sync)
+- [x] Update AuthGateModal.tsx to show Google Login button
+- [x] Add Google Login button to mobile menu in Navbar.tsx
+- [x] Write Vitest tests for Google OAuth routes (4 tests passing)
+- [x] All 22 tests passing (18 existing + 4 new Google OAuth tests)
