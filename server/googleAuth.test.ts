@@ -8,6 +8,7 @@ vi.mock("./_core/env", () => ({
     appId: "test-app-id",
     isProduction: false,
     cookieSecret: "test-secret-at-least-32-chars-long!!",
+    googleRedirectUri: "https://bysisecom-qchtqpc8.manus.space/api/auth/google/callback",
   },
 }));
 
@@ -61,6 +62,8 @@ describe("Google OAuth Routes", () => {
     expect(res.headers.location).toContain("accounts.google.com/o/oauth2/v2/auth");
     expect(res.headers.location).toContain("client_id=test-client-id");
     expect(res.headers.location).toContain("scope=openid+email+profile");
+    // Verify redirect_uri uses the env var (not dynamic host)
+    expect(res.headers.location).toContain(encodeURIComponent("https://bysisecom-qchtqpc8.manus.space/api/auth/google/callback"));
   });
 
   it("GET /api/auth/google includes returnTo in state", async () => {

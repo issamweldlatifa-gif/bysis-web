@@ -12,7 +12,10 @@ const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
 
 function getRedirectUri(req: Request): string {
-  const proto = ENV.isProduction ? "https" : req.protocol;
+  // Use explicit env var if set (required for production to avoid redirect_uri_mismatch)
+  if (ENV.googleRedirectUri) return ENV.googleRedirectUri;
+  // Fallback: build from request (dev only)
+  const proto = req.protocol;
   const host = req.get("host") || "localhost:3000";
   return `${proto}://${host}/api/auth/google/callback`;
 }
