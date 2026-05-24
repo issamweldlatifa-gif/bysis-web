@@ -89,7 +89,13 @@ function StatusBadge({ status, config }: { status: string; config: Record<string
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function ShipMasterDashboard() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user } = useAuth();
+  const { data: adminCheck, isLoading: adminLoading } = trpc.adminAuth.check.useQuery();
+  const adminLogout = trpc.adminAuth.logout.useMutation({
+    onSuccess: () => { navigate("/admin/login"); },
+  });
+  const isAuthenticated = adminCheck?.isAdmin || (user?.role === "admin");
+  const logout = () => adminLogout.mutate();
   const [, navigate] = useLocation();
   const [tab, setTab] = useState<AdminTab>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -151,7 +157,7 @@ export default function ShipMasterDashboard() {
   const newOrdersCount = (orders || []).filter((o: any) => o.status === "new").length;
 
   // ── Auth guard ──
-  if (!isAuthenticated || user?.role !== "admin") {
+  if (!adminLoading && !isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: "#F4F6F9" }}>
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm w-full mx-4 text-center">

@@ -26,7 +26,7 @@ export default function AdminLogin() {
   const loginMutation = trpc.adminAuth.login.useMutation({
     onSuccess: () => {
       toast.success("Connexion réussie");
-      navigate("/admin");
+      navigate("/admin/shipmaster");
     },
     onError: (error) => {
       toast.error(error.message || "Identifiants incorrects");
