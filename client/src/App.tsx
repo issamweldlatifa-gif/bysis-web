@@ -1,6 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Suspense, lazy, useState, createContext, useContext } from "react";
+import { CartProvider } from "./contexts/CartContext";
+import { I18nProvider } from "./contexts/I18nContext";
 import { Route, Switch, useLocation } from "wouter";
 import { AnimatePresence } from "framer-motion";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -31,6 +33,7 @@ const Chat = lazy(() => import("./pages/Chat"));
 const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
 const ShipMasterDashboard = lazy(() => import("./pages/ShipMasterDashboard"));
 const Parametres = lazy(() => import("./pages/Parametres"));
+const Panier = lazy(() => import("./pages/Panier"));
 
 // Loading fallback — minimal spinner matching dark theme
 function PageLoader() {
@@ -69,6 +72,7 @@ function Router() {
           <Route path={"/admin/arrivage"} component={AdminArrivage} />
           <Route path={"/admin/shipmaster"} component={ShipMasterDashboard} />
           <Route path={"/parametres"} component={Parametres} />
+          <Route path={"/panier"} component={Panier} />
           <Route path={"/404"} component={NotFound} />
           <Route component={NotFound} />
         </Switch>
@@ -90,7 +94,9 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider defaultTheme="light" switchable={true}>
+        <I18nProvider>
+        <CartProvider>
         <TooltipProvider>
           <ChatContext.Provider value={{ openChat: () => setChatOpen(true) }}>
             <Toaster />
@@ -98,6 +104,8 @@ function App() {
             <FloatingChatWrapper chatOpen={chatOpen} setChatOpen={setChatOpen} />
           </ChatContext.Provider>
         </TooltipProvider>
+        </CartProvider>
+        </I18nProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

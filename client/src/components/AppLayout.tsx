@@ -1,238 +1,202 @@
-'use client';
-
 import { useState, ReactNode } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  List, X,
-  Scan, ClockCounterClockwise, ShoppingCart, ChatCircleText,
-  House, Calculator, Storefront, MagnifyingGlass, SignIn, SignOut, UserCircle,
-} from '@phosphor-icons/react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/_core/hooks/useAuth';
 import AuthGateModal from '@/components/AuthGateModal';
+import ProfileSheet from '@/components/ProfileSheet';
+import { useCart } from '@/contexts/CartContext';
+import { useI18n } from '@/contexts/I18nContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface AppLayoutProps {
   children: ReactNode;
   showNav?: boolean;
-  onAboutClick?: () => void;
   onChatOpen?: () => void;
 }
 
-interface NavItem {
-  id: string;
-  label: string;
-  icon: React.ComponentType<any>;
-  href: string;
-  isChat?: boolean;
-}
+/* ── Design tokens ─────────────────────────────────────────────────────── */
+const BLUE      = '#0070BA';
+const NAVY      = '#003087';
 
-const navItems: NavItem[] = [
-  { id: 'scan',     label: 'Scan',       icon: Scan,                   href: '/calculator' },
-  { id: 'history',  label: 'Historique', icon: ClockCounterClockwise,  href: '/history' },
-  { id: 'orders',   label: 'Commandes',  icon: ShoppingCart,           href: '/orders' },
-  { id: 'boutique', label: 'Boutique',   icon: Storefront,             href: '/arrivage' },
-  { id: 'chat',     label: 'Chat',       icon: ChatCircleText,         href: '/chat', isChat: true },
-];
+/* ── Icons ─────────────────────────────────────────────────────────────── */
+const IconHome = ({ fill }: { fill?: boolean }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill={fill ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={fill ? 0 : 2} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+    <polyline points="9 22 9 12 15 12 15 22"/>
+  </svg>
+);
+const IconShop = ({ fill }: { fill?: boolean }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill={fill ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={fill ? 0 : 2} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <path d="M16 10a4 4 0 01-8 0"/>
+  </svg>
+);
+const IconScan = () => (
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2"/>
+    <rect x="7" y="7" width="10" height="10" rx="1"/>
+  </svg>
+);
+const IconCart = ({ fill }: { fill?: boolean }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill={fill ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={fill ? 0 : 2} strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+    <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
+  </svg>
+);
+const IconUser = ({ fill }: { fill?: boolean }) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill={fill ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth={fill ? 0 : 2} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </svg>
+);
+const IconBysis = () => (
+  <div
+    className="w-8 h-8 rounded-xl flex items-center justify-center text-white font-black text-base flex-shrink-0"
+    style={{ background: `linear-gradient(135deg, ${BLUE}, ${NAVY})` }}
+  >
+    B
+  </div>
+);
 
-const menuItems = [
-  { label: 'Accueil',            href: '/',           icon: House },
-  { label: 'Calculer le prix',   href: '/calculator', icon: Calculator },
-  { label: 'Mes commandes',      href: '/orders',     icon: ShoppingCart },
-  { label: 'Boutique',           href: '/arrivage',   icon: Storefront },
-  { label: 'Suivre ma commande', href: '/track',      icon: MagnifyingGlass },
-];
+/* ── Header ─────────────────────────────────────────────────────────────── */
+function AppHeader({ onProfileClick }: { onProfileClick: () => void }) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const bg = isDark ? '#1C1C1E' : '#FFFFFF';
+  const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+  const text = isDark ? '#FFFFFF' : '#1C1C1E';
 
-/* ── PayPal Design System ─────────────────────────────────────────────── */
-const PP_BG        = '#EEF2F7';   // PayPal page background
-const PP_WHITE     = '#FFFFFF';   // PayPal card white
-const PP_BLUE      = '#0070BA';   // PayPal Blue
-const PP_NAVY      = '#003087';   // PayPal Navy
-const PP_TEXT      = '#2C2E2F';   // PayPal Near-Black
-const PP_MUTED     = '#6C7378';   // PayPal Gray
-const PP_BORDER    = '#CBD2D9';   // PayPal Border
-const PP_ACTIVE_BG = '#EBF4FB';   // PayPal Blue tint
-
-function AppHeader({ menuOpen, onMenuToggle, onLoginClick }: { menuOpen: boolean; onMenuToggle: () => void; onLoginClick: () => void }) {
-  const [, navigate] = useLocation();
-  const { user, isAuthenticated, logout } = useAuth();
   return (
-    <motion.header
-      initial={{ opacity: 0, y: -16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
-      className="sticky top-0 z-40 safe-area-left safe-area-right"
+    <header
+      className="sticky top-0 z-40 flex items-center justify-between px-4 h-14"
       style={{
-        background: PP_WHITE,
-        borderBottom: `1px solid ${PP_BORDER}`,
-        boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
+        background: bg,
+        borderBottom: `1px solid ${border}`,
+        paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
-      <div className="flex items-center justify-between h-14 px-4 safe-area-top">
-        {/* Hamburger */}
-        <button
-          onClick={onMenuToggle}
-          className="w-9 h-9 flex items-center justify-center rounded-full transition-colors duration-150 hover:bg-[#EEF2F7]"
-          style={{ color: PP_TEXT }}
-        >
-          {menuOpen
-            ? <X size={20} weight="bold" />
-            : <List size={20} weight="bold" />}
-        </button>
-
-        {/* Logo — PayPal-style wordmark */}
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center gap-1.5"
-        >
-          {/* B icon — PayPal-style blue rounded square */}
-          <span
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-sm font-black"
-            style={{ background: `linear-gradient(145deg, ${PP_BLUE}, ${PP_NAVY})` }}
-          >
-            B
-          </span>
-          <span
-            className="text-[19px] font-extrabold tracking-tight"
-            style={{ color: PP_NAVY, letterSpacing: '-0.03em' }}
-          >
-            bysis
-          </span>
-        </button>
-
-        {/* Auth button — right side */}
-        {isAuthenticated ? (
-          <button
-            onClick={() => logout()}
-            className="w-9 h-9 flex items-center justify-center rounded-full transition-colors duration-150 hover:bg-[#EEF2F7] overflow-hidden"
-            title={user?.name || 'Mon compte'}
-          >
-            {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt="avatar" className="w-9 h-9 rounded-full object-cover" />
-            ) : (
-              <UserCircle size={22} weight="duotone" style={{ color: PP_BLUE }} />
-            )}
-          </button>
-        ) : (
-          <button
-            onClick={onLoginClick}
-            className="w-9 h-9 flex items-center justify-center rounded-full transition-colors duration-150 hover:bg-[#EEF2F7]"
-            style={{ color: PP_BLUE }}
-            title="Se connecter"
-          >
-            <SignIn size={20} weight="bold" />
-          </button>
-        )}
+      <div className="flex items-center gap-2.5">
+        <IconBysis />
+        <span className="text-lg font-black tracking-tight" style={{ color: BLUE }}>bysis</span>
       </div>
-
-      {/* Dropdown menu */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.nav
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
-            style={{
-              borderTop: `1px solid ${PP_BORDER}`,
-              background: PP_WHITE,
-              boxShadow: '0 8px 24px rgba(0,0,0,0.09)',
-            }}
-          >
-            <div className="flex flex-col py-2">
-              {menuItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    onClick={onMenuToggle}
-                    className="flex items-center gap-3 px-5 py-3.5 text-sm font-semibold transition-all duration-150 hover:bg-[#EBF4FB] border-l-[3px] border-transparent hover:border-[#0070BA]"
-                    style={{ color: PP_TEXT, fontFamily: 'Inter, sans-serif' }}
-                  >
-                    <span
-                      className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ background: PP_ACTIVE_BG }}
-                    >
-                      <Icon size={16} weight="duotone" style={{ color: PP_BLUE }} />
-                    </span>
-                    {item.label}
-                  </a>
-                );
-              })}
-              {/* Auth row in menu */}
-              <AuthMenuRow onMenuToggle={onMenuToggle} onLoginClick={onLoginClick} />
-            </div>
-          </motion.nav>
-        )}
-      </AnimatePresence>
-    </motion.header>
+      <button
+        onClick={onProfileClick}
+        className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90"
+        style={{ background: isDark ? 'rgba(255,255,255,0.1)' : '#EBF4FB', color: BLUE }}
+      >
+        <IconUser />
+      </button>
+    </header>
   );
 }
 
-function BottomNav({ onChatOpen }: { onChatOpen?: () => void }) {
-  const [location] = useLocation();
+/* ── Bottom Nav ─────────────────────────────────────────────────────────── */
+function BottomNav({ onProfileClick, onScanClick }: { onProfileClick: () => void; onScanClick: () => void }) {
+  const [location, navigate] = useLocation();
+  const { totalItems } = useCart();
+  const { t } = useI18n();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
+  const bg = isDark ? '#1C1C1E' : '#FFFFFF';
+  const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+  const active = BLUE;
+  const inactive = isDark ? 'rgba(255,255,255,0.4)' : '#9CA3AF';
+
+  const tabs = [
+    { id: 'home',      label: t('nav_home'),      icon: IconHome,  href: '/' },
+    { id: 'boutiques', label: t('nav_boutiques'),  icon: IconShop,  href: '/arrivage' },
+    { id: 'scan',      label: t('nav_scan'),       icon: null,      href: null },
+    { id: 'panier',    label: t('nav_panier'),     icon: IconCart,  href: '/panier' },
+    { id: 'moi',       label: t('nav_moi'),        icon: IconUser,  href: null },
+  ];
 
   return (
     <motion.nav
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
-      className="fixed bottom-0 left-0 right-0 z-40 safe-area-left safe-area-right"
+      className="fixed bottom-0 left-0 right-0 z-40"
       style={{
-        background: PP_WHITE,
-        borderTop: `1px solid ${PP_BORDER}`,
-        boxShadow: '0 -2px 8px rgba(0,0,0,0.06)',
+        background: bg,
+        borderTop: `1px solid ${border}`,
+        boxShadow: '0 -4px 20px rgba(0,0,0,0.08)',
+        paddingBottom: 'env(safe-area-inset-bottom, 8px)',
       }}
     >
-      <div className="flex items-center justify-around h-[62px] px-1 safe-area-bottom">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location === item.href || (location === '/chat' && item.isChat);
+      <div className="flex items-end justify-around h-[62px] px-2">
+        {tabs.map((tab) => {
+          // Scan button — center FAB
+          if (tab.id === 'scan') {
+            return (
+              <div key="scan" className="flex flex-col items-center justify-end pb-1" style={{ marginTop: '-18px' }}>
+                <motion.button
+                  onClick={onScanClick}
+                  whileTap={{ scale: 0.88 }}
+                  className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg"
+                  style={{
+                    background: `linear-gradient(135deg, ${BLUE}, ${NAVY})`,
+                    boxShadow: `0 4px 16px rgba(0,112,186,0.45)`,
+                  }}
+                >
+                  <IconScan />
+                </motion.button>
+                <span className="text-[10px] font-semibold mt-1" style={{ color: inactive }}>{tab.label}</span>
+              </div>
+            );
+          }
 
-          if (item.isChat) {
+          // Moi button
+          if (tab.id === 'moi') {
+            const isActive = false;
             return (
               <motion.button
-                key={item.id}
-                onClick={onChatOpen}
+                key="moi"
+                onClick={onProfileClick}
                 whileTap={{ scale: 0.88 }}
-                className="flex flex-col items-center justify-center gap-0.5 py-1.5 px-3 rounded-xl transition-all duration-150"
-                style={{ color: PP_MUTED }}
+                className="flex flex-col items-center justify-center gap-0.5 py-1.5 px-3 rounded-xl relative"
+                style={{ color: isActive ? active : inactive }}
               >
-                <Icon size={22} weight="regular" />
-                <span className="text-[10px] font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>{item.label}</span>
+                <IconUser fill={isActive} />
+                <span className="text-[10px] font-semibold">{tab.label}</span>
               </motion.button>
             );
           }
 
+          // Regular tab
+          const Icon = tab.icon!;
+          const isActive = location === tab.href || (tab.href === '/arrivage' && location === '/arrivage');
+          const isPanier = tab.id === 'panier';
+
           return (
-            <motion.a
-              key={item.id}
-              href={item.href}
+            <motion.button
+              key={tab.id}
+              onClick={() => tab.href && navigate(tab.href)}
               whileTap={{ scale: 0.88 }}
-              className="flex flex-col items-center justify-center gap-0.5 py-1.5 px-3 rounded-xl transition-all duration-150 relative"
-              style={{ color: isActive ? PP_BLUE : PP_MUTED }}
+              className="flex flex-col items-center justify-center gap-0.5 py-1.5 px-3 rounded-xl relative"
+              style={{ color: isActive ? active : inactive }}
             >
               {isActive && (
                 <motion.span
                   layoutId="navActivePill"
                   className="absolute inset-0 rounded-xl"
-                  style={{ background: PP_ACTIVE_BG }}
+                  style={{ background: isDark ? 'rgba(0,112,186,0.15)' : '#EBF4FB' }}
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
-              <Icon
-                size={22}
-                weight={isActive ? 'fill' : 'regular'}
-                style={{ position: 'relative', zIndex: 1 }}
-              />
-              <span
-                className="text-[10px] font-semibold"
-                style={{ position: 'relative', zIndex: 1, fontFamily: 'Inter, sans-serif' }}
-              >
-                {item.label}
+              <span className="relative">
+                <Icon fill={isActive} />
+                {isPanier && totalItems > 0 && (
+                  <span
+                    className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full text-[9px] font-bold text-white flex items-center justify-center"
+                    style={{ background: '#EF4444' }}
+                  >
+                    {totalItems > 9 ? '9+' : totalItems}
+                  </span>
+                )}
               </span>
-            </motion.a>
+              <span className="text-[10px] font-semibold relative z-10">{tab.label}</span>
+            </motion.button>
           );
         })}
       </div>
@@ -240,66 +204,39 @@ function BottomNav({ onChatOpen }: { onChatOpen?: () => void }) {
   );
 }
 
-function AuthMenuRow({ onMenuToggle, onLoginClick }: { onMenuToggle: () => void; onLoginClick: () => void }) {
-  const { user, isAuthenticated, logout } = useAuth();
-  if (isAuthenticated) {
-    return (
-      <button
-        onClick={() => { logout(); onMenuToggle(); }}
-        className="flex items-center gap-3 px-5 py-3.5 text-sm font-semibold transition-all duration-150 hover:bg-red-50 border-l-[3px] border-transparent hover:border-red-400 w-full text-left"
-        style={{ color: '#D32F2F', fontFamily: 'Inter, sans-serif' }}
-      >
-        <span className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#FEE2E2' }}>
-          <SignOut size={16} weight="duotone" style={{ color: '#D32F2F' }} />
-        </span>
-        {user?.name ? `Déconnexion (${user.name.split(' ')[0]})` : 'Se déconnecter'}
-      </button>
-    );
-  }
-  return (
-    <button
-      onClick={() => { onMenuToggle(); onLoginClick(); }}
-      className="flex items-center gap-3 px-5 py-3.5 text-sm font-semibold transition-all duration-150 hover:bg-[#EBF4FB] border-l-[3px] border-transparent hover:border-[#0070BA] w-full text-left"
-      style={{ color: PP_BLUE, fontFamily: 'Inter, sans-serif' }}
-    >
-      <span className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: PP_ACTIVE_BG }}>
-        <SignIn size={16} weight="duotone" style={{ color: PP_BLUE }} />
-      </span>
-      Se connecter
-    </button>
-  );
-}
-
-export default function AppLayout({ children, showNav = true, onAboutClick, onChatOpen }: AppLayoutProps) {
-  const [menuOpen, setMenuOpen] = useState(false);
+/* ── Main Layout ─────────────────────────────────────────────────────────── */
+export default function AppLayout({ children, showNav = true, onChatOpen }: AppLayoutProps) {
+  const [profileOpen, setProfileOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
+  const [, navigate] = useLocation();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const pageBg = isDark ? '#0D0D0F' : '#EEF2F7';
+
+  const handleScanClick = () => {
+    navigate('/calculator');
+  };
 
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ background: PP_BG, color: PP_TEXT, fontFamily: 'Inter, -apple-system, sans-serif' }}
+      style={{ background: pageBg, fontFamily: 'Inter, -apple-system, sans-serif' }}
     >
       <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
-      <AppHeader menuOpen={menuOpen} onMenuToggle={() => setMenuOpen(!menuOpen)} onLoginClick={() => { setMenuOpen(false); setAuthOpen(true); }} />
+      <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
 
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-30"
-            style={{ background: 'rgba(0,0,0,0.18)' }}
-            onClick={() => setMenuOpen(false)}
-          />
-        )}
-      </AnimatePresence>
+      <AppHeader onProfileClick={() => setProfileOpen(true)} />
 
-      <main className="flex-1 overflow-y-auto pb-20 safe-area-left safe-area-right">
+      <main className="flex-1 overflow-y-auto pb-24">
         {children}
       </main>
 
-      {showNav && <BottomNav onChatOpen={onChatOpen} />}
+      {showNav && (
+        <BottomNav
+          onProfileClick={() => setProfileOpen(true)}
+          onScanClick={handleScanClick}
+        />
+      )}
     </div>
   );
 }

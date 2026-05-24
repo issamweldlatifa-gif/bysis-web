@@ -12,6 +12,9 @@ import {
   Sparkle,
 } from '@phosphor-icons/react';
 import { useChatContext } from '@/App';
+import { useCart } from '@/contexts/CartContext';
+import { useI18n } from '@/contexts/I18nContext';
+import { toast } from 'sonner';
 
 const PLATFORM_COLORS: Record<string, { bg: string; text: string; label: string }> = {
   shein:       { bg: 'bg-pink-500/20',   text: 'text-pink-400',   label: 'Shein' },
@@ -37,6 +40,8 @@ type ArrivageItem = {
 export default function Arrivage() {
   const [platformFilter, setPlatformFilter] = useState<'all' | 'shein' | 'aliexpress' | 'temu'>('all');
   const { openChat } = useChatContext();
+  const { addItem } = useCart();
+  const { t } = useI18n();
 
   const { data, isLoading } = trpc.arrivage.list.useQuery();
   const items: ArrivageItem[] = (data as any[]) || [];
@@ -168,16 +173,26 @@ export default function Arrivage() {
                         ) : null}
                       </div>
 
-                      {/* Order via chat */}
+                      {/* Add to cart */}
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.97 }}
-                        onClick={openChat}
+                        onClick={() => {
+                          addItem({
+                            id: String(item.id),
+                            name: item.name,
+                            priceTnd: item.priceTnd,
+                            imageUrl: item.imageUrl || undefined,
+                            productLink: item.productLink || undefined,
+                            platform: item.platform,
+                          });
+                          toast.success(t('add_to_cart') + ' ✓', { duration: 1800 });
+                        }}
                         className="w-full py-2 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-1"
                         style={{ background: 'linear-gradient(90deg, #0070BA, #003087)' }}
                       >
                         <Sparkle size={12} weight="fill" />
-                        Commander
+                        {t('add_to_cart')}
                       </motion.button>
                     </div>
                   </motion.div>

@@ -86,7 +86,7 @@ export default function Home() {
   const { openChat }                  = useChatContext();
 
   return (
-    <AppLayout onAboutClick={() => setAboutOpen(true)} onChatOpen={openChat}>
+    <AppLayout onChatOpen={openChat}>
       <AboutPopup isOpen={aboutOpen} onClose={() => setAboutOpen(false)} />
 
       {/* ── HERO ──────────────────────────────────────────────────────── */}
