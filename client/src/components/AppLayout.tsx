@@ -6,9 +6,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   List, X,
   Scan, ClockCounterClockwise, ShoppingCart, ChatCircleText,
-  House, Calculator, Storefront, MagnifyingGlass,
+  House, Calculator, Storefront, MagnifyingGlass, SignIn, SignOut, UserCircle,
 } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/_core/hooks/useAuth';
+import AuthGateModal from '@/components/AuthGateModal';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -51,8 +53,9 @@ const PP_MUTED     = '#6C7378';   // PayPal Gray
 const PP_BORDER    = '#CBD2D9';   // PayPal Border
 const PP_ACTIVE_BG = '#EBF4FB';   // PayPal Blue tint
 
-function AppHeader({ menuOpen, onMenuToggle }: { menuOpen: boolean; onMenuToggle: () => void }) {
+function AppHeader({ menuOpen, onMenuToggle, onLoginClick }: { menuOpen: boolean; onMenuToggle: () => void; onLoginClick: () => void }) {
   const [, navigate] = useLocation();
+  const { user, isAuthenticated, logout } = useAuth();
   return (
     <motion.header
       initial={{ opacity: 0, y: -16 }}
@@ -97,7 +100,29 @@ function AppHeader({ menuOpen, onMenuToggle }: { menuOpen: boolean; onMenuToggle
           </span>
         </button>
 
-        <div className="w-9" />
+        {/* Auth button — right side */}
+        {isAuthenticated ? (
+          <button
+            onClick={() => logout()}
+            className="w-9 h-9 flex items-center justify-center rounded-full transition-colors duration-150 hover:bg-[#EEF2F7] overflow-hidden"
+            title={user?.name || 'Mon compte'}
+          >
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt="avatar" className="w-9 h-9 rounded-full object-cover" />
+            ) : (
+              <UserCircle size={22} weight="duotone" style={{ color: PP_BLUE }} />
+            )}
+          </button>
+        ) : (
+          <button
+            onClick={onLoginClick}
+            className="w-9 h-9 flex items-center justify-center rounded-full transition-colors duration-150 hover:bg-[#EEF2F7]"
+            style={{ color: PP_BLUE }}
+            title="Se connecter"
+          >
+            <SignIn size={20} weight="bold" />
+          </button>
+        )}
       </div>
 
       {/* Dropdown menu */}
@@ -135,6 +160,8 @@ function AppHeader({ menuOpen, onMenuToggle }: { menuOpen: boolean; onMenuToggle
                   </a>
                 );
               })}
+              {/* Auth row in menu */}
+              <AuthMenuRow onMenuToggle={onMenuToggle} onLoginClick={onLoginClick} />
             </div>
           </motion.nav>
         )}
@@ -213,15 +240,47 @@ function BottomNav({ onChatOpen }: { onChatOpen?: () => void }) {
   );
 }
 
+function AuthMenuRow({ onMenuToggle, onLoginClick }: { onMenuToggle: () => void; onLoginClick: () => void }) {
+  const { user, isAuthenticated, logout } = useAuth();
+  if (isAuthenticated) {
+    return (
+      <button
+        onClick={() => { logout(); onMenuToggle(); }}
+        className="flex items-center gap-3 px-5 py-3.5 text-sm font-semibold transition-all duration-150 hover:bg-red-50 border-l-[3px] border-transparent hover:border-red-400 w-full text-left"
+        style={{ color: '#D32F2F', fontFamily: 'Inter, sans-serif' }}
+      >
+        <span className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#FEE2E2' }}>
+          <SignOut size={16} weight="duotone" style={{ color: '#D32F2F' }} />
+        </span>
+        {user?.name ? `Déconnexion (${user.name.split(' ')[0]})` : 'Se déconnecter'}
+      </button>
+    );
+  }
+  return (
+    <button
+      onClick={() => { onMenuToggle(); onLoginClick(); }}
+      className="flex items-center gap-3 px-5 py-3.5 text-sm font-semibold transition-all duration-150 hover:bg-[#EBF4FB] border-l-[3px] border-transparent hover:border-[#0070BA] w-full text-left"
+      style={{ color: PP_BLUE, fontFamily: 'Inter, sans-serif' }}
+    >
+      <span className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: PP_ACTIVE_BG }}>
+        <SignIn size={16} weight="duotone" style={{ color: PP_BLUE }} />
+      </span>
+      Se connecter
+    </button>
+  );
+}
+
 export default function AppLayout({ children, showNav = true, onAboutClick, onChatOpen }: AppLayoutProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
 
   return (
     <div
       className="min-h-screen flex flex-col"
       style={{ background: PP_BG, color: PP_TEXT, fontFamily: 'Inter, -apple-system, sans-serif' }}
     >
-      <AppHeader menuOpen={menuOpen} onMenuToggle={() => setMenuOpen(!menuOpen)} />
+      <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
+      <AppHeader menuOpen={menuOpen} onMenuToggle={() => setMenuOpen(!menuOpen)} onLoginClick={() => { setMenuOpen(false); setAuthOpen(true); }} />
 
       <AnimatePresence>
         {menuOpen && (
