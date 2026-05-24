@@ -5,7 +5,7 @@ import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppLayout from '@/components/AppLayout';
 
-const BLUE = '#0070BA';
+const BLUE = '#E8192C';
 
 function EmptyCart({ t, isDark }: { t: (k: any) => string; isDark: boolean }) {
   const [, navigate] = useLocation();
@@ -16,7 +16,7 @@ function EmptyCart({ t, isDark }: { t: (k: any) => string; isDark: boolean }) {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         className="w-24 h-24 rounded-3xl flex items-center justify-center mb-6"
-        style={{ background: isDark ? 'rgba(0,112,186,0.15)' : '#EBF4FB' }}
+        style={{ background: isDark ? 'rgba(232,25,44,0.15)' : '#F5F5F5' }}
       >
         <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke={BLUE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
@@ -24,14 +24,14 @@ function EmptyCart({ t, isDark }: { t: (k: any) => string; isDark: boolean }) {
         </svg>
       </motion.div>
       <h2 className="text-xl font-bold mb-2" style={{ color: isDark ? '#fff' : '#1C1C1E' }}>{t('cart_empty')}</h2>
-      <p className="text-sm mb-8" style={{ color: isDark ? 'rgba(255,255,255,0.5)' : '#6C7378' }}>
+      <p className="text-sm mb-8" style={{ color: isDark ? 'rgba(255,255,255,0.5)' : '#999999' }}>
         Parcourez nos boutiques et ajoutez des produits à votre panier
       </p>
       <motion.button
         whileTap={{ scale: 0.96 }}
         onClick={() => navigate('/arrivage')}
         className="px-8 py-3.5 rounded-2xl text-sm font-bold text-white"
-        style={{ background: `linear-gradient(135deg, ${BLUE}, #003087)` }}
+        style={{ background: `linear-gradient(135deg, ${BLUE}, #1A1A1A)` }}
       >
         Voir les boutiques
       </motion.button>
@@ -46,10 +46,10 @@ export default function Panier() {
   const [, navigate] = useLocation();
   const isDark = theme === 'dark';
 
-  const bg = isDark ? '#0D0D0F' : '#EEF2F7';
+  const bg = isDark ? '#0D0D0F' : '#FFFFFF';
   const cardBg = isDark ? '#1C1C1E' : '#FFFFFF';
   const textPrimary = isDark ? '#FFFFFF' : '#1C1C1E';
-  const textSecondary = isDark ? 'rgba(255,255,255,0.5)' : '#6C7378';
+  const textSecondary = isDark ? 'rgba(255,255,255,0.5)' : '#999999';
   const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
 
   const handleCommander = () => {
@@ -120,12 +120,12 @@ export default function Panier() {
                       {item.platform && (
                         <span
                           className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                          style={{ background: isDark ? 'rgba(0,112,186,0.2)' : '#EBF4FB', color: BLUE }}
+                          style={{ background: isDark ? 'rgba(232,25,44,0.2)' : '#F5F5F5', color: '#E8192C' }}
                         >
                           {item.platform}
                         </span>
                       )}
-                      <p className="text-base font-black mt-1" style={{ color: BLUE }}>
+                      <p className="text-base font-black mt-1" style={{ color: '#E8192C' }}>
                         {(item.priceTnd * item.quantity).toFixed(2)} DT
                       </p>
                     </div>
@@ -157,7 +157,7 @@ export default function Panier() {
                         <button
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           className="w-6 h-6 rounded-lg flex items-center justify-center font-bold text-base"
-                          style={{ color: BLUE }}
+                          style={{ color: '#E8192C' }}
                         >
                           +
                         </button>
@@ -184,7 +184,7 @@ export default function Panier() {
               <div style={{ height: 1, background: border, margin: '12px 0' }} />
               <div className="flex justify-between items-center">
                 <span className="text-base font-bold" style={{ color: textPrimary }}>{t('cart_total')}</span>
-                <span className="text-xl font-black" style={{ color: BLUE }}>{totalPrice.toFixed(2)} DT</span>
+                <span className="text-xl font-black" style={{ color: '#E8192C' }}>{totalPrice.toFixed(2)} DT</span>
               </div>
             </div>
 
@@ -193,7 +193,7 @@ export default function Panier() {
               whileTap={{ scale: 0.97 }}
               onClick={handleCommander}
               className="w-full py-4 rounded-2xl text-base font-bold text-white flex items-center justify-center gap-2"
-              style={{ background: `linear-gradient(135deg, ${BLUE}, #003087)`, boxShadow: '0 4px 16px rgba(0,112,186,0.35)' }}
+              style={{ background: `linear-gradient(135deg, ${BLUE}, #1A1A1A)`, boxShadow: '0 4px 16px rgba(232,25,44,0.35)' }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>

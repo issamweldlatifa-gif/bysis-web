@@ -108,7 +108,7 @@ export default function Orders() {
               onClick={() => setMode(m)}
               className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all ${
                 mode === m
-                  ? 'bg-[#0070BA] text-white shadow-lg '
+                  ? 'bg-[#E8192C] text-white shadow-lg '
                   : 'bg-white text-slate-300 hover:bg-gray-100'
               }`}
             >
@@ -131,7 +131,7 @@ export default function Orders() {
                 value={nameQuery}
                 onChange={(e) => setNameQuery(e.target.value)}
                 placeholder="اسم العميل..."
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-[#CBD2D9] text-[#1D1D1D] placeholder-[#9DA3A6] focus:outline-none focus:border-[#0070BA] transition-colors"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-[#CBD2D9] text-[#1D1D1D] placeholder-[#9DA3A6] focus:outline-none focus:border-[#E8192C] transition-colors"
               />
             ) : (
               <input
@@ -139,7 +139,7 @@ export default function Orders() {
                 value={phoneQuery}
                 onChange={(e) => setPhoneQuery(e.target.value)}
                 placeholder="رقم الهاتف..."
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-[#CBD2D9] text-[#1D1D1D] placeholder-[#9DA3A6] focus:outline-none focus:border-[#0070BA] transition-colors"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-white border border-[#CBD2D9] text-[#1D1D1D] placeholder-[#9DA3A6] focus:outline-none focus:border-[#E8192C] transition-colors"
               />
             )}
           </div>
@@ -147,7 +147,7 @@ export default function Orders() {
             type="submit"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-5 py-3 rounded-xl bg-[#0070BA] text-white font-bold  transition-all"
+            className="px-5 py-3 rounded-xl bg-[#E8192C] text-white font-bold  transition-all"
           >
             بحث
           </motion.button>

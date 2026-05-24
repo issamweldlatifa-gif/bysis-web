@@ -24,10 +24,10 @@ import { Link, useLocation } from "wouter";
 const BG = "#F4F6F9";
 const WHITE = "#FFFFFF";
 const SIDEBAR_BG = "#1A2035";
-const SIDEBAR_ACTIVE = "#0070BA";
+const SIDEBAR_ACTIVE = "#E8192C";
 const SIDEBAR_TEXT = "#A0AEC0";
-const BLUE = "#0070BA";
-const NAVY = "#003087";
+const BLUE = "#E8192C";
+const NAVY = "#1A1A1A";
 const GREEN = "#00A651";
 const RED = "#E53E3E";
 const ORANGE = "#E67E22";
@@ -202,7 +202,7 @@ export default function ShipMasterDashboard() {
         {/* Logo */}
         <div className="flex items-center gap-3 px-5 py-5 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
           <div className="h-10 w-10 rounded-xl flex items-center justify-center font-black text-white text-lg flex-shrink-0"
-            style={{ background: "linear-gradient(135deg, #0070BA, #003087)" }}>B</div>
+            style={{ background: "linear-gradient(135deg, #E8192C, #1A1A1A)" }}>B</div>
           <div>
             <p className="font-bold text-white text-sm leading-tight">Bysis</p>
             <p className="text-xs" style={{ color: SIDEBAR_TEXT }}>ShipMaster | CRM & Dashboard</p>
@@ -220,7 +220,7 @@ export default function ShipMasterDashboard() {
               <button key={id} onClick={() => handleTabChange(id)}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all relative"
                 style={{
-                  background: active ? "rgba(0,112,186,0.15)" : "transparent",
+                  background: active ? "rgba(232,25,44,0.15)" : "transparent",
                   color: active ? "#60C8FF" : SIDEBAR_TEXT,
                   borderLeft: active ? `3px solid ${SIDEBAR_ACTIVE}` : "3px solid transparent",
                 }}>
@@ -645,7 +645,7 @@ function ClientSidePanel({ client, orders, onClose, onUpdateStatus, onUpdateNote
     <div className="w-72 flex-shrink-0 rounded-2xl overflow-hidden flex flex-col"
       style={{ background: WHITE, border: `1px solid ${BORDER}` }}>
       {/* Header */}
-      <div className="p-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${BORDER}`, background: "linear-gradient(135deg, #0070BA, #003087)" }}>
+      <div className="p-4 flex items-center justify-between" style={{ borderBottom: `1px solid ${BORDER}`, background: "linear-gradient(135deg, #E8192C, #1A1A1A)" }}>
         <div className="flex items-center gap-3">
           <Avatar className="h-12 w-12 border-2 border-white/30">
             <AvatarImage src={client.avatarUrl || ""} />

@@ -194,3 +194,17 @@
 - [x] Add "Comment ça marche" professional 3-step section
 - [x] Add platforms section (Shein/AliExpress/Temu) with real logos
 - [x] Search and upload real product/service images via manus-upload-file
+
+## 🖤 Shein Full Visual Identity (Radical Redesign - May 2026)
+- [x] index.css: white/black base, Inter font, Shein line-icon style, red only for CTAs
+- [x] AppLayout: Shein-exact bottom nav (Acheter/Catégories/Tendances/Panier/Moi), white bg, black icons, red active
+- [x] Calculator page: Shein-style white card, black text, red calculate button
+- [x] OrderForm page: Shein-style form, white/black, red submit button
+- [x] TrackOrder page: Shein-style order status timeline (black/white/red)
+- [x] OrderConfirmation page: Shein-style success (black checkmark, red CTA)
+- [x] Panier page: Shein-style cart (white cards, black text, red checkout button)
+- [x] History page: Shein-style order list (white cards, black text, status badges)
+- [x] Orders page: Shein-style order management
+- [x] Settings page: Shein-style settings (white rows, black text, chevrons)
+- [x] Parametres page: Shein-style preferences
+- [x] Arrivage page: Shein-style product grid (white cards, black text, red badges)

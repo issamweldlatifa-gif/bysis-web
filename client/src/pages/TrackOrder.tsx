@@ -6,23 +6,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MagnifyingGlass, Package, Truck, CheckCircle, Clock, XCircle, ArrowLeft, Storefront } from '@phosphor-icons/react';
 import { trpc } from '@/lib/trpc';
 
-const BG    = '#EEF2F7';
+const BG    = '#FFFFFF';
 const WHITE = '#FFFFFF';
-const BLUE  = '#0070BA';
-const NAVY  = '#003087';
+const BLUE  = '#E8192C';
+const NAVY  = '#1A1A1A';
 const TEXT  = '#1D1D1D';
-const MUTED = '#4A4F54';
+const MUTED = '#666666';
 const GREEN = '#00A651';
 const RED   = '#C0392B';
 const AMBER = '#E67E22';
-const BORDER = '#CBD2D9';
+const BORDER = '#E5E5E5';
 const SHADOW = '0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05)';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; step: number }> = {
-  new:             { label: 'كومندة وصلت',     color: BLUE,  step: 0 },
+  new:             { label: 'كومندة وصلت',     color: '#E8192C',  step: 0 },
   processing:      { label: 'قيد الشراء',       color: AMBER, step: 1 },
   waiting_payment: { label: 'ينتظر الدفع',      color: AMBER, step: 1 },
-  shipped:         { label: 'في الشحن',         color: BLUE,  step: 2 },
+  shipped:         { label: 'في الشحن',         color: '#E8192C',  step: 2 },
   arrived:         { label: 'وصلت تونس',        color: GREEN, step: 3 },
   completed:       { label: 'تسلّمت',           color: GREEN, step: 4 },
   cancelled:       { label: 'ملغية',            color: RED,   step: -1 },
@@ -68,7 +68,7 @@ export default function TrackOrder() {
     new Date(d).toLocaleDateString('ar-TN', { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
-    <div className="min-h-screen" style={{ background: BG, fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen" style={{ background: '#FFFFFF', fontFamily: "'Inter', sans-serif" }}>
       <div className="max-w-md mx-auto px-4 pt-6 pb-28">
 
         {/* Header */}
@@ -90,7 +90,7 @@ export default function TrackOrder() {
             <h1 style={{ fontSize: '1.25rem', fontWeight: 800, color: TEXT, letterSpacing: '-0.02em' }}>
               تتبع كومندتك
             </h1>
-            <p style={{ fontSize: '0.8125rem', color: MUTED }}>
+            <p style={{ fontSize: '0.8125rem', color: '#666666' }}>
               حط كودك باش تشوف حالة كومندتك
             </p>
           </div>
@@ -108,7 +108,7 @@ export default function TrackOrder() {
           }}
           dir="rtl"
         >
-          <label style={{ fontSize: '0.8125rem', fontWeight: 700, color: MUTED, display: 'block', marginBottom: 10, letterSpacing: '0.04em' }}>
+          <label style={{ fontSize: '0.8125rem', fontWeight: 700, color: '#666666', display: 'block', marginBottom: 10, letterSpacing: '0.04em' }}>
             كود التتبع
           </label>
           <div className="flex gap-2">
@@ -120,7 +120,7 @@ export default function TrackOrder() {
               style={{
                 flex: 1, padding: '12px 14px', borderRadius: 12,
                 border: `1.5px solid ${BORDER}`, fontSize: '1rem',
-                fontWeight: 700, color: TEXT, background: BG,
+                fontWeight: 700, color: TEXT, background: '#FFFFFF',
                 letterSpacing: '0.06em', outline: 'none',
                 fontFamily: "'Inter', sans-serif",
               }}
@@ -133,7 +133,7 @@ export default function TrackOrder() {
                 color: WHITE, border: 'none', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: 6,
                 fontWeight: 700, fontSize: '0.9rem',
-                boxShadow: '0 2px 8px rgba(0,112,186,0.3)',
+                boxShadow: '0 2px 8px rgba(232,25,44,0.3)',
               }}
             >
               <MagnifyingGlass size={18} weight="bold" />
@@ -146,7 +146,7 @@ export default function TrackOrder() {
         <AnimatePresence mode="wait">
           {isLoading && searchCode && (
             <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              style={{ textAlign: 'center', padding: '40px 0', color: MUTED }}
+              style={{ textAlign: 'center', padding: '40px 0', color: '#666666' }}
             >
               <div style={{
                 width: 36, height: 36, borderRadius: '50%',
@@ -164,9 +164,9 @@ export default function TrackOrder() {
             >
               <XCircle size={44} weight="fill" style={{ color: RED, marginBottom: 12 }} />
               <p style={{ fontWeight: 800, fontSize: '1.1rem', color: TEXT, marginBottom: 6 }}>ما لقيناش كومندة</p>
-              <p style={{ color: MUTED, fontSize: '0.875rem', lineHeight: 1.6 }}>
+              <p style={{ color: '#666666', fontSize: '0.875rem', lineHeight: 1.6 }}>
                 تأكد من الكود وعاود المحاولة.<br />
-                الكود يكون بهذا الشكل: <strong style={{ color: NAVY }}>BSS-XXXXXXXX</strong>
+                الكود يكون بهذا الشكل: <strong style={{ color: '#1A1A1A' }}>BSS-XXXXXXXX</strong>
               </p>
             </motion.div>
           )}
@@ -177,11 +177,11 @@ export default function TrackOrder() {
               <div style={{ background: WHITE, borderRadius: 20, padding: '20px', boxShadow: SHADOW, border: `1px solid ${BORDER}` }} dir="rtl">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <p style={{ fontSize: '0.75rem', fontWeight: 700, color: BLUE, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>
+                    <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#E8192C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>
                       {order.trackingCode}
                     </p>
                     <p style={{ fontSize: '1.1rem', fontWeight: 800, color: TEXT }}>{order.customerName}</p>
-                    {order.gouvernorat && <p style={{ fontSize: '0.8125rem', color: MUTED }}>{order.gouvernorat}</p>}
+                    {order.gouvernorat && <p style={{ fontSize: '0.8125rem', color: '#666666' }}>{order.gouvernorat}</p>}
                   </div>
                   <div style={{
                     padding: '8px 14px', borderRadius: 999,
@@ -206,7 +206,7 @@ export default function TrackOrder() {
                             <div style={{
                               width: active ? 32 : 26, height: active ? 32 : 26, borderRadius: '50%',
                               background: done ? (active ? BLUE : `${BLUE}20`) : '#E0E6ED',
-                              border: `2px solid ${done ? BLUE : '#CBD2D9'}`,
+                              border: `2px solid ${done ? BLUE : '#E5E5E5'}`,
                               display: 'flex', alignItems: 'center', justifyContent: 'center',
                               color: done ? (active ? WHITE : BLUE) : '#9DA3A6',
                               flexShrink: 0, transition: 'all 0.3s',
@@ -228,24 +228,24 @@ export default function TrackOrder() {
 
               {/* Details card */}
               <div style={{ background: WHITE, borderRadius: 20, padding: '20px', boxShadow: SHADOW, border: `1px solid ${BORDER}` }} dir="rtl">
-                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: BLUE, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#E8192C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
                   تفاصيل الكومندة
                 </p>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span style={{ fontSize: '0.875rem', color: MUTED, fontWeight: 500 }}>تاريخ الطلب</span>
+                    <span style={{ fontSize: '0.875rem', color: '#666666', fontWeight: 500 }}>تاريخ الطلب</span>
                     <span style={{ fontSize: '0.875rem', color: TEXT, fontWeight: 700 }}>{formatDate(order.createdAt)}</span>
                   </div>
                   <div style={{ height: 1, background: '#F0F4F8' }} />
                   <div className="flex justify-between items-center">
-                    <span style={{ fontSize: '0.875rem', color: MUTED, fontWeight: 500 }}>آخر تحديث</span>
+                    <span style={{ fontSize: '0.875rem', color: '#666666', fontWeight: 500 }}>آخر تحديث</span>
                     <span style={{ fontSize: '0.875rem', color: TEXT, fontWeight: 700 }}>{formatDate(order.updatedAt)}</span>
                   </div>
                   {order.gouvernorat && (
                     <>
                       <div style={{ height: 1, background: '#F0F4F8' }} />
                       <div className="flex justify-between items-center">
-                        <span style={{ fontSize: '0.875rem', color: MUTED, fontWeight: 500 }}>الولاية</span>
+                        <span style={{ fontSize: '0.875rem', color: '#666666', fontWeight: 500 }}>الولاية</span>
                         <span style={{ fontSize: '0.875rem', color: TEXT, fontWeight: 700 }}>{order.gouvernorat}</span>
                       </div>
                     </>

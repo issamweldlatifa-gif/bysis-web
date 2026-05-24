@@ -6,14 +6,14 @@ import { motion } from 'framer-motion';
 import { CheckCircle, Copy, MagnifyingGlass, House, WhatsappLogo } from '@phosphor-icons/react';
 import { toast } from 'sonner';
 
-const BG    = '#EEF2F7';
+const BG    = '#FFFFFF';
 const WHITE = '#FFFFFF';
-const BLUE  = '#0070BA';
-const NAVY  = '#003087';
+const BLUE  = '#E8192C';
+const NAVY  = '#1A1A1A';
 const TEXT  = '#1D1D1D';
-const MUTED = '#4A4F54';
+const MUTED = '#666666';
 const GREEN = '#00A651';
-const BORDER = '#CBD2D9';
+const BORDER = '#E5E5E5';
 const SHADOW = '0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05)';
 
 interface ConfirmationData {
@@ -62,7 +62,7 @@ export default function OrderConfirmation() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ background: BG, fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen" style={{ background: '#FFFFFF', fontFamily: "'Inter', sans-serif" }}>
       <div className="max-w-md mx-auto px-4 pt-10 pb-24">
 
         {/* Success icon */}
@@ -93,7 +93,7 @@ export default function OrderConfirmation() {
           <h1 style={{ fontSize: '1.625rem', fontWeight: 800, color: TEXT, letterSpacing: '-0.03em', marginBottom: 8 }}>
             كومندتك وصلت! 🎉
           </h1>
-          <p style={{ color: MUTED, fontSize: '0.9375rem', lineHeight: 1.6 }}>
+          <p style={{ color: '#666666', fontSize: '0.9375rem', lineHeight: 1.6 }}>
             مرحبا <strong style={{ color: TEXT }}>{data.customerName}</strong>،<br />
             سنتواصل معك قريباً لتأكيد التفاصيل.
           </p>
@@ -114,14 +114,14 @@ export default function OrderConfirmation() {
           }}
           dir="rtl"
         >
-          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: BLUE, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#E8192C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
             TRACKING CODE
           </p>
           <div className="flex items-center justify-between gap-3">
             <span style={{
               fontSize: '1.75rem',
               fontWeight: 800,
-              color: NAVY,
+              color: '#1A1A1A',
               letterSpacing: '0.06em',
               fontVariantNumeric: 'tabular-nums',
             }}>
@@ -149,7 +149,7 @@ export default function OrderConfirmation() {
               {copied ? 'تم!' : 'نسخ'}
             </motion.button>
           </div>
-          <p style={{ fontSize: '0.8125rem', color: MUTED, marginTop: 10, lineHeight: 1.5 }}>
+          <p style={{ fontSize: '0.8125rem', color: '#666666', marginTop: 10, lineHeight: 1.5 }}>
             احفظ هذا الكود باش تتبع كومندتك في أي وقت.
           </p>
         </motion.div>
@@ -169,7 +169,7 @@ export default function OrderConfirmation() {
           }}
           dir="rtl"
         >
-          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: BLUE, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#E8192C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
             حالة الكومندة
           </p>
           <div className="space-y-0">
@@ -180,7 +180,7 @@ export default function OrderConfirmation() {
                   <div style={{
                     width: 20, height: 20, borderRadius: '50%',
                     background: step.done ? GREEN : '#E8ECF0',
-                    border: `2px solid ${step.done ? GREEN : '#CBD2D9'}`,
+                    border: `2px solid ${step.done ? GREEN : '#E5E5E5'}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}>
@@ -236,7 +236,7 @@ export default function OrderConfirmation() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 8,
-              boxShadow: '0 4px 16px rgba(0,112,186,0.3)',
+              boxShadow: '0 4px 16px rgba(232,25,44,0.3)',
               transition: 'all 0.18s ease',
             }}
           >
@@ -251,7 +251,7 @@ export default function OrderConfirmation() {
               padding: '14px 20px',
               borderRadius: 999,
               background: WHITE,
-              color: BLUE,
+              color: '#E8192C',
               fontWeight: 700,
               fontSize: '1rem',
               border: `1.5px solid ${BLUE}`,

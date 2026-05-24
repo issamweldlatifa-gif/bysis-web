@@ -60,10 +60,10 @@ export default function Arrivage() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-1"
         >
-          <h1 className="text-3xl font-bold" style={{ background: 'linear-gradient(90deg, #0070BA, #003087)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+          <h1 className="text-3xl font-bold" style={{ background: 'linear-gradient(90deg, #E8192C, #1A1A1A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
             Boutique
           </h1>
-          <p className="text-[#6C7378] text-sm">Produits disponibles à commander maintenant</p>
+          <p className="text-[#999999] text-sm">Produits disponibles à commander maintenant</p>
         </motion.div>
 
         {/* Platform Filter */}
@@ -77,9 +77,9 @@ export default function Arrivage() {
               className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap text-sm transition-all ${
                 platformFilter === p
                   ? 'text-white shadow-lg shadow-blue-500/30'
-                  : 'bg-[#141520] text-[#6C7378] hover:bg-gray-200'
+                  : 'bg-[#141520] text-[#999999] hover:bg-gray-200'
               }`}
-              style={platformFilter === p ? { background: 'linear-gradient(90deg, #0070BA, #003087)' } : {}}
+              style={platformFilter === p ? { background: 'linear-gradient(90deg, #E8192C, #1A1A1A)' } : {}}
             >
               {p === 'all' ? 'Tous' : PLATFORM_COLORS[p].label}
             </motion.button>
@@ -103,7 +103,7 @@ export default function Arrivage() {
             className="text-center py-16 space-y-3"
           >
             <Package size={52} className="mx-auto text-gray-300" />
-            <p className="text-[#6C7378] text-lg">Aucun produit disponible pour le moment</p>
+            <p className="text-[#999999] text-lg">Aucun produit disponible pour le moment</p>
             <p className="text-[#9DA3A6] text-sm">Revenez bientôt pour les nouveaux arrivages</p>
           </motion.div>
         )}
@@ -149,7 +149,7 @@ export default function Arrivage() {
                       </p>
 
                       {item.description && (
-                        <p className="text-[#6C7378] text-xs line-clamp-1">{item.description}</p>
+                        <p className="text-[#999999] text-xs line-clamp-1">{item.description}</p>
                       )}
 
                       <div className="flex items-center justify-between">
@@ -189,7 +189,7 @@ export default function Arrivage() {
                           toast.success(t('add_to_cart') + ' ✓', { duration: 1800 });
                         }}
                         className="w-full py-2 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-1"
-                        style={{ background: 'linear-gradient(90deg, #0070BA, #003087)' }}
+                        style={{ background: 'linear-gradient(90deg, #E8192C, #1A1A1A)' }}
                       >
                         <Sparkle size={12} weight="fill" />
                         {t('add_to_cart')}
