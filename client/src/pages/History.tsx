@@ -110,10 +110,10 @@ export default function History() {
                   fontSize: '0.875rem',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.18s ease',
-                  background: filter === f ? '#E8192C' : '#FFFFFF',
+                  background: filter === f ? '#1A1A1A' : '#FFFFFF',
                   color: filter === f ? '#FFFFFF' : '#1A1A1A',
                   border: filter === f ? 'none' : '1.5px solid #D0D7DE',
-                  boxShadow: filter === f ? '0 2px 8px rgba(232,25,44,0.25)' : 'none',
+                  boxShadow: filter === f ? '0 2px 8px rgba(26,26,26,0.25)' : 'none',
                 }}
               >
                 {f === 'all' ? 'الكل' : f === 'today' ? 'اليوم' : 'هذا الأسبوع'}
@@ -135,9 +135,9 @@ export default function History() {
                   fontWeight: 600,
                   fontSize: '0.8125rem',
                   transition: 'all 0.18s ease',
-                  background: sortBy === s ? 'rgba(232,25,44,0.1)' : '#FFFFFF',
-                  color: sortBy === s ? '#E8192C' : '#999999',
-                  border: sortBy === s ? '1.5px solid rgba(232,25,44,0.35)' : '1.5px solid #D0D7DE',
+                  background: sortBy === s ? 'rgba(26,26,26,0.1)' : '#FFFFFF',
+                  color: sortBy === s ? '#1A1A1A' : '#999999',
+                  border: sortBy === s ? '1.5px solid rgba(26,26,26,0.35)' : '1.5px solid #D0D7DE',
                 }}
               >
                 {s === 'date' ? 'التاريخ' : 'السعر'}
@@ -149,7 +149,7 @@ export default function History() {
         {/* Loading */}
         {getHistory.isLoading && (
           <div className="flex justify-center py-12">
-            <div style={{ width: 32, height: 32, border: '3px solid #E8192C', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
+            <div style={{ width: 32, height: 32, border: '3px solid #1A1A1A', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
           </div>
         )}
 
@@ -215,7 +215,7 @@ export default function History() {
                           <p style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1A1A1A', letterSpacing: '-0.02em', fontFamily: "'Inter', sans-serif" }}>
                             {parseFloat(item.priceTnd || '0').toFixed(2)} دينار
                           </p>
-                          <p style={{ fontSize: '0.75rem', color: '#E8192C', fontWeight: 600, marginTop: 2 }}>
+                          <p style={{ fontSize: '0.75rem', color: '#1A1A1A', fontWeight: 600, marginTop: 2 }}>
                             {item.originalPrice} {item.originalCurrency}
                             {item.priceEur && parseFloat(item.priceEur) > 0 ? ` • ${parseFloat(item.priceEur).toFixed(2)} EUR` : ''}
                           </p>

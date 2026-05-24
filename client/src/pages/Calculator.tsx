@@ -13,7 +13,7 @@ import {
 
 const BG     = '#FFFFFF';
 const WHITE  = '#FFFFFF';
-const RED    = '#E8192C';
+const RED    = '#1A1A1A';
 const BLACK  = '#1A1A1A';
 const TEXT   = '#1D1D1D';
 const GRAY2  = '#666666';
@@ -193,11 +193,11 @@ export default function Calculator() {
                     onClick={() => setMode('camera')}
                     className="w-full flex items-center gap-4 p-5 rounded-2xl text-left transition-all duration-150"
                     style={{ background: WHITE, border: `1px solid ${BORDER}`, boxShadow: SHADOW }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = RED; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(232,25,44,0.10)'; }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = RED; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(26,26,26,0.10)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = SHADOW; }}
                   >
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: '#F5F5F5' }}>
-                      <Camera size={28} weight="duotone" style={{ color: '#E8192C' }} />
+                      <Camera size={28} weight="duotone" style={{ color: '#1A1A1A' }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-base mb-0.5" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>Prendre une photo</div>
@@ -211,11 +211,11 @@ export default function Calculator() {
                     onClick={() => fileInputRef.current?.click()}
                     className="w-full flex items-center gap-4 p-5 rounded-2xl text-left transition-all duration-150"
                     style={{ background: WHITE, border: `1px solid ${BORDER}`, boxShadow: SHADOW }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = RED; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(232,25,44,0.10)'; }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = RED; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(26,26,26,0.10)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = SHADOW; }}
                   >
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: '#F5F5F5' }}>
-                      <Upload size={28} weight="duotone" style={{ color: '#E8192C' }} />
+                      <Upload size={28} weight="duotone" style={{ color: '#1A1A1A' }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-base mb-0.5" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>Importer une image</div>
@@ -225,8 +225,8 @@ export default function Calculator() {
                   </motion.button>
                 </div>
 
-                <div className="mt-6 flex items-start gap-3 p-4 rounded-2xl" style={{ background: '#F5F5F5', border: '1px solid rgba(232,25,44,0.15)' }}>
-                  <Scan size={20} weight="duotone" style={{ color: '#E8192C', flexShrink: 0, marginTop: 1 }} />
+                <div className="mt-6 flex items-start gap-3 p-4 rounded-2xl" style={{ background: '#F5F5F5', border: '1px solid rgba(26,26,26,0.15)' }}>
+                  <Scan size={20} weight="duotone" style={{ color: '#1A1A1A', flexShrink: 0, marginTop: 1 }} />
                   <p className="text-sm leading-relaxed" style={{ color: '#666666' }}>
                     Prenez en photo l'étiquette de prix ou la page produit sur Shein, AliExpress ou Temu.
                     Notre IA extrait le prix et le convertit en <strong style={{ color: TEXT }}>dinars tunisiens (TND)</strong>.
@@ -267,13 +267,13 @@ export default function Calculator() {
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="w-64 h-64 relative">
                   {['top-0 left-0 border-t-2 border-l-2 rounded-tl-lg','top-0 right-0 border-t-2 border-r-2 rounded-tr-lg','bottom-0 left-0 border-b-2 border-l-2 rounded-bl-lg','bottom-0 right-0 border-b-2 border-r-2 rounded-br-lg'].map((cls, i) => (
-                    <div key={i} className={`absolute w-8 h-8 ${cls}`} style={{ borderColor: '#E8192C' }} />
+                    <div key={i} className={`absolute w-8 h-8 ${cls}`} style={{ borderColor: '#1A1A1A' }} />
                   ))}
                   <motion.div
                     animate={{ top: ['8%', '88%'] }}
                     transition={{ duration: 1.8, repeat: Infinity, ease: 'linear' }}
                     className="absolute left-0 right-0 h-0.5"
-                    style={{ background: 'linear-gradient(90deg, transparent, #E8192C, transparent)' }}
+                    style={{ background: 'linear-gradient(90deg, transparent, #1A1A1A, transparent)' }}
                   />
                 </div>
               </div>
@@ -312,7 +312,7 @@ export default function Calculator() {
               className="px-5 pt-8 pb-24"
             >
               <div className="max-w-md mx-auto">
-                <button onClick={reset} className="flex items-center gap-2 mb-6 text-sm font-medium" style={{ color: '#E8192C' }}>
+                <button onClick={reset} className="flex items-center gap-2 mb-6 text-sm font-medium" style={{ color: '#1A1A1A' }}>
                   <ArrowLeft size={18} />
                   Nouvelle analyse
                 </button>
@@ -329,13 +329,13 @@ export default function Calculator() {
                     style={{ background: WHITE, border: `1px solid ${BORDER}`, boxShadow: SHADOW }}>
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#F5F5F5' }}>
-                        <Scan size={18} weight="duotone" style={{ color: '#E8192C' }} />
+                        <Scan size={18} weight="duotone" style={{ color: '#1A1A1A' }} />
                       </div>
                       <div>
                         <div className="font-semibold text-sm" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>Analyse en cours…</div>
                         <div className="text-xs" style={{ color: '#999999' }}>Extraction du prix par IA</div>
                       </div>
-                      <div className="ml-auto font-bold text-sm" style={{ color: '#E8192C' }}>{scanProgress}%</div>
+                      <div className="ml-auto font-bold text-sm" style={{ color: '#1A1A1A' }}>{scanProgress}%</div>
                     </div>
                     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#FFFFFF' }}>
                       <motion.div className="h-full rounded-full"
@@ -381,12 +381,12 @@ export default function Calculator() {
                     <div className="space-y-3">
                       <button onClick={() => navigate('/order')}
                         className="w-full py-3.5 font-semibold text-white rounded-3xl transition-all active:scale-[0.97]"
-                        style={{ background: RED, fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 14px rgba(232,25,44,0.30)' }}>
+                        style={{ background: RED, fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 14px rgba(26,26,26,0.30)' }}>
                         Commander maintenant
                       </button>
                       <button onClick={reset}
                         className="w-full py-3.5 font-semibold rounded-3xl transition-all active:scale-[0.97]"
-                        style={{ background: WHITE, color: '#E8192C', border: `1.5px solid ${RED}`, fontFamily: 'Inter, sans-serif' }}>
+                        style={{ background: WHITE, color: '#1A1A1A', border: `1.5px solid ${RED}`, fontFamily: 'Inter, sans-serif' }}>
                         Nouvelle analyse
                       </button>
                     </div>

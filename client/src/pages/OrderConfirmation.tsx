@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 
 const BG    = '#FFFFFF';
 const WHITE = '#FFFFFF';
-const BLUE  = '#E8192C';
+const BLUE  = '#1A1A1A';
 const NAVY  = '#1A1A1A';
 const TEXT  = '#1D1D1D';
 const MUTED = '#666666';
@@ -114,7 +114,7 @@ export default function OrderConfirmation() {
           }}
           dir="rtl"
         >
-          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#E8192C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1A1A1A', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
             TRACKING CODE
           </p>
           <div className="flex items-center justify-between gap-3">
@@ -169,7 +169,7 @@ export default function OrderConfirmation() {
           }}
           dir="rtl"
         >
-          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#E8192C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1A1A1A', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
             حالة الكومندة
           </p>
           <div className="space-y-0">
@@ -236,7 +236,7 @@ export default function OrderConfirmation() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 8,
-              boxShadow: '0 4px 16px rgba(232,25,44,0.3)',
+              boxShadow: '0 4px 16px rgba(26,26,26,0.3)',
               transition: 'all 0.18s ease',
             }}
           >
@@ -251,7 +251,7 @@ export default function OrderConfirmation() {
               padding: '14px 20px',
               borderRadius: 999,
               background: WHITE,
-              color: '#E8192C',
+              color: '#1A1A1A',
               fontWeight: 700,
               fontSize: '1rem',
               border: `1.5px solid ${BLUE}`,

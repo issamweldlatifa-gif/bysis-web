@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import AppLayout from '@/components/AppLayout';
 
 /* ── Shein Design Tokens ────────────────────────────────────────────────── */
-const RED    = '#E8192C';
+const RED    = '#1A1A1A';
 const BLACK  = '#1A1A1A';
 const GRAY1  = '#333333';
 const GRAY2  = '#666666';

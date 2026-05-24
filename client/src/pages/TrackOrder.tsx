@@ -8,7 +8,7 @@ import { trpc } from '@/lib/trpc';
 
 const BG    = '#FFFFFF';
 const WHITE = '#FFFFFF';
-const BLUE  = '#E8192C';
+const BLUE  = '#1A1A1A';
 const NAVY  = '#1A1A1A';
 const TEXT  = '#1D1D1D';
 const MUTED = '#666666';
@@ -19,10 +19,10 @@ const BORDER = '#E5E5E5';
 const SHADOW = '0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05)';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; step: number }> = {
-  new:             { label: 'كومندة وصلت',     color: '#E8192C',  step: 0 },
+  new:             { label: 'كومندة وصلت',     color: '#1A1A1A',  step: 0 },
   processing:      { label: 'قيد الشراء',       color: AMBER, step: 1 },
   waiting_payment: { label: 'ينتظر الدفع',      color: AMBER, step: 1 },
-  shipped:         { label: 'في الشحن',         color: '#E8192C',  step: 2 },
+  shipped:         { label: 'في الشحن',         color: '#1A1A1A',  step: 2 },
   arrived:         { label: 'وصلت تونس',        color: GREEN, step: 3 },
   completed:       { label: 'تسلّمت',           color: GREEN, step: 4 },
   cancelled:       { label: 'ملغية',            color: RED,   step: -1 },
@@ -133,7 +133,7 @@ export default function TrackOrder() {
                 color: WHITE, border: 'none', cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: 6,
                 fontWeight: 700, fontSize: '0.9rem',
-                boxShadow: '0 2px 8px rgba(232,25,44,0.3)',
+                boxShadow: '0 2px 8px rgba(26,26,26,0.3)',
               }}
             >
               <MagnifyingGlass size={18} weight="bold" />
@@ -177,7 +177,7 @@ export default function TrackOrder() {
               <div style={{ background: WHITE, borderRadius: 20, padding: '20px', boxShadow: SHADOW, border: `1px solid ${BORDER}` }} dir="rtl">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#E8192C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>
+                    <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1A1A1A', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>
                       {order.trackingCode}
                     </p>
                     <p style={{ fontSize: '1.1rem', fontWeight: 800, color: TEXT }}>{order.customerName}</p>
@@ -228,7 +228,7 @@ export default function TrackOrder() {
 
               {/* Details card */}
               <div style={{ background: WHITE, borderRadius: 20, padding: '20px', boxShadow: SHADOW, border: `1px solid ${BORDER}` }} dir="rtl">
-                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#E8192C', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1A1A1A', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 12 }}>
                   تفاصيل الكومندة
                 </p>
                 <div className="space-y-3">

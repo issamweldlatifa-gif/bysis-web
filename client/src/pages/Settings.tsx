@@ -6,7 +6,7 @@ import { useChatContext } from '@/App';
 import { Bell, Lock, Globe, SignOut, User, Info } from '@phosphor-icons/react';
 import { ChevronRight } from 'lucide-react';
 
-const PP = { bg:'#FFFFFF', white:'#FFFFFF', navy:'#1A1A1A', blue:'#E8192C', text:'#1D1D1D', sub:'#666666', muted:'#999999', border:'#E5E5E5', green:'#00A651' };
+const PP = { bg:'#FFFFFF', white:'#FFFFFF', navy:'#1A1A1A', blue:'#1A1A1A', text:'#1D1D1D', sub:'#666666', muted:'#999999', border:'#E5E5E5', green:'#00A651' };
 
 export default function Settings() {
   const { user, logout } = useAuth();

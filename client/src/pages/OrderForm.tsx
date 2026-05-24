@@ -42,7 +42,7 @@ function PPInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
       {...props}
       style={{ ...inputBase, ...(props.style as React.CSSProperties) }}
       onFocus={(e) => {
-        e.target.style.borderColor = "#E8192C";
+        e.target.style.borderColor = "#1A1A1A";
         e.target.style.background = "#FFFFFF";
         props.onFocus?.(e);
       }}
@@ -61,7 +61,7 @@ function PPTextarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
       {...props}
       style={{ ...inputBase, resize: "vertical", minHeight: "80px", ...(props.style as React.CSSProperties) }}
       onFocus={(e) => {
-        e.target.style.borderColor = "#E8192C";
+        e.target.style.borderColor = "#1A1A1A";
         e.target.style.background = "#FFFFFF";
       }}
       onBlur={(e) => {
@@ -197,7 +197,7 @@ export default function OrderForm() {
             <div className="flex flex-col gap-3">
               <button onClick={handleReset}
                 className="w-full h-12 rounded-xl font-bold text-white flex items-center justify-center gap-2 active:scale-[0.97] transition-all"
-                style={{ background: "#E8192C", boxShadow: "0 4px 14px rgba(232,25,44,0.35)" }}>
+                style={{ background: "#1A1A1A", boxShadow: "0 4px 14px rgba(26,26,26,0.35)" }}>
                 <ShoppingCart size={18} weight="bold" /> Nouvelle commande
               </button>
               <button onClick={() => navigate('/')}
@@ -218,7 +218,7 @@ export default function OrderForm() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ background: "#E8192C" }}>
+            style={{ background: "#1A1A1A" }}>
             <ShoppingCart size={20} weight="fill" className="text-white" />
           </div>
           <div>
@@ -314,7 +314,7 @@ export default function OrderForm() {
               <label htmlFor="screenshot-upload"
                 className="flex flex-col items-center justify-center w-full h-32 rounded-xl cursor-pointer transition-all duration-200"
                 style={{ border: "2px dashed #E5E5E5", background: "#FFFFFF" }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#E8192C"; }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#1A1A1A"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#E5E5E5"; }}>
                 {screenshotPreview ? (
                   <img src={screenshotPreview} alt="Capture" className="h-full w-full object-contain rounded-xl p-2" />
@@ -354,7 +354,7 @@ export default function OrderForm() {
             {/* ─── Payment Section ─── */}
             <div className="rounded-xl p-4 space-y-4" style={{ background: "#FFFFFF", border: "1.5px solid #E5E5E5" }}>
               <div className="flex items-center gap-2 mb-1">
-                <Receipt size={18} className="text-[#E8192C]" weight="fill" />
+                <Receipt size={18} className="text-[#1A1A1A]" weight="fill" />
                 <span className="text-sm font-bold text-[#1D1D1D]">Paiement (optionnel)</span>
               </div>
               <p className="text-xs text-[#999999] -mt-2">
@@ -369,13 +369,13 @@ export default function OrderForm() {
                   onClick={() => setPaymentMethod(paymentMethod === "bank" ? null : "bank")}
                   className="flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-200 active:scale-[0.97]"
                   style={{
-                    border: paymentMethod === "bank" ? "2px solid #E8192C" : "1.5px solid #E5E5E5",
+                    border: paymentMethod === "bank" ? "2px solid #1A1A1A" : "1.5px solid #E5E5E5",
                     background: paymentMethod === "bank" ? "#E8F4FD" : "#FFFFFF",
-                    boxShadow: paymentMethod === "bank" ? "0 2px 8px rgba(232,25,44,0.15)" : "none",
+                    boxShadow: paymentMethod === "bank" ? "0 2px 8px rgba(26,26,26,0.15)" : "none",
                   }}
                 >
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center"
-                    style={{ background: paymentMethod === "bank" ? "#E8192C" : "#FFFFFF" }}>
+                    style={{ background: paymentMethod === "bank" ? "#1A1A1A" : "#FFFFFF" }}>
                     <Bank size={20} weight="fill" className={paymentMethod === "bank" ? "text-white" : "text-[#999999]"} />
                   </div>
                   <div className="text-center">
@@ -383,7 +383,7 @@ export default function OrderForm() {
                     <p className="text-[10px] text-[#999999]">UIB</p>
                   </div>
                   {paymentMethod === "bank" && (
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "#E8192C" }}>
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "#1A1A1A" }}>
                       <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.5 6L6.5 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
                   )}
@@ -395,13 +395,13 @@ export default function OrderForm() {
                   onClick={() => setPaymentMethod(paymentMethod === "mandat" ? null : "mandat")}
                   className="flex flex-col items-center gap-2 p-3 rounded-xl transition-all duration-200 active:scale-[0.97]"
                   style={{
-                    border: paymentMethod === "mandat" ? "2px solid #E8192C" : "1.5px solid #E5E5E5",
+                    border: paymentMethod === "mandat" ? "2px solid #1A1A1A" : "1.5px solid #E5E5E5",
                     background: paymentMethod === "mandat" ? "#E8F4FD" : "#FFFFFF",
-                    boxShadow: paymentMethod === "mandat" ? "0 2px 8px rgba(232,25,44,0.15)" : "none",
+                    boxShadow: paymentMethod === "mandat" ? "0 2px 8px rgba(26,26,26,0.15)" : "none",
                   }}
                 >
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center"
-                    style={{ background: paymentMethod === "mandat" ? "#E8192C" : "#FFFFFF" }}>
+                    style={{ background: paymentMethod === "mandat" ? "#1A1A1A" : "#FFFFFF" }}>
                     <Money size={20} weight="fill" className={paymentMethod === "mandat" ? "text-white" : "text-[#999999]"} />
                   </div>
                   <div className="text-center">
@@ -409,7 +409,7 @@ export default function OrderForm() {
                     <p className="text-[10px] text-[#999999]">La Poste</p>
                   </div>
                   {paymentMethod === "mandat" && (
-                    <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "#E8192C" }}>
+                    <div className="w-4 h-4 rounded-full flex items-center justify-center" style={{ background: "#1A1A1A" }}>
                       <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M1.5 4L3.5 6L6.5 2" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     </div>
                   )}
@@ -431,7 +431,7 @@ export default function OrderForm() {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-[#999999]">RIB</span>
-                      <span className="text-xs font-mono font-bold text-[#E8192C]">12067000013314111448</span>
+                      <span className="text-xs font-mono font-bold text-[#1A1A1A]">12067000013314111448</span>
                     </div>
                   </div>
                   <p className="text-[10px] text-[#999999] pt-1 border-t border-[#FFFFFF]">
@@ -460,7 +460,7 @@ export default function OrderForm() {
                   <label htmlFor="receipt-upload"
                     className="flex flex-col items-center justify-center w-full h-32 rounded-xl cursor-pointer transition-all duration-200"
                     style={{ border: "2px dashed #E5E5E5", background: "#FFFFFF" }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#E8192C"; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#1A1A1A"; }}
                     onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = "#E5E5E5"; }}>
                     {receiptPreview ? (
                       <img src={receiptPreview} alt="Reçu" className="h-full w-full object-contain rounded-xl p-2" />
@@ -480,7 +480,7 @@ export default function OrderForm() {
             {/* Submit */}
             <button type="submit" disabled={createOrder.isPending}
               className="w-full rounded-xl font-bold text-white flex items-center justify-center gap-2 active:scale-[0.97] transition-all disabled:opacity-50"
-              style={{ height: "52px", background: "#E8192C", boxShadow: "0 4px 14px rgba(232,25,44,0.35)" }}>
+              style={{ height: "52px", background: "#1A1A1A", boxShadow: "0 4px 14px rgba(26,26,26,0.35)" }}>
               {createOrder.isPending ? (
                 <><Loader2 className="h-5 w-5 animate-spin" /> Envoi...</>
               ) : (
@@ -493,7 +493,7 @@ export default function OrderForm() {
         {/* Chat alternative */}
         <div className="mt-5 text-center">
           <p className="text-[#999999] text-xs mb-1.5">Ou commandez directement via le chat</p>
-          <button onClick={openChat} className="text-sm font-semibold transition-colors" style={{ color: "#E8192C" }}>
+          <button onClick={openChat} className="text-sm font-semibold transition-colors" style={{ color: "#1A1A1A" }}>
             Ouvrir le chat →
           </button>
         </div>

@@ -60,7 +60,7 @@ export default function Arrivage() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-1"
         >
-          <h1 className="text-3xl font-bold" style={{ background: 'linear-gradient(90deg, #E8192C, #1A1A1A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+          <h1 className="text-3xl font-bold" style={{ background: 'linear-gradient(90deg, #1A1A1A, #1A1A1A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
             Boutique
           </h1>
           <p className="text-[#999999] text-sm">Produits disponibles à commander maintenant</p>
@@ -79,7 +79,7 @@ export default function Arrivage() {
                   ? 'text-white shadow-lg shadow-blue-500/30'
                   : 'bg-[#141520] text-[#999999] hover:bg-gray-200'
               }`}
-              style={platformFilter === p ? { background: 'linear-gradient(90deg, #E8192C, #1A1A1A)' } : {}}
+              style={platformFilter === p ? { background: 'linear-gradient(90deg, #1A1A1A, #1A1A1A)' } : {}}
             >
               {p === 'all' ? 'Tous' : PLATFORM_COLORS[p].label}
             </motion.button>
@@ -189,7 +189,7 @@ export default function Arrivage() {
                           toast.success(t('add_to_cart') + ' ✓', { duration: 1800 });
                         }}
                         className="w-full py-2 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-1"
-                        style={{ background: 'linear-gradient(90deg, #E8192C, #1A1A1A)' }}
+                        style={{ background: 'linear-gradient(90deg, #1A1A1A, #1A1A1A)' }}
                       >
                         <Sparkle size={12} weight="fill" />
                         {t('add_to_cart')}

@@ -14,7 +14,7 @@ interface AppLayoutProps {
 }
 
 /* ── Shein Design Tokens ────────────────────────────────────────────────── */
-const SHEIN_RED    = '#E8192C';
+const SHEIN_RED    = '#1A1A1A';
 const SHEIN_BLACK  = '#1A1A1A';
 
 /* ── Shein-style Line Icons ─────────────────────────────────────────────── */
