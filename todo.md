@@ -183,3 +183,14 @@
 - [ ] Commander → pre-fill OrderForm with first cart item
 - [ ] Cart badge count on Panier tab icon
 - [ ] Apply i18n translations to all public pages (FR/AR)
+
+## 🎨 Shein-Inspired Redesign (May 2026)
+- [x] Update index.css: Shein color palette (red #E8192C, white #FFFFFF, black #1A1A1A, green #00A650)
+- [x] Add Inter/Nunito Google Font in index.html
+- [x] Update AppLayout.tsx: Shein-style bottom nav icons (line icons), lift nav with safe-area + 16px extra
+- [x] Update AppLayout.tsx: white bottom nav background with top border, red active icon
+- [x] Rebuild Home.tsx: Shein-inspired hero section with real service images
+- [x] Add testimonials section with customer photos and ratings
+- [x] Add "Comment ça marche" professional 3-step section
+- [x] Add platforms section (Shein/AliExpress/Temu) with real logos
+- [x] Search and upload real product/service images via manus-upload-file

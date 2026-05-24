@@ -40,7 +40,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  /* PayPal font system — Inter Variable */
+  /* Shein font system — Inter Variable */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
 }
 
@@ -53,75 +53,85 @@
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   PAYPAL DESIGN SYSTEM — Bysis Edition
+   SHEIN DESIGN SYSTEM — Bysis Edition
    ────────────────────────────────────────────────────────────────────────
-   Page BG:       #EEF2F7  — PayPal page background (gris-bleu très clair)
-   Card:          #FFFFFF  — PayPal card white
-   Blue:          #0070BA  — PayPal Blue (boutons, liens, icônes actives)
-   Navy:          #003087  — PayPal Navy (header, stats band, accents forts)
-   Sky:           #009CDE  — PayPal Sky (badges, highlights secondaires)
-   Text-1:        #1D1D1D  — PayPal Near-Black (titres, valeurs importantes)
-   Text-2:        #4A4F54  — PayPal Dark Gray (corps de texte)
-   Text-3:        #6C7378  — PayPal Gray (texte secondaire)
-   Text-4:        #9DA3A6  — PayPal Light Gray (placeholders, labels)
-   Border:        #CBD2D9  — PayPal Border
-   Input BG:      #F5F7FA  — PayPal Input Background
-   Green:         #00A651  — PayPal Green (succès, statuts positifs)
-   Red:           #D0021B  — PayPal Red (erreurs, alertes)
+   Page BG:       #FFFFFF  — Pure white (Shein background)
+   Card:          #FFFFFF  — White card
+   Red:           #E8192C  — Shein Red (primary CTA, prices, active icons)
+   Black:         #1A1A1A  — Near-black (headings, main text)
+   Gray-1:        #333333  — Dark gray (body text)
+   Gray-2:        #666666  — Medium gray (secondary text)
+   Gray-3:        #999999  — Light gray (placeholders, labels)
+   Gray-4:        #F5F5F5  — Very light gray (section backgrounds)
+   Border:        #E5E5E5  — Shein border (very light)
+   Green:         #00A650  — Success green
+   Orange:        #FF6B35  — Discount/sale accent
    ════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Primary */
-  --primary: oklch(0.46 0.17 240);             /* #0070BA */
-  --primary-foreground: oklch(1.00 0.00 0);
+  /* Primary — Shein Red */
+  --primary: oklch(0.48 0.22 25);               /* #E8192C */
+  --primary-foreground: oklch(1.00 0.00 0);     /* white */
 
-  /* Background */
-  --background: oklch(0.94 0.012 235);         /* #EEF2F7 */
-  --foreground: oklch(0.13 0.006 240);         /* #1D1D1D */
+  /* Background — Pure white */
+  --background: oklch(1.00 0.000 0);            /* #FFFFFF */
+  --foreground: oklch(0.15 0.005 0);            /* #1A1A1A */
 
   /* Card */
-  --card: oklch(1.00 0.000 0);                 /* #FFFFFF */
-  --card-foreground: oklch(0.13 0.006 240);    /* #1D1D1D */
+  --card: oklch(1.00 0.000 0);                  /* #FFFFFF */
+  --card-foreground: oklch(0.15 0.005 0);       /* #1A1A1A */
 
   --popover: oklch(1.00 0.000 0);
-  --popover-foreground: oklch(0.13 0.006 240);
+  --popover-foreground: oklch(0.15 0.005 0);
 
-  /* Secondary */
-  --secondary: oklch(0.96 0.008 235);          /* #F5F7FA */
-  --secondary-foreground: oklch(0.13 0.006 240);
+  /* Secondary — light gray */
+  --secondary: oklch(0.96 0.000 0);             /* #F5F5F5 */
+  --secondary-foreground: oklch(0.15 0.005 0);  /* #1A1A1A */
 
   /* Muted */
-  --muted: oklch(0.95 0.008 235);              /* #F0F3F7 */
-  --muted-foreground: oklch(0.46 0.012 235);   /* #6C7378 */
+  --muted: oklch(0.96 0.000 0);                 /* #F5F5F5 */
+  --muted-foreground: oklch(0.55 0.000 0);      /* #888888 */
 
-  /* Accent — sky blue tint */
-  --accent: oklch(0.92 0.030 220);             /* #E8F4FB */
-  --accent-foreground: oklch(0.25 0.14 240);   /* #003087 */
+  /* Accent — light red tint */
+  --accent: oklch(0.97 0.010 25);               /* #FFF0F1 */
+  --accent-foreground: oklch(0.48 0.22 25);     /* #E8192C */
 
-  --destructive: oklch(0.50 0.25 25);          /* #D0021B */
+  --destructive: oklch(0.48 0.22 25);           /* #E8192C */
   --destructive-foreground: oklch(1.00 0 0);
 
-  --border: oklch(0.83 0.012 235);             /* #CBD2D9 */
-  --input: oklch(0.96 0.008 235);              /* #F5F7FA */
-  --ring: oklch(0.46 0.17 240);                /* #0070BA */
+  --border: oklch(0.91 0.000 0);                /* #E5E5E5 */
+  --input: oklch(0.96 0.000 0);                 /* #F5F5F5 */
+  --ring: oklch(0.48 0.22 25);                  /* #E8192C */
 
-  --radius: 0.5rem;
+  --radius: 0.375rem;
 
   /* Charts */
-  --chart-1: oklch(0.46 0.17 240);
-  --chart-2: oklch(0.25 0.14 240);
-  --chart-3: oklch(0.55 0.16 220);
-  --chart-4: oklch(0.60 0.18 160);
-  --chart-5: oklch(0.35 0.18 240);
+  --chart-1: oklch(0.48 0.22 25);              /* red */
+  --chart-2: oklch(0.55 0.18 160);             /* green */
+  --chart-3: oklch(0.65 0.18 55);              /* orange */
+  --chart-4: oklch(0.50 0.15 240);             /* blue */
+  --chart-5: oklch(0.35 0.10 0);               /* dark */
 
   /* Sidebar */
   --sidebar: oklch(1.00 0.000 0);
-  --sidebar-foreground: oklch(0.13 0.006 240);
-  --sidebar-primary: oklch(0.46 0.17 240);
+  --sidebar-foreground: oklch(0.15 0.005 0);
+  --sidebar-primary: oklch(0.48 0.22 25);
   --sidebar-primary-foreground: oklch(1.00 0 0);
-  --sidebar-accent: oklch(0.92 0.030 220);
-  --sidebar-accent-foreground: oklch(0.46 0.17 240);
-  --sidebar-border: oklch(0.83 0.012 235);
-  --sidebar-ring: oklch(0.46 0.17 240);
+  --sidebar-accent: oklch(0.97 0.010 25);
+  --sidebar-accent-foreground: oklch(0.48 0.22 25);
+  --sidebar-border: oklch(0.91 0.000 0);
+  --sidebar-ring: oklch(0.48 0.22 25);
+
+  /* Shein custom tokens */
+  --shein-red: #E8192C;
+  --shein-red-light: #FFF0F1;
+  --shein-orange: #FF6B35;
+  --shein-green: #00A650;
+  --shein-black: #1A1A1A;
+  --shein-gray-1: #333333;
+  --shein-gray-2: #666666;
+  --shein-gray-3: #999999;
+  --shein-gray-4: #F5F5F5;
+  --shein-border: #E5E5E5;
 }
 
 /* ── Base layer ─────────────────────────────────────────────────────────── */
@@ -130,9 +140,8 @@
     @apply border-border outline-ring/50;
   }
   html {
-    /* Inter Variable — optical sizing for crisp rendering at all sizes */
     font-optical-sizing: auto;
-    font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ss01" 1;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -140,71 +149,63 @@
   body {
     @apply bg-background text-foreground;
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 400;
-    line-height: 1.55;
-    letter-spacing: -0.011em;
-    color: #4A4F54;
+    line-height: 1.5;
+    letter-spacing: -0.005em;
+    color: #333333;
   }
 
-  /* ── PayPal Typography Scale ─────────────────────────────────────────── */
-  /* Hero / Display — very large, very bold, tight tracking */
+  /* ── Shein Typography Scale ─────────────────────────────────────────── */
   h1 {
-    font-size: clamp(1.875rem, 5vw, 2.5rem);
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -0.035em;
-    color: #1D1D1D;
-    font-family: "Inter", sans-serif;
-  }
-  /* Section heading */
-  h2 {
-    font-size: clamp(1.375rem, 3.5vw, 1.75rem);
+    font-size: clamp(1.5rem, 5vw, 2rem);
     font-weight: 700;
-    line-height: 1.18;
-    letter-spacing: -0.025em;
-    color: #1D1D1D;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #1A1A1A;
     font-family: "Inter", sans-serif;
   }
-  /* Card heading */
+  h2 {
+    font-size: clamp(1.125rem, 3vw, 1.375rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: #1A1A1A;
+    font-family: "Inter", sans-serif;
+  }
   h3 {
-    font-size: 1.0625rem;
+    font-size: 1rem;
     font-weight: 600;
     line-height: 1.3;
-    letter-spacing: -0.015em;
-    color: #1D1D1D;
+    letter-spacing: -0.01em;
+    color: #1A1A1A;
     font-family: "Inter", sans-serif;
   }
-  /* Label / sub-heading */
   h4 {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     font-weight: 600;
     line-height: 1.4;
-    letter-spacing: -0.01em;
-    color: #1D1D1D;
+    color: #1A1A1A;
     font-family: "Inter", sans-serif;
   }
-  /* Body copy */
   p {
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     font-weight: 400;
-    line-height: 1.65;
-    color: #4A4F54;
+    line-height: 1.6;
+    color: #666666;
   }
-  /* Caption / helper */
   small {
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     font-weight: 400;
-    color: #6C7378;
+    color: #999999;
     line-height: 1.5;
   }
-  /* Links */
   a {
-    color: #0070BA;
+    color: #E8192C;
     text-decoration: none;
     font-weight: 500;
   }
-  a:hover { color: #005EA6; text-decoration: underline; }
+  a:hover { color: #c0141f; }
 
   .safe-area-top    { padding-top: var(--safe-area-top); }
   .safe-area-bottom { padding-bottom: var(--safe-area-bottom); }
@@ -249,205 +250,149 @@
 }
 
 /* ════════════════════════════════════════════════════════════════════════
-   PAYPAL COMPONENT TOKENS
+   SHEIN COMPONENT TOKENS
    ════════════════════════════════════════════════════════════════════════ */
 
 /* ── Card ── */
-.pp-card {
+.shein-card {
   background: #FFFFFF;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07), 0 0 1px rgba(0, 0, 0, 0.05);
-  border: 1px solid #CBD2D9;
-}
-.pp-card-elevated {
-  background: #FFFFFF;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.09), 0 1px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* ── Buttons ── */
-.pp-btn-primary {
-  background: #0070BA;
-  color: #FFFFFF;
-  border-radius: 24px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  padding: 13px 28px;
-  letter-spacing: 0.005em;
-  transition: background 0.15s cubic-bezier(0.23, 1, 0.32, 1), transform 0.1s ease, box-shadow 0.15s ease;
-  border: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-family: "Inter", sans-serif;
-}
-.pp-btn-primary:hover  { background: #005EA6; box-shadow: 0 4px 14px rgba(0,112,186,0.30); }
-.pp-btn-primary:active { background: #004D8F; transform: scale(0.97); }
-
-.pp-btn-secondary {
-  background: transparent;
-  color: #0070BA;
-  border-radius: 24px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  padding: 12px 28px;
-  border: 1.5px solid #0070BA;
-  transition: all 0.15s cubic-bezier(0.23, 1, 0.32, 1);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-family: "Inter", sans-serif;
-}
-.pp-btn-secondary:hover  { background: #EBF4FB; }
-.pp-btn-secondary:active { transform: scale(0.97); }
-
-/* ── Quick-reply chip ── */
-.pp-chip {
-  background: #F0F4F8;
-  color: #1D1D1D;
-  border-radius: 24px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  padding: 10px 16px;
-  border: 1px solid #CBD2D9;
-  transition: all 0.15s cubic-bezier(0.23, 1, 0.32, 1);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  cursor: pointer;
-  font-family: "Inter", sans-serif;
-}
-.pp-chip:hover  { background: #DDE8F0; border-color: #0070BA; color: #0070BA; }
-.pp-chip:active { transform: scale(0.97); }
-
-/* ── Input ── */
-.pp-input {
-  background: #F5F7FA;
-  border: 1.5px solid #CBD2D9;
   border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 0.9375rem;
-  font-weight: 400;
-  color: #1D1D1D;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  width: 100%;
-  outline: none;
-  font-family: "Inter", sans-serif;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border: 1px solid #E5E5E5;
 }
-.pp-input:focus {
-  border-color: #0070BA;
-  background: #FFFFFF;
-  box-shadow: 0 0 0 3px rgba(0, 112, 186, 0.12);
-}
-.pp-input::placeholder { color: #9DA3A6; }
 
-/* ── Badge ── */
-.pp-badge {
-  background: #EBF4FB;
-  color: #0070BA;
-  border-radius: 12px;
+/* ── Price tag ── */
+.price-red {
+  color: #E8192C;
+  font-weight: 700;
+  font-size: 1rem;
+}
+.price-original {
+  color: #999999;
   font-size: 0.75rem;
+  text-decoration: line-through;
+}
+
+/* ── Badge discount ── */
+.badge-discount {
+  background: #E8192C;
+  color: #FFFFFF;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 2px;
+  letter-spacing: 0.02em;
+}
+.badge-sale {
+  background: #FF6B35;
+  color: #FFFFFF;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+.badge-free {
+  background: #00A650;
+  color: #FFFFFF;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+/* ── Shein-style button ── */
+.btn-shein {
+  background: #E8192C;
+  color: #FFFFFF;
   font-weight: 600;
-  padding: 3px 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: "Inter", sans-serif;
+  font-size: 0.875rem;
+  padding: 12px 24px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
   letter-spacing: 0.01em;
 }
-.pp-badge-navy  { background: #003087; color: #FFFFFF; }
-.pp-badge-green { background: #E8F5EE; color: #00A651; }
-.pp-badge-red   { background: #FDE8EB; color: #D0021B; }
+.btn-shein:hover { background: #c0141f; }
+.btn-shein:active { transform: scale(0.98); }
 
-/* ── Section helpers ── */
-.pp-section       { background: #EEF2F7; padding: 24px 16px; }
-.pp-section-white { background: #FFFFFF; padding: 24px 16px; }
-
-/* ── PayPal gradient text ── */
-.pp-gradient-text {
-  background: linear-gradient(135deg, #0070BA 0%, #003087 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.btn-shein-outline {
+  background: transparent;
+  color: #E8192C;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 11px 24px;
+  border-radius: 4px;
+  border: 1.5px solid #E8192C;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-shein-outline:hover {
+  background: #FFF0F1;
 }
 
-/* ── Section label (UPPERCASE small caps) ── */
-.pp-label {
+/* ── Section divider ── */
+.section-divider {
+  height: 8px;
+  background: #F5F5F5;
+  margin: 0 -1rem;
+}
+
+/* ── Star rating ── */
+.star-rating {
+  color: #FFB800;
+  font-size: 0.75rem;
+}
+
+/* ── Tag chip ── */
+.tag-chip {
+  background: #F5F5F5;
+  color: #333333;
   font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  color: #0070BA;
-  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 2px;
+  border: 1px solid #E5E5E5;
 }
 
-/* ── Divider ── */
-.pp-divider {
-  height: 1px;
-  background: #CBD2D9;
-  border: none;
-  margin: 0;
+/* ── Bottom nav Shein style ── */
+.bottom-nav-shein {
+  background: #FFFFFF;
+  border-top: 1px solid #E5E5E5;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
 }
 
-/* ── Scrollbar ── */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #CBD2D9 transparent;
-}
-*::-webkit-scrollbar { width: 5px; height: 5px; }
-*::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb { background: #CBD2D9; border-radius: 4px; }
-*::-webkit-scrollbar-thumb:hover { background: #9DA3A6; }
+/* ── Scrollbar hide ── */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* ── Animations ── */
-@keyframes pp-slide-up {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ── Line clamp ── */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-@keyframes pp-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-@keyframes pp-scale-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
-}
-@keyframes pp-pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.55; transform: scale(0.8); }
-}
-@keyframes pp-shimmer {
-  0%   { background-position: -200% 0; }
+
+/* ── Shimmer loading ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-
-.pp-animate-up    { animation: pp-slide-up  0.32s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
-.pp-animate-fade  { animation: pp-fade-in   0.22s ease forwards; }
-.pp-animate-scale { animation: pp-scale-in  0.28s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
-
-/* Skeleton shimmer */
-.pp-skeleton {
-  background: linear-gradient(90deg, #EEF2F7 25%, #E2E8EF 50%, #EEF2F7 75%);
+.shimmer {
+  background: linear-gradient(90deg, #F5F5F5 25%, #EBEBEB 50%, #F5F5F5 75%);
   background-size: 200% 100%;
-  animation: pp-shimmer 1.4s ease-in-out infinite;
-  border-radius: 8px;
+  animation: shimmer 1.5s infinite;
 }
 
-/* ── Responsive typography ── */
-@media (max-width: 480px) {
-  h1 { font-size: 1.75rem; }
-  h2 { font-size: 1.25rem; }
-  body { font-size: 14px; }
+/* ── Fade in animation ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up {
+  animation: fadeInUp 0.35s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
 
-/* ── Reduced motion ── */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
+/* ── Scale on press ── */
+.press-scale:active { transform: scale(0.97); transition: transform 0.1s ease; }

@@ -1,437 +1,462 @@
-import { useState } from 'react';
-import { Link } from 'wouter';
+import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import {
-  Scan, ShoppingCart, Package,
-  ChatCircleDots, Rocket,
-  CurrencyCircleDollar, MagnifyingGlass, Storefront, Truck,
-} from '@phosphor-icons/react';
-import { ChevronDown } from 'lucide-react';
 import AppLayout from '@/components/AppLayout';
-import AboutPopup from '@/components/AboutPopup';
-import { useChatContext } from '@/App';
 
-/* ── PayPal Design System ─────────────────────────────────────────────── */
-const BG     = '#EEF2F7';   // PayPal page background
-const WHITE  = '#FFFFFF';   // PayPal card white
-const BLUE   = '#0070BA';   // PayPal Blue
-const NAVY   = '#003087';   // PayPal Navy
-const SKY    = '#009CDE';   // PayPal Sky
-const TEXT   = '#2C2E2F';   // PayPal Near-Black
-const MUTED  = '#6C7378';   // PayPal Gray
-const SUBTLE = '#9DA3A6';   // PayPal Light Gray
-const BORDER = '#CBD2D9';   // PayPal Border
-const INPUT  = '#F5F7FA';   // PayPal Input BG
-const GREEN  = '#00A651';   // PayPal Green
-const SHADOW = '0 1px 4px rgba(0,0,0,0.08), 0 0 1px rgba(0,0,0,0.04)';
-const SHADOW_MD = '0 4px 14px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.06)';
+/* ── Shein Design Tokens ────────────────────────────────────────────────── */
+const RED    = '#E8192C';
+const BLACK  = '#1A1A1A';
+const GRAY1  = '#333333';
+const GRAY2  = '#666666';
+const GRAY3  = '#999999';
+const GRAY4  = '#F5F5F5';
+const BORDER = '#E5E5E5';
+const GREEN  = '#00A650';
+const ORANGE = '#FF6B35';
 
+/* ── Image URLs (uploaded via manus-upload-file) ────────────────────────── */
+const IMGS = {
+  hero:       '/manus-storage/hero-delivery-tunisia_2914d89b.webp',
+  unboxing1:  '/manus-storage/unboxing-clothes_5637a1dc.jpg',
+  unboxing2:  '/manus-storage/unboxing-happy_b2d19bf8.jpg',
+  unboxing3:  '/manus-storage/happy-unboxing_eda27441.jpg',
+  couple:     '/manus-storage/couple-phone_771f441d.jpg',
+  womanPhone: '/manus-storage/woman-shopping-phone_0ed1d14c.jpg',
+};
+
+/* ── Inline SVG Icons ───────────────────────────────────────────────────── */
+const IconArrow = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="9 18 15 12 9 6"/>
+  </svg>
+);
+const IconCheck = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+const IconStar = ({ filled = true }: { filled?: boolean }) => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill={filled ? '#FFB800' : 'none'} stroke="#FFB800" strokeWidth="2">
+    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+  </svg>
+);
+const IconTruck = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="1" y="3" width="15" height="13" rx="1"/>
+    <path d="M16 8h4l3 5v3h-7V8z"/>
+    <circle cx="5.5" cy="18.5" r="2.5"/>
+    <circle cx="18.5" cy="18.5" r="2.5"/>
+  </svg>
+);
+const IconShield = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+);
+const IconTag = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+    <line x1="7" y1="7" x2="7.01" y2="7"/>
+  </svg>
+);
+const IconSearch = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8"/>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+  </svg>
+);
+const IconPackage = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/>
+    <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+    <line x1="12" y1="22.08" x2="12" y2="12"/>
+  </svg>
+);
+
+/* ── Data ────────────────────────────────────────────────────────────────── */
 const platforms = [
-  { name: 'Shein',       desc: 'Mode & tendances',  letter: 'S', color: '#111111' },
-  { name: 'AliExpress',  desc: 'Tout & moins cher', letter: 'A', color: '#D0021B' },
-  { name: 'Temu',        desc: 'Prix imbattables',  letter: 'T', color: '#E07B00' },
-];
-
-const stats = [
-  { value: '170+',   label: 'Commandes livrées' },
-  { value: '98%',    label: 'Satisfaction client' },
-  { value: '20-25j', label: 'Délai de livraison' },
-  { value: '3',      label: 'Plateformes' },
-];
-
-const features = [
-  { icon: CurrencyCircleDollar, title: 'Prix en TND',          desc: 'Calcul instantané en dinars tunisiens, sans surprises ni frais cachés.' },
-  { icon: Truck,                title: 'Livraison 20–25 jours', desc: 'Votre colis livré à domicile en Tunisie, rapidement et en sécurité.' },
-  { icon: MagnifyingGlass,      title: 'Suivi en temps réel',  desc: 'Suivez chaque étape de votre commande depuis notre application.' },
-  { icon: Storefront,           title: '3 plateformes',        desc: 'Shein, AliExpress et Temu — tout en un seul endroit.' },
+  { name: 'SHEIN',      color: RED,    bg: '#FFF0F1', desc: 'Mode & Tendances',   tag: 'Mode' },
+  { name: 'AliExpress', color: ORANGE, bg: '#FFF4EE', desc: 'Tout & Moins Cher',  tag: 'Tech' },
+  { name: 'Temu',       color: '#FF6B35', bg: '#FFF4EF', desc: 'Prix Imbattables', tag: 'Maison' },
 ];
 
 const steps = [
-  { n: '1', title: 'Scannez ou collez le lien', desc: 'Prenez une photo du produit ou collez son URL depuis Shein, AliExpress ou Temu.' },
-  { n: '2', title: 'Obtenez le prix en TND',    desc: 'Notre calculateur convertit instantanément avec tous les frais inclus.' },
-  { n: '3', title: 'Confirmez et suivez',        desc: 'Passez commande en quelques secondes et suivez la livraison en temps réel.' },
+  { num: '01', title: 'Envoyez le lien',         desc: 'Copiez le lien du produit depuis Shein, AliExpress ou Temu et envoyez-le nous.', Icon: IconSearch,  color: RED },
+  { num: '02', title: 'On commande pour vous',   desc: 'Notre équipe passe la commande, paie et gère toute la logistique internationale.', Icon: IconPackage, color: ORANGE },
+  { num: '03', title: 'Livraison chez vous',     desc: 'Votre colis arrive directement à votre porte en Tunisie en 20–25 jours.', Icon: IconTruck,   color: GREEN },
 ];
 
-const faqs = [
-  { q: 'Comment calculer le prix final ?',
-    a: 'Scannez le produit depuis Shein, AliExpress ou Temu. Notre outil calcule automatiquement le prix en TND avec les frais de service et de livraison.' },
-  { q: 'Quel est le délai de livraison ?',
-    a: 'En général 20 à 25 jours ouvrables selon la plateforme et la destination en Tunisie.' },
-  { q: 'Comment suivre ma commande ?',
-    a: "Depuis la section \"Commandes\" dans l'application, entrez votre nom ou numéro de téléphone." },
-  { q: 'Quels modes de paiement ?',
-    a: 'Paiement à la livraison (cash) ou virement bancaire selon votre wilaya.' },
+const advantages = [
+  { Icon: IconTruck,  title: 'Livraison 20–25j',   desc: 'Directement chez vous en Tunisie',    color: RED },
+  { Icon: IconShield, title: '100% Sécurisé',       desc: 'Paiement et colis garantis',          color: GREEN },
+  { Icon: IconTag,    title: 'Prix en TND',         desc: 'Calculé en dinars tunisiens',         color: ORANGE },
+  { Icon: IconCheck,  title: 'Suivi temps réel',    desc: 'Suivez votre commande à tout moment', color: '#6C63FF' },
 ];
 
-/* ── Micro-components ─────────────────────────────────────────────────── */
-function SectionLabel({ children }: { children: React.ReactNode }) {
+const testimonials = [
+  {
+    name: 'Sarra B.',     city: 'Tunis',
+    text: "J'ai commandé une robe Shein et elle est arrivée en parfait état ! Prix très raisonnable, je recommande vivement.",
+    rating: 5, img: IMGS.unboxing1, tag: 'Shein',
+  },
+  {
+    name: 'Mohamed K.',   city: 'Sfax',
+    text: "Service rapide et fiable. Mon colis AliExpress est arrivé en 22 jours. Emballage soigné.",
+    rating: 5, img: IMGS.couple, tag: 'AliExpress',
+  },
+  {
+    name: 'Ines M.',      city: 'Sousse',
+    text: "Bysis m'a sauvé ! Je voulais des chaussures Temu introuvables en Tunisie. Parfait !",
+    rating: 5, img: IMGS.womanPhone, tag: 'Temu',
+  },
+];
+
+/* ── Sub-components ──────────────────────────────────────────────────────── */
+function StarRow({ count = 5 }: { count?: number }) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-widest mb-2" style={{ color: BLUE, letterSpacing: '0.12em' }}>
-      {children}
-    </p>
+    <div className="flex gap-0.5">
+      {Array.from({ length: 5 }).map((_, i) => <IconStar key={i} filled={i < count} />)}
+    </div>
   );
 }
 
-function SectionHeading({ children }: { children: React.ReactNode }) {
+function SectionHeader({ label, title, sub }: { label: string; title: string; sub?: string }) {
   return (
-    <h2 className="text-2xl font-extrabold leading-tight" style={{ color: TEXT, letterSpacing: '-0.02em', fontFamily: 'Inter, sans-serif' }}>
-      {children}
-    </h2>
+    <div className="px-4 mb-4">
+      <p className="text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: RED }}>{label}</p>
+      <h2 className="text-xl font-bold leading-tight" style={{ color: BLACK }}>{title}</h2>
+      {sub && <p className="text-sm mt-1" style={{ color: GRAY2 }}>{sub}</p>}
+    </div>
   );
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   HOME PAGE
+   ══════════════════════════════════════════════════════════════════════════ */
 export default function Home() {
-  const [aboutOpen, setAboutOpen]     = useState(false);
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
-  const { openChat }                  = useChatContext();
+  const [, navigate] = useLocation();
 
   return (
-    <AppLayout onChatOpen={openChat}>
-      <AboutPopup isOpen={aboutOpen} onClose={() => setAboutOpen(false)} />
+    <AppLayout>
+    <div className="w-full" style={{ background: '#FFFFFF', fontFamily: '"Inter", sans-serif' }}>
 
-      {/* ── HERO ──────────────────────────────────────────────────────── */}
-      <section className="px-5 pt-10 pb-12" style={{ background: BG }}>
-        <div className="max-w-lg mx-auto">
-
-          {/* Headline — PayPal-style: very large, very bold */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}
-            className="mb-4"
-            style={{
-              fontSize: 'clamp(2rem, 8vw, 2.75rem)',
-              fontWeight: 800,
-              lineHeight: 1.12,
-              letterSpacing: '-0.03em',
-              color: TEXT,
-              fontFamily: 'Inter, sans-serif',
-            }}
+      {/* ── HERO ─────────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden" style={{ background: '#FFF0F1', minHeight: 220 }}>
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `url(${IMGS.hero})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top',
+            opacity: 0.15,
+          }}
+        />
+        <div className="relative px-5 pt-6 pb-8">
+          <motion.div
+            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-4"
+            style={{ background: RED, color: '#fff' }}
           >
-            Achetez depuis{' '}
-            <span style={{ color: '#111111' }}>Shein</span>,{' '}
-            <span style={{ color: '#D0021B' }}>AliExpress</span>{' '}
-            &amp;{' '}
-            <span style={{ color: '#E07B00' }}>Temu</span>
+            <span>🛍️</span>
+            <span>Shein · AliExpress · Temu → Tunisie</span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}
+            className="text-3xl font-black leading-tight mb-2"
+            style={{ color: BLACK, letterSpacing: '-0.03em' }}
+          >
+            Achetez depuis<br />
+            <span style={{ color: RED }}>n'importe où</span>,<br />
+            livré chez vous
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-            className="mb-8 text-base leading-relaxed"
-            style={{ color: MUTED, fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
+            className="text-sm mb-6 leading-relaxed"
+            style={{ color: GRAY1 }}
           >
-            On commande pour vous et on livre directement chez vous en Tunisie.
-            Prix calculé en dinars, livraison 20–25 jours, zéro stress.
+            On commande pour vous sur les plus grandes plateformes mondiales et on livre directement en Tunisie. Prix en TND, livraison 20–25 jours.
           </motion.p>
 
-          {/* CTA buttons — PayPal pill shape */}
           <motion.div
-            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}
-            className="flex flex-col sm:flex-row gap-3"
+            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}
+            className="flex gap-3"
           >
-            <Link href="/calculator">
-              <button
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 font-semibold text-white transition-all duration-150 active:scale-[0.97]"
-                style={{
-                  background: BLUE,
-                  borderRadius: 24,
-                  fontSize: '0.9375rem',
-                  letterSpacing: '0.01em',
-                  boxShadow: `0 4px 14px ${BLUE}40`,
-                  fontFamily: 'Inter, sans-serif',
-                }}
-              >
-                <Scan size={18} weight="bold" />
-                Calculer mon prix
-              </button>
-            </Link>
-            <Link href="/order">
-              <button
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 font-semibold text-white transition-all duration-150 active:scale-[0.97]"
-                style={{
-                  background: NAVY,
-                  borderRadius: 24,
-                  fontSize: '0.9375rem',
-                  letterSpacing: '0.01em',
-                  boxShadow: `0 4px 14px ${NAVY}40`,
-                  fontFamily: 'Inter, sans-serif',
-                }}
-              >
-                <ShoppingCart size={18} weight="bold" />
-                Passer commande
-              </button>
-            </Link>
             <button
-              onClick={openChat}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 font-semibold transition-all duration-150 active:scale-[0.97]"
-              style={{
-                background: WHITE,
-                color: BLUE,
-                borderRadius: 24,
-                fontSize: '0.9375rem',
-                border: `1.5px solid ${BLUE}`,
-                fontFamily: 'Inter, sans-serif',
-              }}
+              onClick={() => navigate('/order')}
+              className="flex-1 flex items-center justify-center gap-2 h-11 rounded-lg font-semibold text-sm text-white press-scale"
+              style={{ background: RED }}
             >
-              <ChatCircleDots size={18} weight="bold" />
-              Parler au chatbot
+              Commander maintenant
+              <IconArrow />
+            </button>
+            <button
+              onClick={() => navigate('/calculator')}
+              className="flex items-center justify-center h-11 px-4 rounded-lg font-semibold text-sm press-scale"
+              style={{ background: '#fff', color: RED, border: `1.5px solid ${RED}` }}
+            >
+              Calculer
             </button>
           </motion.div>
+
+          <div className="flex gap-4 mt-5">
+            {['Livraison garantie', 'Prix en TND', 'Suivi inclus'].map((b, i) => (
+              <div key={i} className="flex items-center gap-1">
+                <span className="text-xs font-bold" style={{ color: GREEN }}>✓</span>
+                <span className="text-xs" style={{ color: GRAY2 }}>{b}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── STATS BAND — PayPal navy ───────────────────────────────────── */}
-      <section className="py-7 px-5" style={{ background: NAVY }}>
-        <div className="max-w-lg mx-auto grid grid-cols-4 gap-2">
-          {stats.map((s, i) => (
+      {/* ── STATS STRIP ──────────────────────────────────────────────────── */}
+      <section style={{ background: BLACK }}>
+        <div className="flex justify-around py-4 px-2">
+          {[
+            { value: '170+', label: 'Commandes livrées' },
+            { value: '98%',  label: 'Satisfaction' },
+            { value: '25j',  label: 'Délai moyen' },
+            { value: '3',    label: 'Plateformes' },
+          ].map((s, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <span className="text-xl font-black" style={{ color: '#fff' }}>{s.value}</span>
+              <span className="text-[10px] mt-0.5 text-center" style={{ color: 'rgba(255,255,255,0.5)' }}>{s.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div style={{ height: 8, background: GRAY4 }} />
+
+      {/* ── PLATFORMS ────────────────────────────────────────────────────── */}
+      <section className="py-5">
+        <SectionHeader label="Plateformes" title="Où on commande pour vous" sub="Trois des plus grandes plateformes mondiales, accessibles depuis la Tunisie." />
+        <div className="px-4 flex gap-3 overflow-x-auto scrollbar-hide pb-1">
+          {platforms.map((p, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.06 }}
-              className="text-center"
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}
+              className="flex-shrink-0 w-32 rounded-xl p-4 flex flex-col items-center gap-2 press-scale"
+              style={{ background: p.bg, border: `1px solid ${BORDER}` }}
+              onClick={() => navigate('/arrivage')}
             >
-              <div
-                className="font-extrabold leading-none mb-1 text-white"
-                style={{ fontSize: 'clamp(1.1rem, 4vw, 1.5rem)', fontFamily: 'Inter, sans-serif', letterSpacing: '-0.02em' }}
-              >
-                {s.value}
+              <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-sm" style={{ background: p.color }}>
+                {p.name.charAt(0)}
               </div>
-              <div className="text-[10px] font-medium leading-tight" style={{ color: 'rgba(255,255,255,0.55)', fontFamily: 'Inter, sans-serif' }}>
-                {s.label}
+              <span className="text-sm font-bold text-center" style={{ color: BLACK }}>{p.name}</span>
+              <span className="text-[10px] text-center" style={{ color: GRAY2 }}>{p.desc}</span>
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: p.color, color: '#fff' }}>{p.tag}</span>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      <div style={{ height: 8, background: GRAY4 }} />
+
+      {/* ── HOW IT WORKS ─────────────────────────────────────────────────── */}
+      <section className="py-5">
+        <SectionHeader label="Comment ça marche" title="Simple comme bonjour" sub="3 étapes pour recevoir vos achats internationaux en Tunisie." />
+        <div className="px-4 flex flex-col gap-3">
+          {steps.map((step, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
+              className="flex items-start gap-4 p-4 rounded-xl"
+              style={{ background: GRAY4, border: `1px solid ${BORDER}` }}
+            >
+              <div className="flex-shrink-0 flex flex-col items-center gap-1">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: step.color + '18', color: step.color }}>
+                  <step.Icon />
+                </div>
+                <span className="text-[10px] font-black" style={{ color: step.color }}>{step.num}</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-bold mb-1" style={{ color: BLACK }}>{step.title}</h3>
+                <p className="text-xs leading-relaxed" style={{ color: GRAY2 }}>{step.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+        <div className="px-4 mt-4">
+          <button onClick={() => navigate('/order')} className="w-full h-11 rounded-lg font-semibold text-sm text-white press-scale" style={{ background: RED }}>
+            Commencer maintenant →
+          </button>
+        </div>
+      </section>
+
+      <div style={{ height: 8, background: GRAY4 }} />
+
+      {/* ── PHOTO SHOWCASE ───────────────────────────────────────────────── */}
+      <section className="py-5">
+        <SectionHeader label="Notre Service" title="Des milliers de produits livrés" sub="Vêtements, accessoires, électronique, maison... tout ce que vous voulez." />
+        <div className="px-4 grid grid-cols-2 gap-2">
+          <div className="col-span-2 rounded-xl overflow-hidden" style={{ height: 180 }}>
+            <img src={IMGS.unboxing2} alt="Unboxing commande Bysis" className="w-full h-full object-cover" />
+          </div>
+          <div className="rounded-xl overflow-hidden" style={{ height: 130 }}>
+            <img src={IMGS.unboxing1} alt="Vêtements commandés" className="w-full h-full object-cover" />
+          </div>
+          <div className="rounded-xl overflow-hidden" style={{ height: 130 }}>
+            <img src={IMGS.unboxing3} alt="Colis reçu" className="w-full h-full object-cover" />
+          </div>
+        </div>
+        <div className="mx-4 mt-3 rounded-xl px-4 py-3 flex items-center justify-between" style={{ background: '#FFF0F1', border: '1px solid #FECDD3' }}>
+          <div>
+            <p className="text-xs font-bold" style={{ color: RED }}>🔥 Livraison GRATUITE</p>
+            <p className="text-xs mt-0.5" style={{ color: GRAY2 }}>Pour toute commande &gt; 150 TND</p>
+          </div>
+          <button onClick={() => navigate('/order')} className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white" style={{ background: RED }}>
+            Commander
+          </button>
+        </div>
+      </section>
+
+      <div style={{ height: 8, background: GRAY4 }} />
+
+      {/* ── ADVANTAGES ───────────────────────────────────────────────────── */}
+      <section className="py-5">
+        <SectionHeader label="Pourquoi Bysis" title="Vos avantages exclusifs" />
+        <div className="px-4 grid grid-cols-2 gap-3">
+          {advantages.map((adv, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.07 }}
+              className="p-4 rounded-xl flex flex-col gap-2"
+              style={{ background: GRAY4, border: `1px solid ${BORDER}` }}
+            >
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: adv.color + '18', color: adv.color }}>
+                <adv.Icon />
+              </div>
+              <h4 className="text-xs font-bold" style={{ color: BLACK }}>{adv.title}</h4>
+              <p className="text-[11px] leading-relaxed" style={{ color: GRAY2 }}>{adv.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      <div style={{ height: 8, background: GRAY4 }} />
+
+      {/* ── TESTIMONIALS ─────────────────────────────────────────────────── */}
+      <section className="py-5">
+        <SectionHeader label="Avis Clients" title="Ce que disent nos clients" sub="Plus de 170 commandes livrées avec succès en Tunisie." />
+
+        {/* Rating summary */}
+        <div className="mx-4 mb-4 p-4 rounded-xl flex items-center gap-4" style={{ background: '#FFF0F1', border: '1px solid #FECDD3' }}>
+          <div className="flex flex-col items-center">
+            <span className="text-4xl font-black" style={{ color: RED }}>4.9</span>
+            <StarRow count={5} />
+            <span className="text-[10px] mt-1" style={{ color: GRAY3 }}>170+ avis</span>
+          </div>
+          <div className="flex-1">
+            {[5, 4, 3].map((n) => (
+              <div key={n} className="flex items-center gap-2 mb-1">
+                <span className="text-[10px] w-2" style={{ color: GRAY3 }}>{n}</span>
+                <div className="flex-1 h-1.5 rounded-full" style={{ background: BORDER }}>
+                  <div className="h-full rounded-full" style={{ background: RED, width: n === 5 ? '88%' : n === 4 ? '9%' : '3%' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Testimonial cards */}
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+          {testimonials.map((t, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
+              className="flex-shrink-0 w-64 rounded-xl p-4 flex flex-col gap-3"
+              style={{ background: '#FFFFFF', border: `1px solid ${BORDER}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                  <img src={t.img} alt={t.name} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-bold truncate" style={{ color: BLACK }}>{t.name}</p>
+                  <p className="text-[10px]" style={{ color: GRAY3 }}>{t.city}</p>
+                </div>
+                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: RED + '18', color: RED }}>
+                  {t.tag}
+                </span>
+              </div>
+              <StarRow count={t.rating} />
+              <p className="text-xs leading-relaxed line-clamp-2" style={{ color: GRAY1 }}>"{t.text}"</p>
+              <div className="flex items-center gap-1">
+                <span style={{ color: GREEN }}><IconCheck /></span>
+                <span className="text-[10px]" style={{ color: GREEN }}>Achat vérifié</span>
               </div>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* ── PLATFORMS ─────────────────────────────────────────────────── */}
-      <section className="py-12 px-5" style={{ background: WHITE }}>
-        <div className="max-w-lg mx-auto">
-          <SectionLabel>Plateformes</SectionLabel>
-          <SectionHeading>Où on commande pour vous</SectionHeading>
-          <p className="mt-2 mb-7 text-sm" style={{ color: MUTED, fontFamily: 'Inter, sans-serif' }}>
-            Trois des plus grandes plateformes mondiales, accessibles depuis la Tunisie.
-          </p>
-          <div className="grid grid-cols-3 gap-3">
-            {platforms.map((p, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.07 }}
-                className="flex flex-col items-center gap-3 p-4 rounded-2xl transition-all duration-150 hover:shadow-md"
-                style={{ background: BG, border: `1px solid ${BORDER}` }}
-              >
-                <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-black text-white"
-                  style={{ background: p.color }}
-                >
-                  {p.letter}
-                </div>
-                <div className="text-center">
-                  <div className="font-bold text-sm" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>{p.name}</div>
-                  <div className="text-[11px] mt-0.5" style={{ color: MUTED }}>{p.desc}</div>
-                </div>
-              </motion.div>
-            ))}
+      <div style={{ height: 8, background: GRAY4 }} />
+
+      {/* ── ABOUT ────────────────────────────────────────────────────────── */}
+      <section className="py-5 px-4">
+        <SectionHeader label="À propos" title="Bysis, votre intermédiaire de confiance" />
+        <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${BORDER}` }}>
+          <div style={{ height: 160 }}>
+            <img src={IMGS.womanPhone} alt="Shopping en ligne avec Bysis" className="w-full h-full object-cover" />
           </div>
-        </div>
-      </section>
-
-      {/* ── FEATURES ──────────────────────────────────────────────────── */}
-      <section className="py-12 px-5" style={{ background: BG }}>
-        <div className="max-w-lg mx-auto">
-          <SectionLabel>Avantages</SectionLabel>
-          <SectionHeading>Pourquoi choisir Bysis ?</SectionHeading>
-          <div className="mt-7 grid grid-cols-2 gap-3">
-            {features.map((f, i) => {
-              const Icon = f.icon;
-              return (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.07 }}
-                  className="p-4 rounded-2xl"
-                  style={{ background: WHITE, border: `1px solid ${BORDER}`, boxShadow: SHADOW }}
-                >
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center mb-3"
-                    style={{ background: '#EBF4FB' }}
-                  >
-                    <Icon size={18} weight="duotone" style={{ color: BLUE }} />
-                  </div>
-                  <h3 className="font-bold text-sm mb-1" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>{f.title}</h3>
-                  <p className="text-xs leading-relaxed" style={{ color: MUTED }}>{f.desc}</p>
-                </motion.div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS ──────────────────────────────────────────────── */}
-      <section className="py-12 px-5" style={{ background: WHITE }}>
-        <div className="max-w-lg mx-auto">
-          <SectionLabel>Processus</SectionLabel>
-          <SectionHeading>Comment ça marche ?</SectionHeading>
-          <div className="mt-7 space-y-3">
-            {steps.map((step, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                className="flex gap-4 p-4 rounded-2xl"
-                style={{ background: BG, border: `1px solid ${BORDER}` }}
-              >
-                {/* Step number — PayPal blue circle */}
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-black flex-shrink-0 text-white"
-                  style={{ background: BLUE, minWidth: 40 }}
-                >
-                  {step.n}
-                </div>
-                <div>
-                  <div className="font-bold text-sm mb-1" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>{step.title}</div>
-                  <p className="text-xs leading-relaxed" style={{ color: MUTED }}>{step.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FAQ ───────────────────────────────────────────────────────── */}
-      <section className="py-12 px-5" style={{ background: BG }}>
-        <div className="max-w-lg mx-auto">
-          <SectionLabel>FAQ</SectionLabel>
-          <SectionHeading>Questions fréquentes</SectionHeading>
-          <div className="mt-7 space-y-2">
-            {faqs.map((faq, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-                className="rounded-2xl overflow-hidden"
-                style={{ background: WHITE, border: `1px solid ${BORDER}`, boxShadow: SHADOW }}
-              >
-                <button
-                  onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
-                  className="w-full p-4 flex items-center justify-between gap-3"
-                  style={{ color: TEXT }}
-                >
-                  <span className="font-semibold text-left text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>{faq.q}</span>
-                  <motion.div animate={{ rotate: expandedFaq === i ? 180 : 0 }} transition={{ duration: 0.2 }} className="flex-shrink-0">
-                    <ChevronDown size={16} style={{ color: BLUE }} />
-                  </motion.div>
-                </button>
-                <motion.div
-                  initial={false}
-                  animate={{ height: expandedFaq === i ? 'auto' : 0 }}
-                  transition={{ duration: 0.22 }}
-                  className="overflow-hidden"
-                >
-                  <div
-                    className="px-4 pb-4 text-xs leading-relaxed"
-                    style={{ color: MUTED, borderTop: `1px solid ${BORDER}`, paddingTop: 12, fontFamily: 'Inter, sans-serif' }}
-                  >
-                    {faq.a}
-                  </div>
-                </motion.div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── AVIS CLIENTS ───────────────────────────────────────────────── */}
-      <section className="py-12 px-5" style={{ background: WHITE }}>
-        <div className="max-w-lg mx-auto">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-8">
-            <SectionLabel>آراء العملاء</SectionLabel>
-            <SectionHeading>ماذا يقول عملاؤنا؟</SectionHeading>
-          </motion.div>
-          <div className="space-y-4">
-            {[
-              { name: 'أمير بن سالم',       city: 'تونس العاصمة', rating: 5, text: 'خدمة ممتازة! طلبت من Shein وجاء الطرد في 22 يوم. السعر بالدينار واضح ومحسوب بدقة. نوصي بيها برشا!' },
-              { name: 'سارة المنصوري',  city: 'صفاقس',             rating: 5, text: 'أول مرة نطلب من AliExpress وما عرفتش كيفاش. Bysis ساعدتني في كل شيء من البداية للنهاية. شكراً جزيلاً!' },
-              { name: 'خالد الطرابلسي', city: 'سوسة',              rating: 5, text: 'الشات بوت سريع ويجاوب على كل الأسئلة. حسبتلي السعر بالدينار في ثواني. تجربة محترفة جداً.' },
-            ].map((rev, i) => (
-              <motion.div key={i} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className="rounded-2xl p-5" style={{ background: BG, border: `1px solid ${BORDER}` }}>
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-extrabold text-white flex-shrink-0"
-                    style={{ background: BLUE, fontFamily: 'Inter, sans-serif' }}>
-                    {rev.name[0]}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <div>
-                        <p className="font-bold text-sm" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>{rev.name}</p>
-                        <p className="text-xs" style={{ color: MUTED }}>{rev.city}</p>
-                      </div>
-                      <div className="flex gap-0.5">{Array.from({ length: rev.rating }).map((_,s) => <span key={s} style={{ color: '#F59E0B', fontSize: '14px' }}>★</span>)}</div>
-                    </div>
-                    <p className="text-sm leading-relaxed" style={{ color: '#4A4F54' }}>{rev.text}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA FINAL — PayPal navy ────────────────────────────────────── */}
-      <section className="py-16 px-5 safe-area-bottom" style={{ background: NAVY }}>
-        <div className="max-w-lg mx-auto text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            {/* Icon */}
-            <div
-              className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-5"
-              style={{ background: 'rgba(255,255,255,0.10)' }}
-            >
-              <Rocket size={28} weight="fill" color="white" />
-            </div>
-
-            <h2
-              className="text-2xl font-extrabold mb-3 text-white"
-              style={{ letterSpacing: '-0.02em', fontFamily: 'Inter, sans-serif' }}
-            >
-              Prêt à commencer ?
-            </h2>
-            <p
-              className="text-sm mb-8 leading-relaxed"
-              style={{ color: 'rgba(255,255,255,0.58)', fontFamily: 'Inter, sans-serif' }}
-            >
-              Rejoignez des milliers de clients qui font confiance à Bysis pour leurs achats en ligne.
+          <div className="p-4">
+            <p className="text-sm leading-relaxed mb-3" style={{ color: GRAY1 }}>
+              <strong style={{ color: BLACK }}>Bysis</strong> est une plateforme tunisienne spécialisée dans l'achat et la livraison de produits depuis les grandes plateformes internationales — <strong>Shein, AliExpress et Temu</strong> — directement en Tunisie.
             </p>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/calculator">
-                <button
-                  className="flex items-center justify-center gap-2 px-8 py-3.5 font-semibold text-white transition-all duration-150 active:scale-[0.97]"
-                  style={{
-                    background: BLUE,
-                    borderRadius: 24,
-                    fontSize: '0.9375rem',
-                    boxShadow: `0 4px 16px rgba(0,112,186,0.45)`,
-                    fontFamily: 'Inter, sans-serif',
-                  }}
-                >
-                  <Scan size={18} weight="bold" />
-                  Calculer mon prix
-                </button>
-              </Link>
-              <Link href="/order">
-                <button
-                  className="flex items-center justify-center gap-2 px-8 py-3.5 font-semibold text-white transition-all duration-150 active:scale-[0.97]"
-                  style={{
-                    background: 'rgba(255,255,255,0.12)',
-                    borderRadius: 24,
-                    fontSize: '0.9375rem',
-                    border: '1.5px solid rgba(255,255,255,0.28)',
-                    fontFamily: 'Inter, sans-serif',
-                  }}
-                >
-                  <ShoppingCart size={18} weight="bold" />
-                  Passer une commande
-                </button>
-              </Link>
+            <p className="text-sm leading-relaxed mb-4" style={{ color: GRAY1 }}>
+              Notre équipe gère tout pour vous : commande, paiement international, suivi et livraison à domicile. Vous payez en dinars tunisiens, sans stress.
+            </p>
+            <div className="flex flex-col gap-2">
+              {[
+                'Aucun compte international requis',
+                'Paiement en TND uniquement',
+                'Suivi de colis en temps réel',
+                'Service client disponible 7j/7',
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: GREEN + '18', color: GREEN }}>
+                    <IconCheck />
+                  </div>
+                  <span className="text-xs" style={{ color: GRAY1 }}>{item}</span>
+                </div>
+              ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
+
+      {/* ── FINAL CTA ────────────────────────────────────────────────────── */}
+      <section className="mx-4 mb-6 rounded-2xl overflow-hidden" style={{ background: BLACK }}>
+        <div className="px-5 py-6">
+          <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: RED }}>Commencez dès aujourd'hui</p>
+          <h2 className="text-xl font-black mb-2 leading-tight" style={{ color: '#fff' }}>
+            Votre prochain achat<br />
+            <span style={{ color: RED }}>commence ici</span>
+          </h2>
+          <p className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
+            Envoyez-nous le lien de votre produit et on s'occupe du reste.
+          </p>
+          <button
+            onClick={() => navigate('/order')}
+            className="w-full h-11 rounded-lg font-bold text-sm press-scale"
+            style={{ background: RED, color: '#fff' }}
+          >
+            Passer une commande →
+          </button>
+          <button
+            onClick={() => navigate('/track')}
+            className="w-full h-10 rounded-lg font-semibold text-sm mt-2 press-scale"
+            style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
+          >
+            Suivre ma commande
+          </button>
+        </div>
+      </section>
+
+    </div>
     </AppLayout>
   );
 }
