@@ -40,8 +40,21 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  /* Shein font system — Inter Variable */
+  /* Shein font system — Inter Variable + Poppins Display */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-display: "Poppins", "Inter", sans-serif;
+  
+  /* Shein Color Palette */
+  --shein-white: #FFFFFF;
+  --shein-black: #1A1A1A;
+  --shein-gray-light: #F5F5F5;
+  --shein-gray-medium: #CCCCCC;
+  --shein-gray-dark: #666666;
+  --shein-border: #E5E5E5;
+  --shein-red: #E8192C;
+  --shein-orange: #FF6B35;
+  --shein-yellow: #FF9500;
+  --shein-green: #00A651;
 }
 
 /* ── Safe area ─────────────────────────────────────────────────────────── */
