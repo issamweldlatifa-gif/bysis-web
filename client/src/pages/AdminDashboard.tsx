@@ -37,10 +37,10 @@ import { useLocation } from "wouter";
 const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
   new: { label: "Nouveau", color: "bg-blue-100 text-blue-700 border-blue-200", icon: Package },
   processing: { label: "En cours", color: "bg-blue-100 text-blue-700 border-blue-200", icon: Clock },
-  waiting_payment: { label: "Attente paiement", color: "bg-yellow-100 text-yellow-700 border-yellow-200", icon: CreditCard },
+  waiting_payment: { label: "Attente paiement", color: "bg-[#FFF9E6] text-yellow-700 border-yellow-200", icon: CreditCard },
   shipped: { label: "Expédié", color: "bg-purple-100 text-purple-700 border-purple-200", icon: Truck },
   arrived: { label: "Arrivé au dépôt", color: "bg-teal-100 text-teal-700 border-teal-200", icon: Warehouse },
-  completed: { label: "Livré", color: "bg-green-100 text-green-700 border-green-200", icon: CheckCircle2 },
+  completed: { label: "Livré", color: "bg-[#E8F5E9] text-green-700 border-green-200", icon: CheckCircle2 },
   cancelled: { label: "Annulé", color: "bg-blue-100 text-blue-700 border-blue-200", icon: XCircle },
 };
 
@@ -350,7 +350,7 @@ function AdminContent() {
             </Card>
             <Card className={`cursor-pointer hover:shadow-md transition-shadow ${statusFilter === "waiting_payment" ? "ring-2 ring-yellow-400" : ""}`} onClick={() => setStatusFilter("waiting_payment")}>
               <CardContent className="p-3 text-center">
-                <p className="text-2xl font-bold text-yellow-600">{stats.waiting_payment}</p>
+                <p className="text-2xl font-bold text-[#FFC107]">{stats.waiting_payment}</p>
                 <p className="text-[11px] text-muted-foreground">Paiement</p>
               </CardContent>
             </Card>
@@ -374,7 +374,7 @@ function AdminContent() {
             </Card>
             <Card className={`cursor-pointer hover:shadow-md transition-shadow ${statusFilter === "completed" ? "ring-2 ring-green-400" : ""}`} onClick={() => setStatusFilter("completed")}>
               <CardContent className="p-3 text-center">
-                <p className="text-2xl font-bold text-green-600">{stats.completed}</p>
+                <p className="text-2xl font-bold text-[#28A745]">{stats.completed}</p>
                 <p className="text-[11px] text-muted-foreground">Livrées</p>
               </CardContent>
             </Card>
@@ -573,7 +573,7 @@ function AdminContent() {
                                       href={(order as any).paymentReceiptUrl}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-1 text-green-600 hover:underline text-xs"
+                                      className="inline-flex items-center gap-1 text-[#28A745] hover:underline text-xs"
                                     >
                                       <Image className="h-3 w-3" />
                                       Voir le reçu

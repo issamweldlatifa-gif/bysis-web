@@ -108,7 +108,7 @@ export default function Orders() {
               onClick={() => setMode(m)}
               className={`flex items-center gap-2 px-4 py-2 rounded-full font-semibold text-sm transition-all ${
                 mode === m
-                  ? 'bg-[#1A1A1A] text-white shadow-lg '
+                  ? 'bg-blue-600 text-white shadow-lg '
                   : 'bg-white text-slate-300 hover:bg-gray-100'
               }`}
             >
@@ -147,7 +147,7 @@ export default function Orders() {
             type="submit"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="px-5 py-3 rounded-xl bg-[#1A1A1A] text-white font-bold  transition-all"
+            className="px-5 py-3 rounded-xl bg-blue-600 text-white font-bold  transition-all"
           >
             بحث
           </motion.button>

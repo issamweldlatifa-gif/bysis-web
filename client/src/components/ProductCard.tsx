@@ -54,7 +54,7 @@ export default function ProductCard({
     >
       {/* Product Image with Scanning Line */}
       <motion.div
-        className="relative rounded-3xl overflow-hidden bg-black border-2 border-cyan-500/30 aspect-square"
+        className="relative rounded-3xl overflow-hidden bg-blue-600 border-2 border-cyan-500/30 aspect-square"
         whileHover={{ borderColor: 'rgba(0, 212, 200, 0.5)' }}
       >
         <img

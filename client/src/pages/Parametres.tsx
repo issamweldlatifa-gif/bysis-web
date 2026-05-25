@@ -20,12 +20,12 @@ const GOUVERNORATS = [
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   new: { label: "Nouvelle", color: "bg-blue-100 text-blue-700" },
-  processing: { label: "En traitement", color: "bg-yellow-100 text-yellow-700" },
+  processing: { label: "En traitement", color: "bg-[#FFF9E6] text-yellow-700" },
   waiting_payment: { label: "En attente paiement", color: "bg-orange-100 text-orange-700" },
   shipped: { label: "Expédiée", color: "bg-purple-100 text-purple-700" },
   arrived: { label: "Arrivée", color: "bg-teal-100 text-teal-700" },
-  completed: { label: "Complétée", color: "bg-green-100 text-green-700" },
-  cancelled: { label: "Annulée", color: "bg-red-100 text-red-700" },
+  completed: { label: "Complétée", color: "bg-[#E8F5E9] text-green-700" },
+  cancelled: { label: "Annulée", color: "bg-[#FFEBEE] text-red-700" },
 };
 
 export default function Parametres() {

@@ -24,7 +24,7 @@ const SHEIN_BLACK  = '#1A1A1A';
 const IconBysis = () => (
   <div
     className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-black text-base flex-shrink-0"
-    style={{ background: SHEIN_RED }}
+    style={{ background: '#0047AB' }}
   >
     B
   </div>
@@ -132,8 +132,8 @@ function BottomNav({ onProfileClick, onScanClick }: {
                   whileTap={{ scale: 0.88 }}
                   className="w-[52px] h-[52px] rounded-full flex items-center justify-center shadow-lg"
                   style={{
-                    background: SHEIN_RED,
-                    boxShadow: `0 4px 14px rgba(232,25,44,0.40)`,
+                    background: '#0047AB',
+                    boxShadow: `0 4px 14px rgba(0,71,171,0.40)`,
                   }}
                 >
                   <Plus size={26} strokeWidth={1.8} color="white" />
@@ -179,7 +179,7 @@ function BottomNav({ onProfileClick, onScanClick }: {
                 {isPanier && totalItems > 0 && (
                   <span
                     className="absolute -top-1.5 -right-2 w-[16px] h-[16px] rounded-full text-[9px] font-bold text-white flex items-center justify-center"
-                    style={{ background: SHEIN_RED, lineHeight: 1 }}
+                    style={{ background: '#0047AB', lineHeight: 1 }}
                   >
                     {totalItems > 9 ? '9+' : totalItems}
                   </span>

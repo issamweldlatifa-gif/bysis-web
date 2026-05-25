@@ -336,7 +336,7 @@ export default function CalculatorModal({ isOpen, onClose, onCalculationComplete
                   className="space-y-4"
                 >
                   {/* Camera Feed */}
-                  <div className="relative rounded-xl overflow-hidden bg-black border-2 border-cyan-500/30 aspect-video">
+                  <div className="relative rounded-xl overflow-hidden bg-blue-600 border-2 border-cyan-500/30 aspect-video">
                     <video
                       ref={videoRef}
                       autoPlay
