@@ -1,5 +1,7 @@
 'use client';
 
+'use client';
+
 import { useState } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { trpc } from '@/lib/trpc';
@@ -8,9 +10,9 @@ import {
   Package,
   ShoppingBag,
   Tag,
-  ArrowSquareOut,
+  ExternalLink,
   Sparkle,
-} from '@phosphor-icons/react';
+} from 'lucide-react';
 import { useChatContext } from '@/App';
 import { useCart } from '@/contexts/CartContext';
 import { useI18n } from '@/contexts/I18nContext';
@@ -168,7 +170,7 @@ export default function Arrivage() {
                             className="p-1.5 rounded-lg bg-blue-500/15 text-blue-400 hover:bg-blue-500/30 transition-all"
                             title="عرض المنتج"
                           >
-                            <ArrowSquareOut size={16} />
+                            <ExternalLink size={16} />
                           </a>
                         ) : null}
                       </div>
@@ -191,7 +193,7 @@ export default function Arrivage() {
                         className="w-full py-2 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-1"
                         style={{ background: 'linear-gradient(90deg, #1A1A1A, #1A1A1A)' }}
                       >
-                        <Sparkle size={12} weight="fill" />
+                        <Sparkle size={12} />
                         {t('add_to_cart')}
                       </motion.button>
                     </div>

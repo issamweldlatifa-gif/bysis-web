@@ -56,7 +56,7 @@ export default function AdminLogin() {
               className="mx-auto w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
               style={{ background: "linear-gradient(135deg, rgba(0,212,200,0.2), rgba(124,58,237,0.2))", border: "1px solid rgba(0,212,200,0.3)" }}
             >
-              <ShieldCheck size={32} weight="fill" className="text-cyan-400" />
+              <ShieldCheck size={32} className="text-cyan-400" />
             </div>
             <h1 className="text-2xl font-bold text-white mb-1">Administration</h1>
             <p className="text-[#9DA3A6] text-sm">Connectez-vous pour accéder au tableau de bord</p>

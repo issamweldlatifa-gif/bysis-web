@@ -1,9 +1,11 @@
 'use client';
+
+'use client';
 import { motion } from 'framer-motion';
 import AppLayout from '@/components/AppLayout';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { useChatContext } from '@/App';
-import { Bell, Lock, Globe, SignOut, User, Info } from '@phosphor-icons/react';
+import { Bell, Lock, Globe, LogOut, User, Info } from 'lucide-react';
 import { ChevronRight } from 'lucide-react';
 
 const PP = { bg:'#FFFFFF', white:'#FFFFFF', navy:'#1A1A1A', blue:'#1A1A1A', text:'#1D1D1D', sub:'#666666', muted:'#999999', border:'#E5E5E5', green:'#00A651' };
@@ -49,7 +51,7 @@ export default function Settings() {
                 onClick={()=>{}}>
                 <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                   style={{background:item.ibg}}>
-                  <Icon size={20} weight="duotone" style={{color:item.ic}} />
+                  <Icon size={20} style={{color:item.ic}} />
                 </div>
                 <div className="flex-1 text-right">
                   <p className="font-semibold text-sm" style={{color:PP.text,fontFamily:'Inter,sans-serif'}}>{item.label}</p>
@@ -65,7 +67,7 @@ export default function Settings() {
           <button onClick={()=>logout()}
             className="w-full h-12 rounded-3xl font-semibold flex items-center justify-center gap-2 transition-all active:scale-[0.97]"
             style={{background:'#FEF2F2',color:'#DC2626',border:'1.5px solid #FECACA'}}>
-            <SignOut size={18} />
+            <LogOut size={18} />
             تسجيل الخروج
           </button>
         </motion.div>

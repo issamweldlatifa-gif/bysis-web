@@ -1,9 +1,11 @@
 'use client';
 
+'use client';
+
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { CheckCircle, Copy, MagnifyingGlass, House, WhatsappLogo } from '@phosphor-icons/react';
+import { CheckCircle, Copy, Search, House, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 const BG    = '#FFFFFF';
@@ -78,7 +80,7 @@ export default function OrderConfirmation() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             border: `2px solid ${GREEN}40`,
           }}>
-            <CheckCircle size={44} weight="fill" style={{ color: GREEN }} />
+            <CheckCircle size={44} style={{ color: GREEN }} />
           </div>
         </motion.div>
 
@@ -145,7 +147,7 @@ export default function OrderConfirmation() {
                 transition: 'all 0.18s ease',
               }}
             >
-              <Copy size={16} weight="bold" />
+              <Copy size={16} />
               {copied ? 'تم!' : 'نسخ'}
             </motion.button>
           </div>
@@ -240,7 +242,7 @@ export default function OrderConfirmation() {
               transition: 'all 0.18s ease',
             }}
           >
-            <MagnifyingGlass size={20} weight="bold" />
+            <Search size={20} />
             تتبع كومندتي
           </button>
 
@@ -263,7 +265,7 @@ export default function OrderConfirmation() {
               transition: 'all 0.18s ease',
             }}
           >
-            <House size={20} weight="bold" />
+            <House size={20} />
             الصفحة الرئيسية
           </button>
         </motion.div>

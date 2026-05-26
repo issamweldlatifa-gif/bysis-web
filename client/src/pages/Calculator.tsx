@@ -1,4 +1,6 @@
 'use client';
+
+'use client';
 import { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import AppLayout from '@/components/AppLayout';
@@ -9,7 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Camera, Upload, X, ArrowLeft, Scan,
   CheckCircle, ArrowRight,
-} from '@phosphor-icons/react';
+} from 'lucide-react';
 
 const BG     = '#FFFFFF';
 const WHITE  = '#FFFFFF';
@@ -197,7 +199,7 @@ export default function Calculator() {
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = SHADOW; }}
                   >
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: '#F5F5F5' }}>
-                      <Camera size={28} weight="duotone" style={{ color: '#1A1A1A' }} />
+                      <Camera size={28} style={{ color: '#1A1A1A' }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-base mb-0.5" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>Prendre une photo</div>
@@ -215,7 +217,7 @@ export default function Calculator() {
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = SHADOW; }}
                   >
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: '#F5F5F5' }}>
-                      <Upload size={28} weight="duotone" style={{ color: '#1A1A1A' }} />
+                      <Upload size={28} style={{ color: '#1A1A1A' }} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-base mb-0.5" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>Importer une image</div>
@@ -226,7 +228,7 @@ export default function Calculator() {
                 </div>
 
                 <div className="mt-6 flex items-start gap-3 p-4 rounded-2xl" style={{ background: '#F5F5F5', border: '1px solid rgba(26,26,26,0.15)' }}>
-                  <Scan size={20} weight="duotone" style={{ color: '#1A1A1A', flexShrink: 0, marginTop: 1 }} />
+                  <Scan size={20} style={{ color: '#1A1A1A', flexShrink: 0, marginTop: 1 }} />
                   <p className="text-sm leading-relaxed" style={{ color: '#666666' }}>
                     Prenez en photo l'étiquette de prix ou la page produit sur Shein, AliExpress ou Temu.
                     Notre IA extrait le prix et le convertit en <strong style={{ color: TEXT }}>dinars tunisiens (TND)</strong>.
@@ -284,7 +286,7 @@ export default function Calculator() {
                   <motion.button whileTap={{ scale: 0.9 }} onClick={() => fileInputRef.current?.click()}
                     className="w-12 h-12 rounded-2xl flex items-center justify-center"
                     style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}>
-                    <Upload size={22} className="text-white" weight="bold" />
+                    <Upload size={22} className="text-white" />
                   </motion.button>
                   <motion.button whileTap={{ scale: 0.93 }} onClick={captureFromCamera}
                     className="w-20 h-20 rounded-full flex items-center justify-center"
@@ -329,7 +331,7 @@ export default function Calculator() {
                     style={{ background: WHITE, border: `1px solid ${BORDER}`, boxShadow: SHADOW }}>
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#F5F5F5' }}>
-                        <Scan size={18} weight="duotone" style={{ color: '#1A1A1A' }} />
+                        <Scan size={18} style={{ color: '#1A1A1A' }} />
                       </div>
                       <div>
                         <div className="font-semibold text-sm" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>Analyse en cours…</div>
@@ -350,7 +352,7 @@ export default function Calculator() {
                   <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}>
                     <div className="mb-4 p-6 rounded-2xl" style={{ background: WHITE, border: `1px solid ${BORDER}`, boxShadow: SHADOW_MD }}>
                       <div className="flex items-center gap-2 mb-4">
-                        <CheckCircle size={20} weight="fill" style={{ color: GREEN }} />
+                        <CheckCircle size={20} style={{ color: GREEN }} />
                         <span className="font-semibold text-sm" style={{ color: GREEN, fontFamily: 'Inter, sans-serif' }}>Prix extrait avec succès</span>
                       </div>
                       <div className="text-center py-4 mb-4 rounded-xl" style={{ background: '#FFFFFF' }}>

@@ -1,9 +1,11 @@
 'use client';
 
+'use client';
+
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MagnifyingGlass, Package, Truck, CheckCircle, Clock, XCircle, ArrowLeft, Storefront } from '@phosphor-icons/react';
+import { Search, Package, Truck, CheckCircle, Clock, XCircle, ArrowLeft, Store } from 'lucide-react';
 import { trpc } from '@/lib/trpc';
 
 const BG    = '#FFFFFF';
@@ -30,7 +32,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; step: number
 
 const TIMELINE_STEPS = [
   { key: 'new',        label: 'وصلت',     Icon: Package },
-  { key: 'processing', label: 'شراء',     Icon: Storefront },
+  { key: 'processing', label: 'شراء',     Icon: Store },
   { key: 'shipped',    label: 'شحن',      Icon: Truck },
   { key: 'arrived',    label: 'تونس',     Icon: Package },
   { key: 'completed',  label: 'تسلّمت',   Icon: CheckCircle },
@@ -84,7 +86,7 @@ export default function TrackOrder() {
               boxShadow: '0 1px 4px rgba(0,0,0,0.07)',
             }}
           >
-            <ArrowLeft size={18} weight="bold" />
+            <ArrowLeft size={18} />
           </motion.button>
           <div dir="rtl">
             <h1 style={{ fontSize: '1.25rem', fontWeight: 800, color: TEXT, letterSpacing: '-0.02em' }}>
@@ -136,7 +138,7 @@ export default function TrackOrder() {
                 boxShadow: '0 2px 8px rgba(26,26,26,0.3)',
               }}
             >
-              <MagnifyingGlass size={18} weight="bold" />
+              <Search size={18} />
               ابحث
             </motion.button>
           </div>
@@ -162,7 +164,7 @@ export default function TrackOrder() {
               style={{ background: WHITE, borderRadius: 20, padding: '28px 20px', boxShadow: SHADOW, border: `1px solid ${BORDER}`, textAlign: 'center' }}
               dir="rtl"
             >
-              <XCircle size={44} weight="fill" style={{ color: RED, marginBottom: 12 }} />
+              <XCircle size={44} style={{ color: RED, marginBottom: 12 }} />
               <p style={{ fontWeight: 800, fontSize: '1.1rem', color: TEXT, marginBottom: 6 }}>ما لقيناش كومندة</p>
               <p style={{ color: '#666666', fontSize: '0.875rem', lineHeight: 1.6 }}>
                 تأكد من الكود وعاود المحاولة.<br />
@@ -212,7 +214,7 @@ export default function TrackOrder() {
                               flexShrink: 0, transition: 'all 0.3s',
                               boxShadow: active ? `0 0 0 4px ${BLUE}20` : 'none',
                             }}>
-                              <Icon size={14} weight="fill" />
+                              <Icon size={14} />
                             </div>
                             {i < TIMELINE_STEPS.length - 1 && <div style={{ flex: 1, height: 2, background: currentStep > i ? BLUE : '#E0E6ED', transition: 'background 0.3s' }} />}
                           </div>

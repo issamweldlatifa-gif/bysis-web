@@ -1,11 +1,13 @@
 'use client';
 
+'use client';
+
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppLayout from '@/components/AppLayout';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
-import { Trash, ClockClockwise } from '@phosphor-icons/react';
+import { Trash, Clock } from 'lucide-react';
 import { useChatContext } from '@/App';
 
 // Stable device ID — one per browser, never shared between users
@@ -160,7 +162,7 @@ export default function History() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-16 space-y-3"
           >
-            <ClockClockwise size={48} className="mx-auto" style={{ color: '#9DA3A6' }} />
+            <Clock size={48} className="mx-auto" style={{ color: '#9DA3A6' }} />
             <p style={{ color: '#999999', fontSize: '1rem', fontWeight: 600 }}>لا توجد عناصر في السجل</p>
             <p style={{ color: '#9DA3A6', fontSize: '0.875rem' }}>استخدم الحاسبة لمسح أسعار المنتجات</p>
           </motion.div>

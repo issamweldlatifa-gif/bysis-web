@@ -1,5 +1,7 @@
 'use client';
 
+'use client';
+
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppLayout from '@/components/AppLayout';
@@ -13,11 +15,11 @@ import {
   Truck,
   Warehouse,
   CreditCard,
-  MagnifyingGlass,
+  Search,
   Phone,
   User,
   Image as PhImage,
-} from '@phosphor-icons/react';
+} from 'lucide-react';
 import { useChatContext } from '@/App';
 
 // DB status values
@@ -121,7 +123,7 @@ export default function Orders() {
         {/* Search Form */}
         <form onSubmit={handleSearch} className="flex gap-2">
           <div className="flex-1 relative">
-            <MagnifyingGlass
+            <Search
               size={18}
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6C7378]"
             />

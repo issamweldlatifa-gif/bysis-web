@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useCallback } from "react";
 import AppLayout from "@/components/AppLayout";
 import { useChatContext } from "@/App";
@@ -186,7 +188,7 @@ export default function OrderForm() {
           <div className="rounded-3xl max-w-sm w-full text-center p-10 space-y-6" style={{ background: "#FFFFFF", border: "1px solid #E5E5E5", boxShadow: "0 4px 16px rgba(0,0,0,0.09)" }}>
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto"
               style={{ background: "#E6F7EE", border: "1px solid rgba(0,166,81,0.3)" }}>
-              <CheckCircle size={44} weight="fill" className="text-[#00A651]" />
+              <CheckCircle size={44} className="text-[#00A651]" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-[#1D1D1D] mb-2">Commande envoyée !</h2>
@@ -198,7 +200,7 @@ export default function OrderForm() {
               <button onClick={handleReset}
                 className="w-full h-12 rounded-xl font-bold text-white flex items-center justify-center gap-2 active:scale-[0.97] transition-all"
                 style={{ background: "#1A1A1A", boxShadow: "0 4px 14px rgba(26,26,26,0.35)" }}>
-                <ShoppingCart size={18} weight="bold" /> Nouvelle commande
+                <ShoppingCart size={18} /> Nouvelle commande
               </button>
               <button onClick={() => navigate('/')}
                 className="w-full h-12 rounded-xl font-semibold text-[#999999] flex items-center justify-center gap-2 active:scale-[0.97] transition-all"
@@ -219,7 +221,7 @@ export default function OrderForm() {
         <div className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
             style={{ background: "#1A1A1A" }}>
-            <ShoppingCart size={20} weight="fill" className="text-white" />
+            <ShoppingCart size={20} className="text-white" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-[#1D1D1D]">Passer une commande</h1>
@@ -354,7 +356,7 @@ export default function OrderForm() {
             {/* ─── Payment Section ─── */}
             <div className="rounded-xl p-4 space-y-4" style={{ background: "#FFFFFF", border: "1.5px solid #E5E5E5" }}>
               <div className="flex items-center gap-2 mb-1">
-                <Receipt size={18} className="text-[#1A1A1A]" weight="fill" />
+                <Receipt size={18} className="text-[#1A1A1A]" />
                 <span className="text-sm font-bold text-[#1D1D1D]">Paiement (optionnel)</span>
               </div>
               <p className="text-xs text-[#999999] -mt-2">
@@ -376,7 +378,7 @@ export default function OrderForm() {
                 >
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center"
                     style={{ background: paymentMethod === "bank" ? "#1A1A1A" : "#FFFFFF" }}>
-                    <Bank size={20} weight="fill" className={paymentMethod === "bank" ? "text-white" : "text-[#999999]"} />
+                    <Bank size={20} className={paymentMethod === "bank" ? "text-white" : "text-[#999999]"} />
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-bold" style={{ color: paymentMethod === "bank" ? "#1A1A1A" : "#1D1D1D" }}>Virement bancaire</p>
@@ -402,7 +404,7 @@ export default function OrderForm() {
                 >
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center"
                     style={{ background: paymentMethod === "mandat" ? "#1A1A1A" : "#FFFFFF" }}>
-                    <Money size={20} weight="fill" className={paymentMethod === "mandat" ? "text-white" : "text-[#999999]"} />
+                    <Money size={20} className={paymentMethod === "mandat" ? "text-white" : "text-[#999999]"} />
                   </div>
                   <div className="text-center">
                     <p className="text-xs font-bold" style={{ color: paymentMethod === "mandat" ? "#1A1A1A" : "#1D1D1D" }}>Mandat minute</p>
@@ -484,7 +486,7 @@ export default function OrderForm() {
               {createOrder.isPending ? (
                 <><Loader2 className="h-5 w-5 animate-spin" /> Envoi...</>
               ) : (
-                <><ShoppingCart size={20} weight="bold" /> Envoyer la commande</>
+                <><ShoppingCart size={20} /> Envoyer la commande</>
               )}
             </button>
           </form>

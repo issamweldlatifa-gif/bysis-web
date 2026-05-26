@@ -65,7 +65,7 @@ function ConversationsContent() {
             </button>
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-3" style={{ color: "#1D1D1D" }}>
-                <ChatCircle size={24} weight="fill" className="text-cyan-400" />
+                <ChatCircle size={24} className="text-cyan-400" />
                 Conversations clients
               </h1>
               <p className="text-sm text-[#9DA3A6]">
@@ -126,7 +126,7 @@ function ConversationsContent() {
                                 className="text-[10px] px-1.5 py-0.5 rounded-full flex items-center gap-0.5 flex-shrink-0"
                                 style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.2)" }}
                               >
-                                <ShoppingCart size={9} weight="fill" />
+                                <ShoppingCart size={9} />
                                 Cmd
                               </span>
                             )}
@@ -180,7 +180,7 @@ function ConversationsContent() {
                             }}
                           >
                             {msg.role === "user" ? (
-                              <User size={12} weight="fill" className="text-gray-900" />
+                              <User size={12} className="text-gray-900" />
                             ) : (
                               <span className="text-white text-[10px] font-bold" style={{ color: "white" }}>B</span>
                             )}

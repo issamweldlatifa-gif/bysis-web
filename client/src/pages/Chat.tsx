@@ -1,5 +1,7 @@
 'use client';
 
+'use client';
+
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { useChatContext } from '@/App';
