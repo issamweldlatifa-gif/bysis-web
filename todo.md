@@ -230,3 +230,18 @@
 - [x] Update AppLayout header and Bottom Nav with new colors
 - [x] Update all form inputs and interactive elements
 - [x] Verify color contrast for accessibility (WCAG AA standard)
+
+
+## 🎬 Dynamic UI Redesign (May 2026)
+- [x] Install Framer Motion (advanced animations and transitions)
+- [x] Install Swiper (carousel/slider component)
+- [x] Install react-intersection-observer (scroll animations)
+- [x] Rebuild Home.tsx: Large hero image with dynamic parallax effect
+- [x] Add smooth scroll animations to all sections
+- [x] Create animated card components with hover effects
+- [x] Implement image carousel for product/service showcase
+- [x] Add fade-in animations on scroll for all sections
+- [x] Create dynamic testimonials carousel with auto-play
+- [x] Add micro-interactions to buttons and CTAs
+- [ ] Update all pages with dynamic components
+- [ ] Test animations on mobile devices

@@ -1,462 +1,433 @@
-import { useLocation } from 'wouter';
+'use client';
+
 import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Autoplay, Pagination, Navigation } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 import AppLayout from '@/components/AppLayout';
+import { ArrowRight, Check, Star, Truck, Shield, Zap, Users, Globe } from 'lucide-react';
 
-/* ── Shein Design Tokens ────────────────────────────────────────────────── */
-const RED    = '#1A1A1A';
-const BLACK  = '#1A1A1A';
-const GRAY1  = '#333333';
-const GRAY2  = '#666666';
-const GRAY3  = '#999999';
-const GRAY4  = '#F5F5F5';
-const BORDER = '#E5E5E5';
-const GREEN  = '#00A650';
-const ORANGE = '#FF6B35';
+/* ── Color Palette ────────────────────────────────────────────────────────── */
+const COLORS = {
+  black: '#0A0A0A',
+  white: '#FFFFFF',
+  blue: '#0047AB',
+  charcoal: '#2D2D2D',
+  darkGray: '#4A4A4A',
+  lightGray: '#E0E0E0',
+  success: '#28A745',
+  warning: '#FFC107',
+  error: '#DC3545',
+};
 
-/* ── Image URLs (uploaded via manus-upload-file) ────────────────────────── */
+/* ── Image URLs ───────────────────────────────────────────────────────────── */
 const IMGS = {
-  hero:       '/manus-storage/hero-delivery-tunisia_2914d89b.webp',
-  unboxing1:  '/manus-storage/unboxing-clothes_5637a1dc.jpg',
-  unboxing2:  '/manus-storage/unboxing-happy_b2d19bf8.jpg',
-  unboxing3:  '/manus-storage/happy-unboxing_eda27441.jpg',
-  couple:     '/manus-storage/couple-phone_771f441d.jpg',
+  hero: '/manus-storage/hero-delivery-tunisia_2914d89b.webp',
+  unboxing1: '/manus-storage/unboxing-clothes_5637a1dc.jpg',
+  unboxing2: '/manus-storage/unboxing-happy_b2d19bf8.jpg',
+  unboxing3: '/manus-storage/happy-unboxing_eda27441.jpg',
+  couple: '/manus-storage/couple-phone_771f441d.jpg',
   womanPhone: '/manus-storage/woman-shopping-phone_0ed1d14c.jpg',
 };
 
-/* ── Inline SVG Icons ───────────────────────────────────────────────────── */
-const IconArrow = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="9 18 15 12 9 6"/>
-  </svg>
-);
-const IconCheck = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12"/>
-  </svg>
-);
-const IconStar = ({ filled = true }: { filled?: boolean }) => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill={filled ? '#FFB800' : 'none'} stroke="#FFB800" strokeWidth="2">
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-  </svg>
-);
-const IconTruck = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="1" y="3" width="15" height="13" rx="1"/>
-    <path d="M16 8h4l3 5v3h-7V8z"/>
-    <circle cx="5.5" cy="18.5" r="2.5"/>
-    <circle cx="18.5" cy="18.5" r="2.5"/>
-  </svg>
-);
-const IconShield = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-  </svg>
-);
-const IconTag = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
-    <line x1="7" y1="7" x2="7.01" y2="7"/>
-  </svg>
-);
-const IconSearch = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8"/>
-    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-  </svg>
-);
-const IconPackage = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/>
-    <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
-    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-    <line x1="12" y1="22.08" x2="12" y2="12"/>
-  </svg>
-);
+/* ── Animation Variants ───────────────────────────────────────────────────── */
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
 
-/* ── Data ────────────────────────────────────────────────────────────────── */
-const platforms = [
-  { name: 'SHEIN',      color: RED,    bg: '#FFF0F1', desc: 'Mode & Tendances',   tag: 'Mode' },
-  { name: 'AliExpress', color: ORANGE, bg: '#FFF4EE', desc: 'Tout & Moins Cher',  tag: 'Tech' },
-  { name: 'Temu',       color: '#FF6B35', bg: '#FFF4EF', desc: 'Prix Imbattables', tag: 'Maison' },
-];
+const fadeInLeft = {
+  hidden: { opacity: 0, x: -40 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
+};
 
-const steps = [
-  { num: '01', title: 'Envoyez le lien',         desc: 'Copiez le lien du produit depuis Shein, AliExpress ou Temu et envoyez-le nous.', Icon: IconSearch,  color: RED },
-  { num: '02', title: 'On commande pour vous',   desc: 'Notre équipe passe la commande, paie et gère toute la logistique internationale.', Icon: IconPackage, color: ORANGE },
-  { num: '03', title: 'Livraison chez vous',     desc: 'Votre colis arrive directement à votre porte en Tunisie en 20–25 jours.', Icon: IconTruck,   color: GREEN },
-];
+const fadeInRight = {
+  hidden: { opacity: 0, x: 40 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
+};
 
-const advantages = [
-  { Icon: IconTruck,  title: 'Livraison 20–25j',   desc: 'Directement chez vous en Tunisie',    color: RED },
-  { Icon: IconShield, title: '100% Sécurisé',       desc: 'Paiement et colis garantis',          color: GREEN },
-  { Icon: IconTag,    title: 'Prix en TND',         desc: 'Calculé en dinars tunisiens',         color: ORANGE },
-  { Icon: IconCheck,  title: 'Suivi temps réel',    desc: 'Suivez votre commande à tout moment', color: '#6C63FF' },
-];
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.6 } },
+};
 
-const testimonials = [
-  {
-    name: 'Sarra B.',     city: 'Tunis',
-    text: "J'ai commandé une robe Shein et elle est arrivée en parfait état ! Prix très raisonnable, je recommande vivement.",
-    rating: 5, img: IMGS.unboxing1, tag: 'Shein',
-  },
-  {
-    name: 'Mohamed K.',   city: 'Sfax',
-    text: "Service rapide et fiable. Mon colis AliExpress est arrivé en 22 jours. Emballage soigné.",
-    rating: 5, img: IMGS.couple, tag: 'AliExpress',
-  },
-  {
-    name: 'Ines M.',      city: 'Sousse',
-    text: "Bysis m'a sauvé ! Je voulais des chaussures Temu introuvables en Tunisie. Parfait !",
-    rating: 5, img: IMGS.womanPhone, tag: 'Temu',
-  },
-];
-
-/* ── Sub-components ──────────────────────────────────────────────────────── */
-function StarRow({ count = 5 }: { count?: number }) {
+/* ── Section Wrapper with Scroll Animation ────────────────────────────────── */
+function AnimatedSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
   return (
-    <div className="flex gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => <IconStar key={i} filled={i < count} />)}
-    </div>
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      animate={inView ? 'visible' : 'hidden'}
+      variants={fadeInUp}
+      className={className}
+    >
+      {children}
+    </motion.div>
   );
 }
 
-function SectionHeader({ label, title, sub }: { label: string; title: string; sub?: string }) {
-  return (
-    <div className="px-4 mb-4">
-      <p className="text-[10px] font-bold tracking-widest uppercase mb-1" style={{ color: RED }}>{label}</p>
-      <h2 className="text-xl font-bold leading-tight" style={{ color: BLACK }}>{title}</h2>
-      {sub && <p className="text-sm mt-1" style={{ color: GRAY2 }}>{sub}</p>}
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════════════════
-   HOME PAGE
-   ══════════════════════════════════════════════════════════════════════════ */
 export default function Home() {
-  const [, navigate] = useLocation();
-
   return (
     <AppLayout>
-    <div className="w-full" style={{ background: '#FFFFFF', fontFamily: '"Inter", sans-serif' }}>
-
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden" style={{ background: '#FFF0F1', minHeight: 220 }}>
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `url(${IMGS.hero})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center top',
-            opacity: 0.15,
-          }}
-        />
-        <div className="relative px-5 pt-6 pb-8">
+      <div className="w-full bg-white overflow-hidden">
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        {/* HERO SECTION — Large Dynamic Image with Parallax ═════════════════════════ */}
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden bg-black">
+          {/* Background Image with Parallax */}
           <motion.div
-            initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-4"
-            style={{ background: RED, color: '#fff' }}
+            className="absolute inset-0"
+            initial={{ scale: 1.1 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
           >
-            <span>🛍️</span>
-            <span>Shein · AliExpress · Temu → Tunisie</span>
+            <img
+              src={IMGS.hero}
+              alt="Bysis Delivery Service"
+              className="w-full h-full object-cover"
+            />
+            {/* Dark Overlay */}
+            <div className="absolute inset-0 bg-black/40" />
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}
-            className="text-3xl font-black leading-tight mb-2"
-            style={{ color: BLACK, letterSpacing: '-0.03em' }}
-          >
-            Achetez depuis<br />
-            <span style={{ color: RED }}>n'importe où</span>,<br />
-            livré chez vous
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-            className="text-sm mb-6 leading-relaxed"
-            style={{ color: GRAY1 }}
-          >
-            On commande pour vous sur les plus grandes plateformes mondiales et on livre directement en Tunisie. Prix en TND, livraison 20–25 jours.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}
-            className="flex gap-3"
-          >
-            <button
-              onClick={() => navigate('/order')}
-              className="flex-1 flex items-center justify-center gap-2 h-11 rounded-lg font-semibold text-sm text-white press-scale"
-              style={{ background: RED }}
+          {/* Content Overlay */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="max-w-2xl"
             >
-              Commander maintenant
-              <IconArrow />
-            </button>
-            <button
-              onClick={() => navigate('/calculator')}
-              className="flex items-center justify-center h-11 px-4 rounded-lg font-semibold text-sm press-scale"
-              style={{ background: '#fff', color: RED, border: `1.5px solid ${RED}` }}
-            >
-              Calculer
-            </button>
-          </motion.div>
-
-          <div className="flex gap-4 mt-5">
-            {['Livraison garantie', 'Prix en TND', 'Suivi inclus'].map((b, i) => (
-              <div key={i} className="flex items-center gap-1">
-                <span className="text-xs font-bold" style={{ color: GREEN }}>✓</span>
-                <span className="text-xs" style={{ color: GRAY2 }}>{b}</span>
-              </div>
-            ))}
+              <h1 className="text-4xl md:text-6xl font-black text-white mb-4 leading-tight">
+                Achetez depuis n'importe où, livré chez vous
+              </h1>
+              <p className="text-lg md:text-xl text-gray-100 mb-8">
+                On commande pour vous sur les plus grandes plateformes mondiales et on livre directement en Tunisie. Prix en TND, livraison 20-25 jours.
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-4 bg-blue-600 text-white font-bold rounded-lg text-lg transition-all hover:shadow-lg"
+                style={{ background: COLORS.blue }}
+              >
+                Commander maintenant
+                <ArrowRight className="inline-block ml-2" size={20} />
+              </motion.button>
+            </motion.div>
           </div>
-        </div>
-      </section>
 
-      {/* ── STATS STRIP ──────────────────────────────────────────────────── */}
-      <section style={{ background: BLACK }}>
-        <div className="flex justify-around py-4 px-2">
-          {[
-            { value: '170+', label: 'Commandes livrées' },
-            { value: '98%',  label: 'Satisfaction' },
-            { value: '25j',  label: 'Délai moyen' },
-            { value: '3',    label: 'Plateformes' },
-          ].map((s, i) => (
-            <div key={i} className="flex flex-col items-center">
-              <span className="text-xl font-black" style={{ color: '#fff' }}>{s.value}</span>
-              <span className="text-[10px] mt-0.5 text-center" style={{ color: 'rgba(255,255,255,0.5)' }}>{s.label}</span>
+          {/* Scroll Indicator */}
+          <motion.div
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <div className="w-6 h-10 border-2 border-white rounded-full flex items-center justify-center">
+              <div className="w-1 h-2 bg-white rounded-full" />
             </div>
-          ))}
-        </div>
-      </section>
+          </motion.div>
+        </section>
 
-      <div style={{ height: 8, background: GRAY4 }} />
-
-      {/* ── PLATFORMS ────────────────────────────────────────────────────── */}
-      <section className="py-5">
-        <SectionHeader label="Plateformes" title="Où on commande pour vous" sub="Trois des plus grandes plateformes mondiales, accessibles depuis la Tunisie." />
-        <div className="px-4 flex gap-3 overflow-x-auto scrollbar-hide pb-1">
-          {platforms.map((p, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}
-              className="flex-shrink-0 w-32 rounded-xl p-4 flex flex-col items-center gap-2 press-scale"
-              style={{ background: p.bg, border: `1px solid ${BORDER}` }}
-              onClick={() => navigate('/arrivage')}
-            >
-              <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-black text-sm" style={{ background: p.color }}>
-                {p.name.charAt(0)}
-              </div>
-              <span className="text-sm font-bold text-center" style={{ color: BLACK }}>{p.name}</span>
-              <span className="text-[10px] text-center" style={{ color: GRAY2 }}>{p.desc}</span>
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full" style={{ background: p.color, color: '#fff' }}>{p.tag}</span>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      <div style={{ height: 8, background: GRAY4 }} />
-
-      {/* ── HOW IT WORKS ─────────────────────────────────────────────────── */}
-      <section className="py-5">
-        <SectionHeader label="Comment ça marche" title="Simple comme bonjour" sub="3 étapes pour recevoir vos achats internationaux en Tunisie." />
-        <div className="px-4 flex flex-col gap-3">
-          {steps.map((step, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
-              className="flex items-start gap-4 p-4 rounded-xl"
-              style={{ background: GRAY4, border: `1px solid ${BORDER}` }}
-            >
-              <div className="flex-shrink-0 flex flex-col items-center gap-1">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: step.color + '18', color: step.color }}>
-                  <step.Icon />
-                </div>
-                <span className="text-[10px] font-black" style={{ color: step.color }}>{step.num}</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-bold mb-1" style={{ color: BLACK }}>{step.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: GRAY2 }}>{step.desc}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-        <div className="px-4 mt-4">
-          <button onClick={() => navigate('/order')} className="w-full h-11 rounded-lg font-semibold text-sm text-white press-scale" style={{ background: RED }}>
-            Commencer maintenant →
-          </button>
-        </div>
-      </section>
-
-      <div style={{ height: 8, background: GRAY4 }} />
-
-      {/* ── PHOTO SHOWCASE ───────────────────────────────────────────────── */}
-      <section className="py-5">
-        <SectionHeader label="Notre Service" title="Des milliers de produits livrés" sub="Vêtements, accessoires, électronique, maison... tout ce que vous voulez." />
-        <div className="px-4 grid grid-cols-2 gap-2">
-          <div className="col-span-2 rounded-xl overflow-hidden" style={{ height: 180 }}>
-            <img src={IMGS.unboxing2} alt="Unboxing commande Bysis" className="w-full h-full object-cover" />
-          </div>
-          <div className="rounded-xl overflow-hidden" style={{ height: 130 }}>
-            <img src={IMGS.unboxing1} alt="Vêtements commandés" className="w-full h-full object-cover" />
-          </div>
-          <div className="rounded-xl overflow-hidden" style={{ height: 130 }}>
-            <img src={IMGS.unboxing3} alt="Colis reçu" className="w-full h-full object-cover" />
-          </div>
-        </div>
-        <div className="mx-4 mt-3 rounded-xl px-4 py-3 flex items-center justify-between" style={{ background: '#FFF0F1', border: '1px solid #FECDD3' }}>
-          <div>
-            <p className="text-xs font-bold" style={{ color: RED }}>🔥 Livraison GRATUITE</p>
-            <p className="text-xs mt-0.5" style={{ color: GRAY2 }}>Pour toute commande &gt; 150 TND</p>
-          </div>
-          <button onClick={() => navigate('/order')} className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white" style={{ background: RED }}>
-            Commander
-          </button>
-        </div>
-      </section>
-
-      <div style={{ height: 8, background: GRAY4 }} />
-
-      {/* ── ADVANTAGES ───────────────────────────────────────────────────── */}
-      <section className="py-5">
-        <SectionHeader label="Pourquoi Bysis" title="Vos avantages exclusifs" />
-        <div className="px-4 grid grid-cols-2 gap-3">
-          {advantages.map((adv, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.07 }}
-              className="p-4 rounded-xl flex flex-col gap-2"
-              style={{ background: GRAY4, border: `1px solid ${BORDER}` }}
-            >
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: adv.color + '18', color: adv.color }}>
-                <adv.Icon />
-              </div>
-              <h4 className="text-xs font-bold" style={{ color: BLACK }}>{adv.title}</h4>
-              <p className="text-[11px] leading-relaxed" style={{ color: GRAY2 }}>{adv.desc}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      <div style={{ height: 8, background: GRAY4 }} />
-
-      {/* ── TESTIMONIALS ─────────────────────────────────────────────────── */}
-      <section className="py-5">
-        <SectionHeader label="Avis Clients" title="Ce que disent nos clients" sub="Plus de 170 commandes livrées avec succès en Tunisie." />
-
-        {/* Rating summary */}
-        <div className="mx-4 mb-4 p-4 rounded-xl flex items-center gap-4" style={{ background: '#FFF0F1', border: '1px solid #FECDD3' }}>
-          <div className="flex flex-col items-center">
-            <span className="text-4xl font-black" style={{ color: RED }}>4.9</span>
-            <StarRow count={5} />
-            <span className="text-[10px] mt-1" style={{ color: GRAY3 }}>170+ avis</span>
-          </div>
-          <div className="flex-1">
-            {[5, 4, 3].map((n) => (
-              <div key={n} className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] w-2" style={{ color: GRAY3 }}>{n}</span>
-                <div className="flex-1 h-1.5 rounded-full" style={{ background: BORDER }}>
-                  <div className="h-full rounded-full" style={{ background: RED, width: n === 5 ? '88%' : n === 4 ? '9%' : '3%' }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Testimonial cards */}
-        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
-              className="flex-shrink-0 w-64 rounded-xl p-4 flex flex-col gap-3"
-              style={{ background: '#FFFFFF', border: `1px solid ${BORDER}`, boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                  <img src={t.img} alt={t.name} className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold truncate" style={{ color: BLACK }}>{t.name}</p>
-                  <p className="text-[10px]" style={{ color: GRAY3 }}>{t.city}</p>
-                </div>
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: RED + '18', color: RED }}>
-                  {t.tag}
-                </span>
-              </div>
-              <StarRow count={t.rating} />
-              <p className="text-xs leading-relaxed line-clamp-2" style={{ color: GRAY1 }}>"{t.text}"</p>
-              <div className="flex items-center gap-1">
-                <span style={{ color: GREEN }}><IconCheck /></span>
-                <span className="text-[10px]" style={{ color: GREEN }}>Achat vérifié</span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      <div style={{ height: 8, background: GRAY4 }} />
-
-      {/* ── ABOUT ────────────────────────────────────────────────────────── */}
-      <section className="py-5 px-4">
-        <SectionHeader label="À propos" title="Bysis, votre intermédiaire de confiance" />
-        <div className="rounded-xl overflow-hidden" style={{ border: `1px solid ${BORDER}` }}>
-          <div style={{ height: 160 }}>
-            <img src={IMGS.womanPhone} alt="Shopping en ligne avec Bysis" className="w-full h-full object-cover" />
-          </div>
-          <div className="p-4">
-            <p className="text-sm leading-relaxed mb-3" style={{ color: GRAY1 }}>
-              <strong style={{ color: BLACK }}>Bysis</strong> est une plateforme tunisienne spécialisée dans l'achat et la livraison de produits depuis les grandes plateformes internationales — <strong>Shein, AliExpress et Temu</strong> — directement en Tunisie.
-            </p>
-            <p className="text-sm leading-relaxed mb-4" style={{ color: GRAY1 }}>
-              Notre équipe gère tout pour vous : commande, paiement international, suivi et livraison à domicile. Vous payez en dinars tunisiens, sans stress.
-            </p>
-            <div className="flex flex-col gap-2">
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        {/* STATS SECTION ═════════════════════════════════════════════════════════════ */}
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        <AnimatedSection className="py-12 md:py-16 px-4 bg-black text-white">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
               {[
-                'Aucun compte international requis',
-                'Paiement en TND uniquement',
-                'Suivi de colis en temps réel',
-                'Service client disponible 7j/7',
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: GREEN + '18', color: GREEN }}>
-                    <IconCheck />
-                  </div>
-                  <span className="text-xs" style={{ color: GRAY1 }}>{item}</span>
-                </div>
+                { value: '170+', label: 'Commandes livrées' },
+                { value: '98%', label: 'Satisfaction' },
+                { value: '25j', label: 'Délai moyen' },
+                { value: '3', label: 'Plateformes' },
+              ].map((stat, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="text-3xl md:text-4xl font-black mb-2">{stat.value}</div>
+                  <div className="text-sm md:text-base text-gray-300">{stat.label}</div>
+                </motion.div>
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        </AnimatedSection>
 
-      {/* ── FINAL CTA ────────────────────────────────────────────────────── */}
-      <section className="mx-4 mb-6 rounded-2xl overflow-hidden" style={{ background: BLACK }}>
-        <div className="px-5 py-6">
-          <p className="text-xs font-bold tracking-widest uppercase mb-2" style={{ color: RED }}>Commencez dès aujourd'hui</p>
-          <h2 className="text-xl font-black mb-2 leading-tight" style={{ color: '#fff' }}>
-            Votre prochain achat<br />
-            <span style={{ color: RED }}>commence ici</span>
-          </h2>
-          <p className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
-            Envoyez-nous le lien de votre produit et on s'occupe du reste.
-          </p>
-          <button
-            onClick={() => navigate('/order')}
-            className="w-full h-11 rounded-lg font-bold text-sm press-scale"
-            style={{ background: RED, color: '#fff' }}
-          >
-            Passer une commande →
-          </button>
-          <button
-            onClick={() => navigate('/track')}
-            className="w-full h-10 rounded-lg font-semibold text-sm mt-2 press-scale"
-            style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)' }}
-          >
-            Suivre ma commande
-          </button>
-        </div>
-      </section>
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        {/* PLATFORMS SECTION ════════════════════════════════════════════════════════ */}
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        <AnimatedSection className="py-16 md:py-20 px-4 bg-white">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-black text-center mb-4">Où on commande pour vous</h2>
+            <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+              Trois des plus grandes plateformes mondiales, accessibles depuis la Tunisie.
+            </p>
 
-    </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { name: 'SHEIN', emoji: '👗', desc: 'Mode & Tendances' },
+                { name: 'AliExpress', emoji: '🛍️', desc: 'Tout & Moins Cher' },
+                { name: 'Temu', emoji: '🎁', desc: 'Prix Imbattables' },
+              ].map((platform, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.15 }}
+                  whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
+                  className="p-8 bg-gray-50 rounded-xl border border-gray-200 text-center cursor-pointer transition-all"
+                >
+                  <div className="text-5xl mb-4">{platform.emoji}</div>
+                  <h3 className="text-xl font-bold mb-2">{platform.name}</h3>
+                  <p className="text-gray-600 text-sm">{platform.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </AnimatedSection>
+
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        {/* HOW IT WORKS SECTION ═════════════════════════════════════════════════════ */}
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        <AnimatedSection className="py-16 md:py-20 px-4 bg-gray-50">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-black text-center mb-4">Comment ça marche</h2>
+            <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+              3 étapes simples pour recevoir vos achats internationaux en Tunisie.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  step: '1',
+                  title: 'Commandez',
+                  desc: 'Donnez-nous vos liens de produits préférés',
+                  icon: Globe,
+                },
+                {
+                  step: '2',
+                  title: 'Nous achetons',
+                  desc: 'Nous commandons pour vous sur les plateformes',
+                  icon: Zap,
+                },
+                {
+                  step: '3',
+                  title: 'Livraison',
+                  desc: 'Reçu chez vous en 20-25 jours',
+                  icon: Truck,
+                },
+              ].map((item, i) => {
+                const Icon = item.icon;
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: i === 0 ? -40 : i === 2 ? 40 : 0 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.2 }}
+                    className="relative"
+                  >
+                    <div className="flex flex-col items-center text-center">
+                      <motion.div
+                        whileHover={{ rotate: 10, scale: 1.1 }}
+                        className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                        style={{ background: COLORS.blue }}
+                      >
+                        <Icon size={32} color="white" />
+                      </motion.div>
+                      <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                      <p className="text-gray-600">{item.desc}</p>
+                    </div>
+                    {i < 2 && (
+                      <motion.div
+                        className="hidden md:block absolute top-8 -right-4 text-2xl font-light text-gray-300"
+                        animate={{ x: [0, 5, 0] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        →
+                      </motion.div>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </AnimatedSection>
+
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        {/* GALLERY CAROUSEL ══════════════════════════════════════════════════════════ */}
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        <AnimatedSection className="py-16 md:py-20 px-4 bg-white">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-black text-center mb-4">Voir nos clients heureux</h2>
+            <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+              Des milliers de clients satisfaits reçoivent leurs commandes chaque mois.
+            </p>
+
+            <Swiper
+              modules={[Autoplay, Pagination, Navigation]}
+              autoplay={{ delay: 4000 }}
+              pagination={{ clickable: true }}
+              navigation
+              className="rounded-xl overflow-hidden"
+              loop
+            >
+              {[IMGS.unboxing1, IMGS.unboxing2, IMGS.unboxing3, IMGS.couple, IMGS.womanPhone].map((img, i) => (
+                <SwiperSlide key={i}>
+                  <img src={img} alt={`Unboxing ${i + 1}`} className="w-full h-96 object-cover" />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        </AnimatedSection>
+
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        {/* TESTIMONIALS SECTION ═════════════════════════════════════════════════════ */}
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        <AnimatedSection className="py-16 md:py-20 px-4 bg-gray-50">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-black text-center mb-4">Ce que disent nos clients</h2>
+
+            <Swiper
+              modules={[Autoplay, Pagination]}
+              autoplay={{ delay: 5000 }}
+              pagination={{ clickable: true }}
+              className="mt-12"
+              loop
+              breakpoints={{
+                640: { slidesPerView: 1 },
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+              }}
+            >
+              {[
+                {
+                  name: 'Amira Ben Ali',
+                  text: 'Livraison rapide et produits de qualité. Très satisfaite!',
+                  rating: 5,
+                  verified: true,
+                },
+                {
+                  name: 'Mohamed Saïd',
+                  text: 'Excellent service, prix compétitifs. Je recommande!',
+                  rating: 5,
+                  verified: true,
+                },
+                {
+                  name: 'Fatima Trabelsi',
+                  text: 'Première commande réussie. Merci Bysis!',
+                  rating: 4,
+                  verified: true,
+                },
+              ].map((testimonial, i) => (
+                <SwiperSlide key={i}>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    className="p-6 bg-white rounded-lg border border-gray-200 h-full flex flex-col"
+                  >
+                    <div className="flex gap-1 mb-4">
+                      {Array.from({ length: testimonial.rating }).map((_, j) => (
+                        <Star key={j} size={16} fill={COLORS.warning} color={COLORS.warning} />
+                      ))}
+                    </div>
+                    <p className="text-gray-700 mb-4 flex-grow">{testimonial.text}</p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-bold text-sm">{testimonial.name}</p>
+                        {testimonial.verified && (
+                          <p className="text-xs text-green-600 flex items-center gap-1">
+                            <Check size={12} /> Achat vérifié
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+        </AnimatedSection>
+
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        {/* FEATURES SECTION ═════════════════════════════════════════════════════════ */}
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        <AnimatedSection className="py-16 md:py-20 px-4 bg-white">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-black text-center mb-12">Pourquoi choisir Bysis?</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {[
+                {
+                  icon: Shield,
+                  title: 'Sécurisé',
+                  desc: 'Vos données sont protégées avec les meilleures normes de sécurité.',
+                },
+                {
+                  icon: Truck,
+                  title: 'Livraison Fiable',
+                  desc: 'Suivi en temps réel de votre commande jusqu\'à la livraison.',
+                },
+                {
+                  icon: Zap,
+                  title: 'Rapide',
+                  desc: 'Traitement rapide de vos commandes et expédition en 48h.',
+                },
+                {
+                  icon: Users,
+                  title: 'Support 24/7',
+                  desc: 'Notre équipe est toujours disponible pour vous aider.',
+                },
+              ].map((feature, i) => {
+                const Icon = feature.icon;
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="p-6 bg-gray-50 rounded-lg border border-gray-200 flex gap-4"
+                  >
+                    <div className="flex-shrink-0">
+                      <Icon size={32} color={COLORS.blue} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg mb-2">{feature.title}</h3>
+                      <p className="text-gray-600 text-sm">{feature.desc}</p>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        </AnimatedSection>
+
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        {/* CTA SECTION ═══════════════════════════════════════════════════════════════ */}
+        {/* ═══════════════════════════════════════════════════════════════════════════ */}
+        <AnimatedSection className="py-16 md:py-20 px-4 bg-black text-white">
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-black mb-6">Prêt à commencer?</h2>
+            <p className="text-lg text-gray-300 mb-8">
+              Rejoignez des milliers de clients satisfaits et commencez vos achats internationaux dès aujourd'hui.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-8 py-4 rounded-lg text-lg font-bold transition-all hover:shadow-lg"
+              style={{ background: COLORS.blue, color: 'white' }}
+            >
+              Commander maintenant
+              <ArrowRight className="inline-block ml-2" size={20} />
+            </motion.button>
+          </div>
+        </AnimatedSection>
+      </div>
     </AppLayout>
   );
 }
