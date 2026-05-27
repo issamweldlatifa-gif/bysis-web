@@ -1,367 +1,276 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation, Pagination } from 'swiper/modules';
-import { Home, Grid3x3, TrendingUp, ShoppingCart, User, Plus, Search, Star, Truck, Shield, Clock, ArrowRight } from 'lucide-react';
+import { Autoplay, Pagination } from 'swiper/modules';
+import { Search, Heart, Camera, ChevronRight, Star } from 'lucide-react';
 import AppLayout from '@/components/AppLayout';
 import 'swiper/css';
-import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 export default function HomePage() {
-  const { ref: statsRef, inView: statsInView } = useInView({ threshold: 0.1 });
-  const { ref: featuresRef, inView: featuresInView } = useInView({ threshold: 0.1 });
-  const { ref: testimonialsRef, inView: testimonialsInView } = useInView({ threshold: 0.1 });
+  // Categories for horizontal scroll
+  const categories = [
+    { id: 1, name: 'Tout', icon: '🏠' },
+    { id: 2, name: 'Entrepôt UE', icon: '📦' },
+    { id: 3, name: 'Femme', icon: '👗' },
+    { id: 4, name: 'Lingerie', icon: '👙' },
+    { id: 5, name: 'Homme', icon: '👔' },
+    { id: 6, name: 'Enfant', icon: '👶' },
+    { id: 7, name: 'Maison', icon: '🏠' },
+    { id: 8, name: 'Beauté', icon: '💄' },
+  ];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
+  // Product categories (circular grid)
+  const productCategories = [
+    { id: 1, name: 'Femme', image: '👗' },
+    { id: 2, name: 'Curvy', image: '👯' },
+    { id: 3, name: 'Enfant', image: '👧' },
+    { id: 4, name: 'Homme', image: '👨' },
+    { id: 5, name: 'Bébé', image: '👶' },
+    { id: 6, name: 'Maison', image: '🏠' },
+    { id: 7, name: 'Lingerie', image: '👙' },
+    { id: 8, name: 'Sports', image: '⚽' },
+    { id: 9, name: 'Beauté', image: '💄' },
+  ];
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
+  // Carousel images
+  const carouselImages = [
+    '/manus-storage/9vxTX23dpFU4_983af5df.jpg',
+    '/manus-storage/9vxTX23dpFU4_983af5df.jpg',
+    '/manus-storage/9vxTX23dpFU4_983af5df.jpg',
+  ];
+
+  // Deals section
+  const deals = [
+    { id: 1, title: 'Câbles USB', price: '0,96€', originalPrice: '1,48€', image: '🔌' },
+    { id: 2, title: 'Chaussures', price: '7,18€', originalPrice: '10,98€', image: '👟' },
+    { id: 3, title: 'iPhone 15 Pro', price: '544,26€', image: '📱' },
+  ];
 
   return (
     <AppLayout>
-      {/* Hero Section with Large Image */}
+      {/* Header with Search */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="sticky top-0 z-40 bg-white border-b border-gray-100"
+      >
+        {/* Top bar with icons */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <Camera size={20} className="text-gray-600" />
+            <div className="w-6 h-6 bg-gray-200 rounded"></div>
+          </div>
+          <span className="text-xs text-gray-500">39</span>
+        </div>
+
+        {/* Search bar */}
+        <div className="px-4 py-3">
+          <div className="flex items-center gap-2 bg-gray-100 rounded-lg px-3 py-2">
+            <Search size={18} className="text-gray-400" />
+            <input
+              type="text"
+              placeholder="Claquette Homme trends"
+              className="flex-1 bg-transparent text-sm outline-none"
+            />
+            <Heart size={18} className="text-gray-400" />
+          </div>
+        </div>
+
+        {/* Categories horizontal scroll */}
+        <div className="overflow-x-auto border-t border-gray-100">
+          <div className="flex gap-4 px-4 py-3 min-w-max">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                className="text-xs text-gray-600 whitespace-nowrap hover:text-gray-900 transition"
+              >
+                {cat.name}
+              </button>
+            ))}
+            <button className="text-xs text-gray-600 whitespace-nowrap">⋯</button>
+          </div>
+        </div>
+      </motion.header>
+
+      {/* Hero Carousel */}
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        className="relative h-96 w-full overflow-hidden bg-gradient-to-b from-[#F5F5F5] to-white"
+        transition={{ duration: 0.6, delay: 0.1 }}
+        className="relative w-full"
       >
-        <img
-          src="/manus-storage/9vxTX23dpFU4_983af5df.jpg"
-          alt="International Shopping"
-          className="h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/40" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            className="max-w-2xl px-4 text-4xl font-bold text-white md:text-5xl"
-          >
-            Achetez depuis n'importe où, livré chez vous
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.6 }}
-            className="mt-4 max-w-xl px-4 text-lg text-white/90"
-          >
-            Commandez sur les plus grandes plateformes mondiales et nous livrons directement en Tunisie
-          </motion.p>
-          <motion.button
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.7, duration: 0.6 }}
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#FF9900] px-6 py-3 font-bold text-white transition-all hover:bg-[#E68A00] active:scale-95"
-          >
-            <Plus size={20} />
-            Commencer maintenant
-          </motion.button>
+        <Swiper
+          modules={[Autoplay, Pagination]}
+          autoplay={{ delay: 4000 }}
+          pagination={{ clickable: true }}
+          className="w-full h-64"
+        >
+          {carouselImages.map((img, idx) => (
+            <SwiperSlide key={idx}>
+              <div className="relative w-full h-full bg-gradient-to-b from-blue-200 to-blue-100">
+                <img
+                  src={img}
+                  alt={`Slide ${idx + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/20 flex flex-col items-center justify-center">
+                  <h2 className="text-white text-2xl font-bold text-center px-4">
+                    MODE VACANCES
+                  </h2>
+                  <p className="text-white text-4xl font-bold mt-2">JUSQU'À -60%</p>
+                  <button className="mt-4 bg-white text-black px-6 py-2 rounded text-sm font-semibold">
+                    ACHETEZ MAINTENANT
+                  </button>
+                </div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </motion.section>
+
+      {/* Info bars */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="grid grid-cols-2 gap-3 px-4 py-4 bg-gray-50"
+      >
+        <div className="flex items-center gap-2 bg-white p-3 rounded">
+          <span className="text-lg">✓</span>
+          <div className="text-xs">
+            <p className="font-semibold">Livraison gratuite</p>
+            <p className="text-gray-600">Éligible pour obtenir</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 bg-white p-3 rounded">
+          <span className="text-lg">🔄</span>
+          <div className="text-xs">
+            <p className="font-semibold">Retours gratuits</p>
+            <p className="text-gray-600">Sous 30 jours</p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Product Categories Grid (Circular) */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+        className="px-4 py-6"
+      >
+        <div className="grid grid-cols-3 gap-4">
+          {productCategories.map((cat) => (
+            <motion.button
+              key={cat.id}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex flex-col items-center gap-2"
+            >
+              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-3xl hover:bg-gray-200 transition">
+                {cat.image}
+              </div>
+              <p className="text-xs text-center font-medium">{cat.name}</p>
+            </motion.button>
+          ))}
         </div>
       </motion.section>
 
-      {/* Stats Section */}
+      {/* Bonnes Affaires Section */}
       <motion.section
-        ref={statsRef}
-        variants={containerVariants}
-        initial="hidden"
-        animate={statsInView ? 'visible' : 'hidden'}
-        className="bg-white py-12 px-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className="px-4 py-6"
       >
-        <div className="container mx-auto grid grid-cols-3 gap-4 max-w-6xl md:gap-8">
-          {[
-            { label: '170+', desc: 'Commandes' },
-            { label: '98%', desc: 'Satisfaction' },
-            { label: '25j', desc: 'Livraison' },
-          ].map((stat, i) => (
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold">
+            Nos <span className="italic">Bonnes Affaires</span>
+          </h2>
+          <ChevronRight size={20} />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {deals.slice(0, 2).map((deal) => (
             <motion.div
-              key={i}
-              variants={itemVariants}
-              className="flex flex-col items-center justify-center rounded-lg bg-[#F5F5F5] p-4 md:p-6"
+              key={deal.id}
+              whileHover={{ y: -4 }}
+              className="bg-white rounded border border-gray-200 overflow-hidden"
             >
-              <div className="text-2xl font-bold text-[#333333] md:text-3xl">{stat.label}</div>
-              <div className="text-sm text-[#666666] md:text-base">{stat.desc}</div>
+              <div className="w-full h-32 bg-gray-100 flex items-center justify-center text-4xl">
+                {deal.image}
+              </div>
+              <div className="p-3">
+                <p className="text-xs text-gray-600 line-through">{deal.originalPrice}</p>
+                <p className="text-sm font-bold text-orange-500">{deal.price}</p>
+              </div>
             </motion.div>
           ))}
         </div>
       </motion.section>
 
-      {/* Platforms Section */}
+      {/* Marques Section */}
       <motion.section
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        className="bg-[#F5F5F5] py-12 px-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+        className="px-4 py-6"
       >
-        <div className="container mx-auto max-w-6xl">
-          <motion.h2
-            variants={itemVariants}
-            className="mb-8 text-center text-2xl font-bold text-[#333333] md:text-3xl"
-          >
-            Plateformes Disponibles
-          </motion.h2>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            {[
-              { name: 'Shein', desc: 'Mode & Accessoires' },
-              { name: 'AliExpress', desc: 'Électronique & Maison' },
-              { name: 'Temu', desc: 'Tendances & Gadgets' },
-            ].map((platform, i) => (
-              <motion.div
-                key={i}
-                variants={itemVariants}
-                whileHover={{ y: -4 }}
-                className="flex flex-col items-center justify-center rounded-lg border border-[#EEEEEE] bg-white p-6 transition-shadow hover:shadow-md"
-              >
-                <div className="mb-2 text-3xl font-bold text-[#FF9900]">{platform.name}</div>
-                <div className="text-sm text-[#666666]">{platform.desc}</div>
-              </motion.div>
-            ))}
-          </div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold">
+            <span className="text-orange-500">Offres</span> Marques
+          </h2>
+          <ChevronRight size={20} />
         </div>
-      </motion.section>
-
-      {/* How It Works Section */}
-      <motion.section
-        variants={containerVariants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        className="bg-white py-12 px-4"
-      >
-        <div className="container mx-auto max-w-6xl">
-          <motion.h2
-            variants={itemVariants}
-            className="mb-8 text-center text-2xl font-bold text-[#333333] md:text-3xl"
-          >
-            Comment ça marche
-          </motion.h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {[
-              { icon: Search, title: 'Cherchez', desc: 'Trouvez ce que vous voulez' },
-              { icon: ShoppingCart, title: 'Commandez', desc: 'Nous achetons pour vous' },
-              { icon: Truck, title: 'Recevez', desc: 'Livraison en Tunisie' },
-            ].map((step, i) => (
-              <motion.div
-                key={i}
-                variants={itemVariants}
-                className="flex flex-col items-center rounded-lg bg-[#F5F5F5] p-6 text-center"
-              >
-                <div className="mb-4 rounded-full bg-[#FF9900] p-4 text-white">
-                  <step.icon size={32} />
-                </div>
-                <h3 className="mb-2 text-lg font-bold text-[#333333]">{step.title}</h3>
-                <p className="text-sm text-[#666666]">{step.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Services Carousel */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        className="bg-[#F5F5F5] py-12 px-4"
-      >
-        <div className="container mx-auto max-w-6xl">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mb-8 text-center text-2xl font-bold text-[#333333] md:text-3xl"
-          >
-            Nos Services
-          </motion.h2>
-          <Swiper
-            modules={[Autoplay, Navigation, Pagination]}
-            autoplay={{ delay: 4000 }}
-            pagination={{ clickable: true }}
-            navigation
-            slidesPerView={1}
-            spaceBetween={20}
-            breakpoints={{
-              640: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
-            }}
-            className="pb-12"
-          >
-            {[
-              { img: '/manus-storage/DeDLkNQm8s1o_a39a7961.jpg', title: 'Logistique Globale' },
-              { img: '/manus-storage/9jYjDta1GFa2_5d7dfdb6.jpg', title: 'Shipping International' },
-              { img: '/manus-storage/8UJ5W4JCQp6i_894944a4.jpg', title: 'Livraison Rapide' },
-            ].map((service, i) => (
-              <SwiperSlide key={i}>
-                <motion.div
-                  whileHover={{ scale: 1.02 }}
-                  className="relative h-64 overflow-hidden rounded-lg bg-white shadow-md"
-                >
-                  <img
-                    src={service.img}
-                    alt={service.title}
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/50 to-transparent p-4">
-                    <h3 className="text-lg font-bold text-white">{service.title}</h3>
-                  </div>
-                </motion.div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      </motion.section>
-
-      {/* Features Section */}
-      <motion.section
-        ref={featuresRef}
-        variants={containerVariants}
-        initial="hidden"
-        animate={featuresInView ? 'visible' : 'hidden'}
-        className="bg-white py-12 px-4"
-      >
-        <div className="container mx-auto max-w-6xl">
-          <motion.h2
-            variants={itemVariants}
-            className="mb-8 text-center text-2xl font-bold text-[#333333] md:text-3xl"
-          >
-            Pourquoi Bysis
-          </motion.h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { icon: Truck, title: 'Livraison Rapide', desc: '20-25 jours' },
-              { icon: Shield, title: 'Sécurisé', desc: 'Assurance incluse' },
-              { icon: Clock, title: 'Support 24/7', desc: 'Toujours disponible' },
-              { icon: Star, title: 'Qualité', desc: 'Produits vérifiés' },
-            ].map((feature, i) => (
-              <motion.div
-                key={i}
-                variants={itemVariants}
-                className="flex flex-col items-center rounded-lg border border-[#EEEEEE] bg-[#F5F5F5] p-6 text-center"
-              >
-                <div className="mb-4 text-[#FF9900]">
-                  <feature.icon size={32} />
-                </div>
-                <h3 className="mb-2 font-bold text-[#333333]">{feature.title}</h3>
-                <p className="text-sm text-[#666666]">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </div>
+        <div className="grid grid-cols-3 gap-2">
+          {['Apple', 'Medicube', 'Adidas'].map((brand, idx) => (
+            <motion.div
+              key={idx}
+              whileHover={{ y: -4 }}
+              className="bg-white rounded border border-gray-200 overflow-hidden"
+            >
+              <div className="w-full h-24 bg-gray-100 flex items-center justify-center text-2xl">
+                {idx === 0 ? '📱' : idx === 1 ? '💅' : '👟'}
+              </div>
+              <div className="p-2 text-center">
+                <p className="text-xs font-semibold">{brand}</p>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </motion.section>
 
       {/* Testimonials Section */}
       <motion.section
-        ref={testimonialsRef}
-        initial={{ opacity: 0 }}
-        animate={testimonialsInView ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.6 }}
-        className="bg-[#F5F5F5] py-12 px-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.6 }}
+        className="px-4 py-6 bg-gray-50"
       >
-        <div className="container mx-auto max-w-6xl">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={testimonialsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-            transition={{ duration: 0.6 }}
-            className="mb-8 text-center text-2xl font-bold text-[#333333] md:text-3xl"
-          >
-            Avis des Clients
-          </motion.h2>
-          <Swiper
-            modules={[Autoplay, Pagination]}
-            autoplay={{ delay: 5000 }}
-            pagination={{ clickable: true }}
-            slidesPerView={1}
-            spaceBetween={20}
-            breakpoints={{
-              768: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
-            }}
-            className="pb-12"
-          >
-            {[
-              { name: 'Fatima', rating: 5, text: 'Service excellent! Livraison rapide et produits de qualité.' },
-              { name: 'Ahmed', rating: 5, text: 'Très satisfait. Je recommande vivement Bysis!' },
-              { name: 'Leila', rating: 4, text: 'Bonne expérience. Support client très réactif.' },
-            ].map((testimonial, i) => (
-              <SwiperSlide key={i}>
-                <motion.div
-                  whileHover={{ y: -4 }}
-                  className="rounded-lg border border-[#EEEEEE] bg-white p-6 shadow-sm"
-                >
-                  <div className="mb-4 flex gap-1">
-                    {Array.from({ length: testimonial.rating }).map((_, j) => (
-                      <Star key={j} size={16} className="fill-[#FFC107] text-[#FFC107]" />
+        <h2 className="text-lg font-bold mb-4">Avis des Clients</h2>
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white rounded p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold">Client {i}</p>
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, j) => (
+                      <Star key={j} size={12} className="fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                  <p className="mb-4 text-[#666666]">"{testimonial.text}"</p>
-                  <p className="font-bold text-[#333333]">{testimonial.name}</p>
-                  <p className="text-sm text-[#999999]">Achat vérifié</p>
-                </motion.div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600">Excellent produit, livraison rapide!</p>
+            </div>
+          ))}
         </div>
       </motion.section>
 
-      {/* CTA Section */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        className="bg-gradient-to-r from-[#FF9900] to-[#146EB4] py-12 px-4 text-white"
-      >
-        <div className="container mx-auto flex max-w-6xl flex-col items-center justify-center gap-6 text-center">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-3xl font-bold md:text-4xl"
-          >
-            Prêt à commencer?
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="max-w-xl text-lg"
-          >
-            Rejoignez des milliers de clients satisfaits qui font leurs achats avec Bysis
-          </motion.p>
-          <motion.button
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-3 font-bold text-[#FF9900] transition-all hover:shadow-lg"
-          >
-            Commencer maintenant
-            <ArrowRight size={20} />
-          </motion.button>
-        </div>
-      </motion.section>
+      {/* Spacer for bottom nav */}
+      <div className="h-20"></div>
     </AppLayout>
   );
 }
