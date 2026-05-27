@@ -3,431 +3,365 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination, Navigation } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
+import { Autoplay, Navigation, Pagination } from 'swiper/modules';
+import { Home, Grid3x3, TrendingUp, ShoppingCart, User, Plus, Search, Star, Truck, Shield, Clock, ArrowRight } from 'lucide-react';
 import AppLayout from '@/components/AppLayout';
-import { ArrowRight, Check, Star, Truck, Shield, Zap, Users, Globe } from 'lucide-react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
-/* ── Color Palette ────────────────────────────────────────────────────────── */
-const COLORS = {
-  black: '#0A0A0A',
-  white: '#FFFFFF',
-  blue: '#0047AB',
-  charcoal: '#2D2D2D',
-  darkGray: '#4A4A4A',
-  lightGray: '#E0E0E0',
-  success: '#28A745',
-  warning: '#FFC107',
-  error: '#DC3545',
-};
+export default function HomePage() {
+  const { ref: statsRef, inView: statsInView } = useInView({ threshold: 0.1 });
+  const { ref: featuresRef, inView: featuresInView } = useInView({ threshold: 0.1 });
+  const { ref: testimonialsRef, inView: testimonialsInView } = useInView({ threshold: 0.1 });
 
-/* ── Image URLs ───────────────────────────────────────────────────────────── */
-const IMGS = {
-  hero: '/manus-storage/hero-delivery-tunisia_2914d89b.webp',
-  unboxing1: '/manus-storage/unboxing-clothes_5637a1dc.jpg',
-  unboxing2: '/manus-storage/unboxing-happy_b2d19bf8.jpg',
-  unboxing3: '/manus-storage/happy-unboxing_eda27441.jpg',
-  couple: '/manus-storage/couple-phone_771f441d.jpg',
-  womanPhone: '/manus-storage/woman-shopping-phone_0ed1d14c.jpg',
-};
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  };
 
-/* ── Animation Variants ───────────────────────────────────────────────────── */
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-};
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5 },
+    },
+  };
 
-const fadeInLeft = {
-  hidden: { opacity: 0, x: -40 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
-};
-
-const fadeInRight = {
-  hidden: { opacity: 0, x: 40 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6 } },
-};
-
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.6 } },
-};
-
-/* ── Section Wrapper with Scroll Animation ────────────────────────────────── */
-function AnimatedSection({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
-  return (
-    <motion.div
-      ref={ref}
-      initial="hidden"
-      animate={inView ? 'visible' : 'hidden'}
-      variants={fadeInUp}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-export default function Home() {
   return (
     <AppLayout>
-      <div className="w-full bg-white overflow-hidden">
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        {/* HERO SECTION — Large Dynamic Image with Parallax ═════════════════════════ */}
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden bg-black">
-          {/* Background Image with Parallax */}
-          <motion.div
-            className="absolute inset-0"
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
+      {/* Hero Section with Large Image */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        className="relative h-96 w-full overflow-hidden bg-gradient-to-b from-[#F5F5F5] to-white"
+      >
+        <img
+          src="/manus-storage/9vxTX23dpFU4_983af5df.jpg"
+          alt="International Shopping"
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/40" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="max-w-2xl px-4 text-4xl font-bold text-white md:text-5xl"
           >
-            <img
-              src={IMGS.hero}
-              alt="Bysis Delivery Service"
-              className="w-full h-full object-cover"
-            />
-            {/* Dark Overlay */}
-            <div className="absolute inset-0 bg-black/40" />
-          </motion.div>
+            Achetez depuis n'importe où, livré chez vous
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.6 }}
+            className="mt-4 max-w-xl px-4 text-lg text-white/90"
+          >
+            Commandez sur les plus grandes plateformes mondiales et nous livrons directement en Tunisie
+          </motion.p>
+          <motion.button
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.7, duration: 0.6 }}
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#FF9900] px-6 py-3 font-bold text-white transition-all hover:bg-[#E68A00] active:scale-95"
+          >
+            <Plus size={20} />
+            Commencer maintenant
+          </motion.button>
+        </div>
+      </motion.section>
 
-          {/* Content Overlay */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center z-10">
+      {/* Stats Section */}
+      <motion.section
+        ref={statsRef}
+        variants={containerVariants}
+        initial="hidden"
+        animate={statsInView ? 'visible' : 'hidden'}
+        className="bg-white py-12 px-4"
+      >
+        <div className="container mx-auto grid grid-cols-3 gap-4 max-w-6xl md:gap-8">
+          {[
+            { label: '170+', desc: 'Commandes' },
+            { label: '98%', desc: 'Satisfaction' },
+            { label: '25j', desc: 'Livraison' },
+          ].map((stat, i) => (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="max-w-2xl"
+              key={i}
+              variants={itemVariants}
+              className="flex flex-col items-center justify-center rounded-lg bg-[#F5F5F5] p-4 md:p-6"
             >
-              <h1 className="text-4xl md:text-6xl font-black text-white mb-4 leading-tight">
-                Achetez depuis n'importe où, livré chez vous
-              </h1>
-              <p className="text-lg md:text-xl text-gray-100 mb-8">
-                On commande pour vous sur les plus grandes plateformes mondiales et on livre directement en Tunisie. Prix en TND, livraison 20-25 jours.
-              </p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 bg-blue-600 text-white font-bold rounded-lg text-lg transition-all hover:shadow-lg"
-                style={{ background: COLORS.blue }}
-              >
-                Commander maintenant
-                <ArrowRight className="inline-block ml-2" size={20} />
-              </motion.button>
+              <div className="text-2xl font-bold text-[#333333] md:text-3xl">{stat.label}</div>
+              <div className="text-sm text-[#666666] md:text-base">{stat.desc}</div>
             </motion.div>
-          </div>
+          ))}
+        </div>
+      </motion.section>
 
-          {/* Scroll Indicator */}
-          <motion.div
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
+      {/* Platforms Section */}
+      <motion.section
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="bg-[#F5F5F5] py-12 px-4"
+      >
+        <div className="container mx-auto max-w-6xl">
+          <motion.h2
+            variants={itemVariants}
+            className="mb-8 text-center text-2xl font-bold text-[#333333] md:text-3xl"
           >
-            <div className="w-6 h-10 border-2 border-white rounded-full flex items-center justify-center">
-              <div className="w-1 h-2 bg-white rounded-full" />
-            </div>
-          </motion.div>
-        </section>
+            Plateformes Disponibles
+          </motion.h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {[
+              { name: 'Shein', desc: 'Mode & Accessoires' },
+              { name: 'AliExpress', desc: 'Électronique & Maison' },
+              { name: 'Temu', desc: 'Tendances & Gadgets' },
+            ].map((platform, i) => (
+              <motion.div
+                key={i}
+                variants={itemVariants}
+                whileHover={{ y: -4 }}
+                className="flex flex-col items-center justify-center rounded-lg border border-[#EEEEEE] bg-white p-6 transition-shadow hover:shadow-md"
+              >
+                <div className="mb-2 text-3xl font-bold text-[#FF9900]">{platform.name}</div>
+                <div className="text-sm text-[#666666]">{platform.desc}</div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
 
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        {/* STATS SECTION ═════════════════════════════════════════════════════════════ */}
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        <AnimatedSection className="py-12 md:py-16 px-4 bg-black text-white">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-              {[
-                { value: '170+', label: 'Commandes livrées' },
-                { value: '98%', label: 'Satisfaction' },
-                { value: '25j', label: 'Délai moyen' },
-                { value: '3', label: 'Plateformes' },
-              ].map((stat, i) => (
+      {/* How It Works Section */}
+      <motion.section
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        className="bg-white py-12 px-4"
+      >
+        <div className="container mx-auto max-w-6xl">
+          <motion.h2
+            variants={itemVariants}
+            className="mb-8 text-center text-2xl font-bold text-[#333333] md:text-3xl"
+          >
+            Comment ça marche
+          </motion.h2>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {[
+              { icon: Search, title: 'Cherchez', desc: 'Trouvez ce que vous voulez' },
+              { icon: ShoppingCart, title: 'Commandez', desc: 'Nous achetons pour vous' },
+              { icon: Truck, title: 'Recevez', desc: 'Livraison en Tunisie' },
+            ].map((step, i) => (
+              <motion.div
+                key={i}
+                variants={itemVariants}
+                className="flex flex-col items-center rounded-lg bg-[#F5F5F5] p-6 text-center"
+              >
+                <div className="mb-4 rounded-full bg-[#FF9900] p-4 text-white">
+                  <step.icon size={32} />
+                </div>
+                <h3 className="mb-2 text-lg font-bold text-[#333333]">{step.title}</h3>
+                <p className="text-sm text-[#666666]">{step.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Services Carousel */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        className="bg-[#F5F5F5] py-12 px-4"
+      >
+        <div className="container mx-auto max-w-6xl">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-8 text-center text-2xl font-bold text-[#333333] md:text-3xl"
+          >
+            Nos Services
+          </motion.h2>
+          <Swiper
+            modules={[Autoplay, Navigation, Pagination]}
+            autoplay={{ delay: 4000 }}
+            pagination={{ clickable: true }}
+            navigation
+            slidesPerView={1}
+            spaceBetween={20}
+            breakpoints={{
+              640: { slidesPerView: 2 },
+              1024: { slidesPerView: 3 },
+            }}
+            className="pb-12"
+          >
+            {[
+              { img: '/manus-storage/DeDLkNQm8s1o_a39a7961.jpg', title: 'Logistique Globale' },
+              { img: '/manus-storage/9jYjDta1GFa2_5d7dfdb6.jpg', title: 'Shipping International' },
+              { img: '/manus-storage/8UJ5W4JCQp6i_894944a4.jpg', title: 'Livraison Rapide' },
+            ].map((service, i) => (
+              <SwiperSlide key={i}>
                 <motion.div
-                  key={i}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.1 }}
-                  className="text-center"
+                  whileHover={{ scale: 1.02 }}
+                  className="relative h-64 overflow-hidden rounded-lg bg-white shadow-md"
                 >
-                  <div className="text-3xl md:text-4xl font-black mb-2">{stat.value}</div>
-                  <div className="text-sm md:text-base text-gray-300">{stat.label}</div>
+                  <img
+                    src={service.img}
+                    alt={service.title}
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/50 to-transparent p-4">
+                    <h3 className="text-lg font-bold text-white">{service.title}</h3>
+                  </div>
                 </motion.div>
-              ))}
-            </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      </motion.section>
+
+      {/* Features Section */}
+      <motion.section
+        ref={featuresRef}
+        variants={containerVariants}
+        initial="hidden"
+        animate={featuresInView ? 'visible' : 'hidden'}
+        className="bg-white py-12 px-4"
+      >
+        <div className="container mx-auto max-w-6xl">
+          <motion.h2
+            variants={itemVariants}
+            className="mb-8 text-center text-2xl font-bold text-[#333333] md:text-3xl"
+          >
+            Pourquoi Bysis
+          </motion.h2>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: Truck, title: 'Livraison Rapide', desc: '20-25 jours' },
+              { icon: Shield, title: 'Sécurisé', desc: 'Assurance incluse' },
+              { icon: Clock, title: 'Support 24/7', desc: 'Toujours disponible' },
+              { icon: Star, title: 'Qualité', desc: 'Produits vérifiés' },
+            ].map((feature, i) => (
+              <motion.div
+                key={i}
+                variants={itemVariants}
+                className="flex flex-col items-center rounded-lg border border-[#EEEEEE] bg-[#F5F5F5] p-6 text-center"
+              >
+                <div className="mb-4 text-[#FF9900]">
+                  <feature.icon size={32} />
+                </div>
+                <h3 className="mb-2 font-bold text-[#333333]">{feature.title}</h3>
+                <p className="text-sm text-[#666666]">{feature.desc}</p>
+              </motion.div>
+            ))}
           </div>
-        </AnimatedSection>
+        </div>
+      </motion.section>
 
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        {/* PLATFORMS SECTION ════════════════════════════════════════════════════════ */}
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        <AnimatedSection className="py-16 md:py-20 px-4 bg-white">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-black text-center mb-4">Où on commande pour vous</h2>
-            <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-              Trois des plus grandes plateformes mondiales, accessibles depuis la Tunisie.
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                { name: 'SHEIN', emoji: '👗', desc: 'Mode & Tendances' },
-                { name: 'AliExpress', emoji: '🛍️', desc: 'Tout & Moins Cher' },
-                { name: 'Temu', emoji: '🎁', desc: 'Prix Imbattables' },
-              ].map((platform, i) => (
+      {/* Testimonials Section */}
+      <motion.section
+        ref={testimonialsRef}
+        initial={{ opacity: 0 }}
+        animate={testimonialsInView ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.6 }}
+        className="bg-[#F5F5F5] py-12 px-4"
+      >
+        <div className="container mx-auto max-w-6xl">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={testimonialsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6 }}
+            className="mb-8 text-center text-2xl font-bold text-[#333333] md:text-3xl"
+          >
+            Avis des Clients
+          </motion.h2>
+          <Swiper
+            modules={[Autoplay, Pagination]}
+            autoplay={{ delay: 5000 }}
+            pagination={{ clickable: true }}
+            slidesPerView={1}
+            spaceBetween={20}
+            breakpoints={{
+              768: { slidesPerView: 2 },
+              1024: { slidesPerView: 3 },
+            }}
+            className="pb-12"
+          >
+            {[
+              { name: 'Fatima', rating: 5, text: 'Service excellent! Livraison rapide et produits de qualité.' },
+              { name: 'Ahmed', rating: 5, text: 'Très satisfait. Je recommande vivement Bysis!' },
+              { name: 'Leila', rating: 4, text: 'Bonne expérience. Support client très réactif.' },
+            ].map((testimonial, i) => (
+              <SwiperSlide key={i}>
                 <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.15 }}
-                  whileHover={{ y: -8, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
-                  className="p-8 bg-gray-50 rounded-xl border border-gray-200 text-center cursor-pointer transition-all"
+                  whileHover={{ y: -4 }}
+                  className="rounded-lg border border-[#EEEEEE] bg-white p-6 shadow-sm"
                 >
-                  <div className="text-5xl mb-4">{platform.emoji}</div>
-                  <h3 className="text-xl font-bold mb-2">{platform.name}</h3>
-                  <p className="text-gray-600 text-sm">{platform.desc}</p>
+                  <div className="mb-4 flex gap-1">
+                    {Array.from({ length: testimonial.rating }).map((_, j) => (
+                      <Star key={j} size={16} className="fill-[#FFC107] text-[#FFC107]" />
+                    ))}
+                  </div>
+                  <p className="mb-4 text-[#666666]">"{testimonial.text}"</p>
+                  <p className="font-bold text-[#333333]">{testimonial.name}</p>
+                  <p className="text-sm text-[#999999]">Achat vérifié</p>
                 </motion.div>
-              ))}
-            </div>
-          </div>
-        </AnimatedSection>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      </motion.section>
 
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        {/* HOW IT WORKS SECTION ═════════════════════════════════════════════════════ */}
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        <AnimatedSection className="py-16 md:py-20 px-4 bg-gray-50">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-black text-center mb-4">Comment ça marche</h2>
-            <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-              3 étapes simples pour recevoir vos achats internationaux en Tunisie.
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  step: '1',
-                  title: 'Commandez',
-                  desc: 'Donnez-nous vos liens de produits préférés',
-                  icon: Globe,
-                },
-                {
-                  step: '2',
-                  title: 'Nous achetons',
-                  desc: 'Nous commandons pour vous sur les plateformes',
-                  icon: Zap,
-                },
-                {
-                  step: '3',
-                  title: 'Livraison',
-                  desc: 'Reçu chez vous en 20-25 jours',
-                  icon: Truck,
-                },
-              ].map((item, i) => {
-                const Icon = item.icon;
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: i === 0 ? -40 : i === 2 ? 40 : 0 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.2 }}
-                    className="relative"
-                  >
-                    <div className="flex flex-col items-center text-center">
-                      <motion.div
-                        whileHover={{ rotate: 10, scale: 1.1 }}
-                        className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-                        style={{ background: COLORS.blue }}
-                      >
-                        <Icon size={32} color="white" />
-                      </motion.div>
-                      <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                      <p className="text-gray-600">{item.desc}</p>
-                    </div>
-                    {i < 2 && (
-                      <motion.div
-                        className="hidden md:block absolute top-8 -right-4 text-2xl font-light text-gray-300"
-                        animate={{ x: [0, 5, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                      >
-                        →
-                      </motion.div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </AnimatedSection>
-
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        {/* GALLERY CAROUSEL ══════════════════════════════════════════════════════════ */}
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        <AnimatedSection className="py-16 md:py-20 px-4 bg-white">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-black text-center mb-4">Voir nos clients heureux</h2>
-            <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-              Des milliers de clients satisfaits reçoivent leurs commandes chaque mois.
-            </p>
-
-            <Swiper
-              modules={[Autoplay, Pagination, Navigation]}
-              autoplay={{ delay: 4000 }}
-              pagination={{ clickable: true }}
-              navigation
-              className="rounded-xl overflow-hidden"
-              loop
-            >
-              {[IMGS.unboxing1, IMGS.unboxing2, IMGS.unboxing3, IMGS.couple, IMGS.womanPhone].map((img, i) => (
-                <SwiperSlide key={i}>
-                  <img src={img} alt={`Unboxing ${i + 1}`} className="w-full h-96 object-cover" />
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-        </AnimatedSection>
-
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        {/* TESTIMONIALS SECTION ═════════════════════════════════════════════════════ */}
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        <AnimatedSection className="py-16 md:py-20 px-4 bg-gray-50">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-black text-center mb-4">Ce que disent nos clients</h2>
-
-            <Swiper
-              modules={[Autoplay, Pagination]}
-              autoplay={{ delay: 5000 }}
-              pagination={{ clickable: true }}
-              className="mt-12"
-              loop
-              breakpoints={{
-                640: { slidesPerView: 1 },
-                768: { slidesPerView: 2 },
-                1024: { slidesPerView: 3 },
-              }}
-            >
-              {[
-                {
-                  name: 'Amira Ben Ali',
-                  text: 'Livraison rapide et produits de qualité. Très satisfaite!',
-                  rating: 5,
-                  verified: true,
-                },
-                {
-                  name: 'Mohamed Saïd',
-                  text: 'Excellent service, prix compétitifs. Je recommande!',
-                  rating: 5,
-                  verified: true,
-                },
-                {
-                  name: 'Fatima Trabelsi',
-                  text: 'Première commande réussie. Merci Bysis!',
-                  rating: 4,
-                  verified: true,
-                },
-              ].map((testimonial, i) => (
-                <SwiperSlide key={i}>
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    className="p-6 bg-white rounded-lg border border-gray-200 h-full flex flex-col"
-                  >
-                    <div className="flex gap-1 mb-4">
-                      {Array.from({ length: testimonial.rating }).map((_, j) => (
-                        <Star key={j} size={16} fill={COLORS.warning} color={COLORS.warning} />
-                      ))}
-                    </div>
-                    <p className="text-gray-700 mb-4 flex-grow">{testimonial.text}</p>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-bold text-sm">{testimonial.name}</p>
-                        {testimonial.verified && (
-                          <p className="text-xs text-green-600 flex items-center gap-1">
-                            <Check size={12} /> Achat vérifié
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
-        </AnimatedSection>
-
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        {/* FEATURES SECTION ═════════════════════════════════════════════════════════ */}
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        <AnimatedSection className="py-16 md:py-20 px-4 bg-white">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-black text-center mb-12">Pourquoi choisir Bysis?</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {[
-                {
-                  icon: Shield,
-                  title: 'Sécurisé',
-                  desc: 'Vos données sont protégées avec les meilleures normes de sécurité.',
-                },
-                {
-                  icon: Truck,
-                  title: 'Livraison Fiable',
-                  desc: 'Suivi en temps réel de votre commande jusqu\'à la livraison.',
-                },
-                {
-                  icon: Zap,
-                  title: 'Rapide',
-                  desc: 'Traitement rapide de vos commandes et expédition en 48h.',
-                },
-                {
-                  icon: Users,
-                  title: 'Support 24/7',
-                  desc: 'Notre équipe est toujours disponible pour vous aider.',
-                },
-              ].map((feature, i) => {
-                const Icon = feature.icon;
-                return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="p-6 bg-gray-50 rounded-lg border border-gray-200 flex gap-4"
-                  >
-                    <div className="flex-shrink-0">
-                      <Icon size={32} color={COLORS.blue} />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg mb-2">{feature.title}</h3>
-                      <p className="text-gray-600 text-sm">{feature.desc}</p>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        </AnimatedSection>
-
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        {/* CTA SECTION ═══════════════════════════════════════════════════════════════ */}
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        <AnimatedSection className="py-16 md:py-20 px-4 bg-black text-white">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-black mb-6">Prêt à commencer?</h2>
-            <p className="text-lg text-gray-300 mb-8">
-              Rejoignez des milliers de clients satisfaits et commencez vos achats internationaux dès aujourd'hui.
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 rounded-lg text-lg font-bold transition-all hover:shadow-lg"
-              style={{ background: COLORS.blue, color: 'white' }}
-            >
-              Commander maintenant
-              <ArrowRight className="inline-block ml-2" size={20} />
-            </motion.button>
-          </div>
-        </AnimatedSection>
-      </div>
+      {/* CTA Section */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        className="bg-gradient-to-r from-[#FF9900] to-[#146EB4] py-12 px-4 text-white"
+      >
+        <div className="container mx-auto flex max-w-6xl flex-col items-center justify-center gap-6 text-center">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-3xl font-bold md:text-4xl"
+          >
+            Prêt à commencer?
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="max-w-xl text-lg"
+          >
+            Rejoignez des milliers de clients satisfaits qui font leurs achats avec Bysis
+          </motion.p>
+          <motion.button
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-3 font-bold text-[#FF9900] transition-all hover:shadow-lg"
+          >
+            Commencer maintenant
+            <ArrowRight size={20} />
+          </motion.button>
+        </div>
+      </motion.section>
     </AppLayout>
   );
 }
