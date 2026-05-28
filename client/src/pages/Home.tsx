@@ -25,6 +25,7 @@ const COLORS = {
 
 /* ── Image URLs ───────────────────────────────────────────────────────────── */
 const IMGS = {
+  thankyou: '/manus-storage/Thankyou_95cdb69e.png',
   carousel1: '/manus-storage/BluePlayfulTypographicComingSoonFashionPoster-1_a6370ec0.png',
   carousel2: '/manus-storage/BluePlayfulTypographicComingSoonFashionPoster-2_ac6372e4.png',
   carousel3: '/manus-storage/BluePlayfulTypographicComingSoonFashionPoster-3_482eefd5.png',
@@ -92,6 +93,13 @@ export default function Home() {
             loop={true}
             className="w-full h-full"
           >
+            <SwiperSlide>
+              <img
+                src={IMGS.thankyou}
+                alt="Merci - Thank You"
+                className="w-full h-full object-cover"
+              />
+            </SwiperSlide>
             <SwiperSlide>
               <img
                 src={IMGS.carousel1}
