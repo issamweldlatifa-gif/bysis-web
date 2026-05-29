@@ -1,4 +1,4 @@
-import { useState, ReactNode } from 'react';
+import { useState, ReactNode, createContext, useContext } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Grid3x3, TrendingUp, ShoppingCart, User, Plus, Search } from 'lucide-react';
@@ -7,6 +7,10 @@ import ProfileSheet from '@/components/ProfileSheet';
 import { useCart } from '@/contexts/CartContext';
 import { useI18n } from '@/contexts/I18nContext';
 import { useTheme } from '@/contexts/ThemeContext';
+
+// Dynamic Background Color Context
+const BgColorContext = createContext<{ bgColor: string; setBgColor: (color: string) => void }>({ bgColor: '#FFFFFF', setBgColor: () => {} });
+export const useBgColor = () => useContext(BgColorContext);
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -201,18 +205,20 @@ function BottomNav({ onProfileClick, onScanClick }: {
 export default function AppLayout({ children, showNav = true }: AppLayoutProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const [authOpen, setAuthOpen]       = useState(false);
+  const [bgColor, setBgColor]         = useState('#FFFFFF');
   const [, navigate]                  = useLocation();
   const { theme }                     = useTheme();
   const isDark                        = theme === 'dark';
-  const pageBg                        = isDark ? '#0D0D0F' : '#FFFFFF';
+  const pageBg                        = isDark ? '#0D0D0F' : bgColor;
 
   const handleScanClick = () => navigate('/calculator');
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ background: pageBg, fontFamily: '"Inter", -apple-system, sans-serif' }}
-    >
+    <BgColorContext.Provider value={{ bgColor, setBgColor }}>
+      <div
+        className="min-h-screen flex flex-col transition-colors duration-500"
+        style={{ background: pageBg, fontFamily: '"Inter", -apple-system, sans-serif' }}
+      >
       <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
       <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
 
@@ -229,6 +235,7 @@ export default function AppLayout({ children, showNav = true }: AppLayoutProps) 
           onScanClick={handleScanClick}
         />
       )}
-    </div>
+      </div>
+    </BgColorContext.Provider>
   );
 }
