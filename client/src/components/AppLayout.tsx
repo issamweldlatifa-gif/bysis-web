@@ -22,12 +22,12 @@ const SHEIN_BLACK  = '#1A1A1A';
 
 /* ── Bysis Logo ─────────────────────────────────────────────────────────── */
 const IconBysis = () => (
-  <div
-    className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-black text-base flex-shrink-0"
-    style={{ background: '#0047AB' }}
-  >
-    B
-  </div>
+  <img
+    src="/manus-storage/IMG_7001_ab805ac0.PNG"
+    alt="Bysis Logo"
+    className="h-8 flex-shrink-0"
+    style={{ objectFit: 'contain' }}
+  />
 );
 
 
@@ -52,12 +52,6 @@ function AppHeader({ onProfileClick }: { onProfileClick: () => void }) {
       {/* Logo */}
       <div className="flex items-center gap-2">
         <IconBysis />
-        <span
-          className="text-lg font-black tracking-tight"
-          style={{ color: SHEIN_RED, letterSpacing: '-0.03em' }}
-        >
-          bysis
-        </span>
       </div>
 
       {/* Search bar — Shein style */}
