@@ -164,6 +164,7 @@
   html {
     /* Dynamic background extends into iOS status bar area — like SHEIN */
     background-color: var(--app-bg-color, #cadfe2);
+    transition: background-color 0.65s cubic-bezier(0.23, 1, 0.32, 1);
     font-optical-sizing: auto;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
@@ -183,6 +184,7 @@
     color: #333333;
     /* Body also takes dynamic bg so no white flash */
     background-color: var(--app-bg-color, #cadfe2);
+    transition: background-color 0.65s cubic-bezier(0.23, 1, 0.32, 1);
     min-height: 100%;
     margin: 0;
   }
@@ -190,6 +192,7 @@
     min-height: 100vh;
     min-height: 100dvh;
     background-color: var(--app-bg-color, #cadfe2);
+    transition: background-color 0.65s cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   /* ── Shein Typography Scale ─────────────────────────────────────────── */
