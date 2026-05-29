@@ -160,13 +160,16 @@
     @apply border-border outline-ring/50;
   }
   html {
-    /* Allow dynamic background to show through safe-area on iOS */
-    background-color: transparent;
+    /* Dynamic background extends into iOS status bar area — like SHEIN */
+    background-color: var(--app-bg-color, #8d847c);
     font-optical-sizing: auto;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* Ensure html fills full viewport including safe-area */
+    min-height: 100%;
+    height: 100%;
   }
   body {
     @apply text-foreground;
@@ -176,6 +179,15 @@
     line-height: 1.5;
     letter-spacing: -0.005em;
     color: #333333;
+    /* Body also takes dynamic bg so no white flash */
+    background-color: var(--app-bg-color, #8d847c);
+    min-height: 100%;
+    margin: 0;
+  }
+  #root {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background-color: var(--app-bg-color, #8d847c);
   }
 
   /* ── Shein Typography Scale ─────────────────────────────────────────── */

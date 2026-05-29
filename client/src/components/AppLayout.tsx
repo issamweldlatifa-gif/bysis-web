@@ -44,11 +44,10 @@ function AppHeader({ onScanClick }: { onScanClick: () => void }) {
   return (
     <header
       className="sticky top-0 z-40 w-full"
-      style={{
-        background: bgColor,
-        paddingTop: 'env(safe-area-inset-top, 0px)',
-      }}
+      style={{ background: bgColor }}
     >
+      {/* Safe-area spacer — fills iOS status bar with the same bg color */}
+      <div style={{ height: 'env(safe-area-inset-top, 0px)', background: bgColor }} />
       <div className="w-full px-3 py-2.5">
         {/* Search bar — full width, white, rounded pill */}
         <div
@@ -185,12 +184,26 @@ function AppLayoutInner({ children, showNav = true }: AppLayoutProps) {
   return (
     <div
       className="min-h-screen flex flex-col"
-      style={{ fontFamily: '"Inter", -apple-system, sans-serif' }}
+      style={{
+        fontFamily: '"Inter", -apple-system, sans-serif',
+        /* Extend bg behind iOS status bar */
+        background: pageBg,
+      }}
     >
-      {/* Full-screen background — same color as header */}
+      {/* Full-screen background — same color as header, covers safe-area too */}
       <div
-        className="fixed inset-0 z-0 transition-colors duration-500"
-        style={{ background: pageBg, pointerEvents: 'none' }}
+        className="fixed z-0 transition-colors duration-500"
+        style={{
+          background: pageBg,
+          pointerEvents: 'none',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          /* Extend into safe-area on all sides */
+          marginTop: 'calc(-1 * env(safe-area-inset-top, 0px))',
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+        }}
       />
 
       {/* Content */}

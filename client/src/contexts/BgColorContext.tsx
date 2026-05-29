@@ -13,11 +13,14 @@ const BgColorContext = createContext<BgColorContextType>({
 export function BgColorProvider({ children }: { children: ReactNode }) {
   const [bgColor, setBgColor] = useState('#8d847c');
 
-  // Update meta theme-color dynamically so iOS status bar matches background
+  // Update meta theme-color AND html CSS variable dynamically
   const setColorAndMeta = (color: string) => {
     setBgColor(color);
+    // Update meta theme-color for iOS status bar in Safari
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', color);
+    // Update CSS variable on html element so background extends into safe-area
+    document.documentElement.style.setProperty('--app-bg-color', color);
   };
 
   return (
