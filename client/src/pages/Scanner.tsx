@@ -52,7 +52,7 @@ function HelpSection({ title, body }: { title: string; body: string }) {
   );
 }
 
-/* ── Sparkle Star SVG ───────────────────────────────────────────────────── */
+/* ── Sparkle Star ───────────────────────────────────────────────────────── */
 function SparkleStar({ size = 12, color = 'white' }: { size?: number; color?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 12 12" fill={color}>
@@ -64,8 +64,13 @@ function SparkleStar({ size = 12, color = 'white' }: { size?: number; color?: st
 /* ── Flash Icon ─────────────────────────────────────────────────────────── */
 function FlashIcon({ active }: { active: boolean }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#FFD700' : 'white'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill={active ? '#FFD700' : 'none'} />
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" strokeLinecap="round" strokeLinejoin="round">
+      <polygon
+        points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"
+        fill={active ? '#FFD700' : 'none'}
+        stroke={active ? '#FFD700' : 'white'}
+        strokeWidth="2"
+      />
     </svg>
   );
 }
@@ -79,10 +84,10 @@ export default function Scanner() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const torchTrackRef = useRef<MediaStreamTrack | null>(null);
+  const videoTrackRef = useRef<MediaStreamTrack | null>(null);
 
   const [flashOn, setFlashOn] = useState(false);
-  const [flashSupported, setFlashSupported] = useState(false);
+  const [flashSupported, setFlashSupported] = useState<boolean | null>(null); // null = unknown
   const [mode, setMode] = useState<Mode>('camera');
   const [showHelp, setShowHelp] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
@@ -91,65 +96,126 @@ export default function Scanner() {
   /* ── Start camera ── */
   const startCamera = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: 'environment' },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-        },
+      // First try to get the back camera specifically via enumerateDevices
+      let backCameraId: string | undefined;
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cameras = devices.filter(d => d.kind === 'videoinput');
+        // Last camera is usually the back camera on mobile
+        if (cameras.length > 1) {
+          backCameraId = cameras[cameras.length - 1].deviceId;
+        }
+      } catch {
+        // ignore enumerate errors
+      }
+
+      const constraints: MediaStreamConstraints = {
+        video: backCameraId
+          ? { deviceId: { exact: backCameraId }, width: { ideal: 1920 }, height: { ideal: 1080 } }
+          : { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
         audio: false,
-      });
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
 
-      // Check torch support
       const track = stream.getVideoTracks()[0];
-      torchTrackRef.current = track;
-      const caps = track.getCapabilities?.() as any;
-      if (caps?.torch) {
-        setFlashSupported(true);
+      videoTrackRef.current = track;
+
+      // Check torch support via getCapabilities
+      try {
+        const caps = track.getCapabilities?.() as any;
+        setFlashSupported(!!caps?.torch);
+      } catch {
+        setFlashSupported(false);
       }
 
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play().catch(() => {});
+        await videoRef.current.play().catch(() => {});
       }
       setCameraError(null);
-    } catch {
+    } catch (err: any) {
+      console.error('Camera error:', err);
       setCameraError("Accès à la caméra refusé. Veuillez autoriser l'accès dans les paramètres.");
     }
   }, []);
 
   /* ── Stop camera ── */
-  const stopCamera = useCallback(() => {
+  const stopCamera = useCallback(async () => {
     // Turn off torch before stopping
-    if (torchTrackRef.current && flashOn) {
+    const track = videoTrackRef.current;
+    if (track) {
       try {
-        (torchTrackRef.current as any).applyConstraints({ advanced: [{ torch: false }] }).catch(() => {});
+        await (track as any).applyConstraints({ advanced: [{ torch: false }] });
       } catch {}
     }
     streamRef.current?.getTracks().forEach(t => t.stop());
     streamRef.current = null;
-    torchTrackRef.current = null;
-  }, [flashOn]);
+    videoTrackRef.current = null;
+    setFlashOn(false);
+  }, []);
 
   useEffect(() => {
     startCamera();
-    return () => stopCamera();
+    return () => {
+      stopCamera();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /* ── Toggle flash (torch) ── */
   const toggleFlash = useCallback(async () => {
-    const track = torchTrackRef.current;
-    if (!track) return;
-    const newState = !flashOn;
-    try {
-      await (track as any).applyConstraints({ advanced: [{ torch: newState }] });
-      setFlashOn(newState);
-    } catch {
-      // Torch not supported — silently ignore
+    const track = videoTrackRef.current;
+    if (!track) {
+      console.warn('No video track available for torch');
+      return;
     }
-  }, [flashOn]);
+
+    const newState = !flashOn;
+
+    try {
+      // Method 1: applyConstraints with advanced torch
+      await (track as any).applyConstraints({
+        advanced: [{ torch: newState }],
+      });
+      setFlashOn(newState);
+      console.log(`Torch ${newState ? 'ON' : 'OFF'} via applyConstraints`);
+    } catch (err1) {
+      console.warn('applyConstraints torch failed:', err1);
+      // Method 2: Try direct constraint (some browsers)
+      try {
+        await (track as any).applyConstraints({ torch: newState } as any);
+        setFlashOn(newState);
+        console.log(`Torch ${newState ? 'ON' : 'OFF'} via direct constraint`);
+      } catch (err2) {
+        console.warn('Direct torch constraint also failed:', err2);
+        // Method 3: Restart stream with torch constraint
+        try {
+          await stopCamera();
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode: { ideal: 'environment' },
+              // @ts-ignore
+              advanced: [{ torch: newState }],
+            },
+            audio: false,
+          });
+          streamRef.current = stream;
+          const newTrack = stream.getVideoTracks()[0];
+          videoTrackRef.current = newTrack;
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            await videoRef.current.play().catch(() => {});
+          }
+          setFlashOn(newState);
+          console.log(`Torch ${newState ? 'ON' : 'OFF'} via stream restart`);
+        } catch (err3) {
+          console.error('All torch methods failed:', err3);
+        }
+      }
+    }
+  }, [flashOn, stopCamera]);
 
   /* ── Capture photo ── */
   const captureAndSearch = useCallback(() => {
@@ -181,7 +247,6 @@ export default function Scanner() {
   useEffect(() => {
     if (mode !== 'barcode') return;
     let scanner: any;
-    // Stop main camera stream first to avoid conflict
     stopCamera();
     import('html5-qrcode').then(({ Html5Qrcode }) => {
       scanner = new Html5Qrcode('barcode-reader');
@@ -198,9 +263,9 @@ export default function Scanner() {
     return () => {
       scanner?.stop().catch(() => {});
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
-  // When switching back to camera, restart it
   useEffect(() => {
     if (mode === 'camera') {
       startCamera();
@@ -214,7 +279,7 @@ export default function Scanner() {
       className="fixed inset-0 flex flex-col"
       style={{
         background: '#000',
-        zIndex: 100, // Above AppLayout header (z-40) and FloatingChat (z-50)
+        zIndex: 100,
         paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
@@ -255,11 +320,12 @@ export default function Scanner() {
 
         {/* Right: Flash + Help */}
         <div className="flex items-center gap-1">
-          {/* Flash button — only show if torch supported or always show */}
+          {/* Flash button */}
           <button
             onClick={toggleFlash}
             className="flex items-center justify-center w-10 h-10 rounded-full active:bg-white/10 transition-colors"
             aria-label={flashOn ? 'Éteindre le flash' : 'Allumer le flash'}
+            style={{ opacity: flashSupported === false ? 0.4 : 1 }}
           >
             <FlashIcon active={flashOn} />
           </button>
@@ -285,7 +351,9 @@ export default function Scanner() {
             {cameraError ? (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-8">
                 <svg width="48" height="48" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.5">
-                  <path d="M23 19a4 4 0 0 1 4 4v1l5 3V15l-5 3v-1a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v12a4 4 0 0 0 4 4h14a4 4 0 0 0 4-4v-1l5 3V21l-5 3v-1a4 4 0 0 0-4-4" />
+                  <rect x="2" y="8" width="44" height="34" rx="5" />
+                  <circle cx="24" cy="25" r="9" />
+                  <path d="M16 8l3-5h10l3 5" />
                 </svg>
                 <p className="text-white/70 text-center text-sm leading-relaxed">{cameraError}</p>
                 <button
@@ -415,12 +483,10 @@ export default function Scanner() {
             }}
           >
             <svg width="24" height="24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              {/* Barcode scan frame corners */}
               <path d="M4 9V6a2 2 0 0 1 2-2h3" />
               <path d="M15 4h3a2 2 0 0 1 2 2v3" />
               <path d="M20 15v3a2 2 0 0 1-2 2h-3" />
               <path d="M9 20H6a2 2 0 0 1-2-2v-3" />
-              {/* Barcode lines */}
               <line x1="7" y1="8" x2="7" y2="16" strokeWidth="1.5" />
               <line x1="9.5" y1="8" x2="9.5" y2="16" strokeWidth="2.5" />
               <line x1="12" y1="8" x2="12" y2="16" strokeWidth="1" />
