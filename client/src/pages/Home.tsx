@@ -1,22 +1,45 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { useBgColor } from '@/contexts/BgColorContext';
 import { useImageColor } from '@/hooks/useImageColor';
 
-const HERO_IMG = '/manus-storage/BluePlayfulTypographicComingSoonFashionPoster-1_a27baff4.png';
-// Background color extracted from image corners (light blue/sky)
-const HERO_BG_COLOR = '#cadfe2';
+/* ── Carousel Images (4 colors) ───────────────────────────────────────────── */
+const CAROUSEL_IMAGES = [
+  {
+    url: '/manus-storage/PublicationInstagramPrisedeRendez-VousInstitutMinimalisteBeigeMarronNoir_0bce6d06.png',
+    bgColor: '#B8E6A0', // Lime green
+    label: 'Collection Verte'
+  },
+  {
+    url: '/manus-storage/PublicationInstagramPrisedeRendez-VousInstitutMinimalisteBeigeMarronNoir_01_39d923ba.png',
+    bgColor: '#17A2B8', // Teal/Cyan
+    label: 'Collection Bleue'
+  },
+  {
+    url: '/manus-storage/PublicationInstagramPrisedeRendez-VousInstitutMinimalisteBeigeMarronNoir_02_f8a07893.png',
+    bgColor: '#FF5252', // Red
+    label: 'Collection Rouge'
+  },
+  {
+    url: '/manus-storage/PublicationInstagramPrisedeRendez-VousInstitutMinimalisteBeigeMarronNoir_03_f78e6c6a.png',
+    bgColor: '#003D82', // Navy blue
+    label: 'Collection Marine'
+  }
+];
 
 /* ── Home Component ───────────────────────────────────────────────────────── */
 function HomeContent() {
   const { setBgColor } = useBgColor();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const currentImage = CAROUSEL_IMAGES[currentIndex];
 
-  // Set correct color immediately on mount (no CORS delay)
+  // Set background color on mount and when index changes
   useEffect(() => {
-    setBgColor(HERO_BG_COLOR);
-  }, [setBgColor]);
+    setBgColor(currentImage.bgColor);
+  }, [currentIndex, setBgColor, currentImage.bgColor]);
 
-  // Also try dynamic extraction (will override if CORS allows)
+  // Try dynamic extraction as fallback
   const handleColor = useCallback(
     (hex: string) => {
       setBgColor(hex);
@@ -24,19 +47,87 @@ function HomeContent() {
     [setBgColor]
   );
 
-  useImageColor(HERO_IMG, handleColor);
+  useImageColor(currentImage.url, handleColor);
+
+  // Handle scroll snapping
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+    const container = scrollContainerRef.current;
+    const scrollLeft = container.scrollLeft;
+    const itemWidth = container.offsetWidth;
+    const newIndex = Math.round(scrollLeft / itemWidth);
+    setCurrentIndex(Math.min(newIndex, CAROUSEL_IMAGES.length - 1));
+  };
 
   return (
     <div className="w-full">
-      {/* HERO IMAGE — full width, no gap */}
-      <div className="w-full" style={{ aspectRatio: '3/4', maxHeight: '55vh', overflow: 'hidden' }}>
-        <img
-          src={HERO_IMG}
-          alt="Bysis - Nouvelle Collection"
-          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', background: HERO_BG_COLOR }}
-          loading="eager"
-          crossOrigin="anonymous"
-        />
+      {/* HORIZONTAL SCROLL CAROUSEL — snap-to-center */}
+      <div
+        ref={scrollContainerRef}
+        className="w-full overflow-x-auto snap-x snap-mandatory scroll-smooth"
+        style={{
+          aspectRatio: '3/4',
+          maxHeight: '55vh',
+          scrollBehavior: 'smooth',
+          WebkitOverflowScrolling: 'touch',
+          msOverflowStyle: 'none', // Hide scrollbar on IE/Edge
+          scrollbarWidth: 'none' // Hide scrollbar on Firefox
+        }}
+        onScroll={handleScroll}
+      >
+        <style>{`
+          /* Hide scrollbar on Chrome/Safari */
+          div::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+        
+        <div className="flex" style={{ width: `${CAROUSEL_IMAGES.length * 100}%` }}>
+          {CAROUSEL_IMAGES.map((item, idx) => (
+            <div
+              key={idx}
+              className="snap-center snap-always flex-shrink-0"
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <img
+                src={item.url}
+                alt={item.label}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  display: 'block',
+                  background: item.bgColor
+                }}
+                loading={idx === 0 ? 'eager' : 'lazy'}
+                crossOrigin="anonymous"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* DOT INDICATORS */}
+      <div className="flex justify-center gap-2 py-4 bg-white">
+        {CAROUSEL_IMAGES.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => {
+              if (scrollContainerRef.current) {
+                const itemWidth = scrollContainerRef.current.offsetWidth;
+                scrollContainerRef.current.scrollTo({
+                  left: itemWidth * idx,
+                  behavior: 'smooth'
+                });
+                setCurrentIndex(idx);
+              }
+            }}
+            className={`w-2 h-2 rounded-full transition-all ${
+              idx === currentIndex ? 'bg-black w-6' : 'bg-gray-300'
+            }`}
+            aria-label={`Go to slide ${idx + 1}`}
+          />
+        ))}
       </div>
 
       {/* SECTION BELOW */}
