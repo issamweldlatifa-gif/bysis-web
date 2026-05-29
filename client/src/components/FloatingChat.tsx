@@ -105,7 +105,7 @@ function BotAvatar({ size = "sm" }: { size?: "sm" | "md" }) {
     <div
       className={`${dim} rounded-2xl flex items-center justify-center flex-shrink-0`}
       style={{
-        background: "linear-gradient(135deg, #131921 0%, #232F3E 60%, #37475A 100%)",
+        background: "linear-gradient(135deg, #003087 0%, #0070BA 60%, #009CDE 100%)",
         boxShadow: "0 4px 14px rgba(0,112,186,0.35)",
       }}
     >
@@ -129,7 +129,7 @@ function TypingIndicator() {
               key={i}
               className="w-2 h-2 rounded-full"
               style={{
-                background: "linear-gradient(135deg, #FF9900, #E68A00)",
+                background: "linear-gradient(135deg, #0070BA, #003087)",
                 animation: `typing-orb 1.4s ease-in-out ${i * 0.2}s infinite`,
               }}
             />
@@ -139,7 +139,7 @@ function TypingIndicator() {
           <div
             className="absolute inset-y-0 w-8 rounded-full"
             style={{
-              background: "linear-gradient(90deg, transparent, rgba(255,153,0,0.35), transparent)",
+              background: "linear-gradient(90deg, transparent, rgba(0,112,186,0.45), transparent)",
               animation: "scan-line 1.2s ease-in-out infinite",
             }}
           />
@@ -152,12 +152,12 @@ function TypingIndicator() {
 
 // ─── Quick actions ────────────────────────────────────────────────────────────
 const QUICK_ACTIONS = [
-  { icon: ShoppingCart, label: "نحب نعدي كومند", text: "نحب نعدي كومند", color: "#FF9900", emoji: "🛒" },
-  { icon: CurrencyDollar, label: "احسبلي سعر", text: "احسبلي سعر منتوج", color: "#007600", emoji: "🧮" },
-  { icon: Package, label: "وقتاش الأريفاج؟", text: "وقتاش الأريفاج القادم؟", color: "#FF9900", emoji: "📦" },
-  { icon: Truck, label: "وين كومندتي؟", text: "نحب نتبع كومندتي", color: "#007185", emoji: "🔍" },
-  { icon: CurrencyDollar, label: "كيفاش نخلص؟", text: "كيفاش نخلص؟", color: "#B12704", emoji: "💳" },
-  { icon: ChatCircleText, label: "شنوة bysis؟", text: "شنوة bysis وكيفاش تخدم؟", color: "#131921", emoji: "ℹ️" },
+  { icon: ShoppingCart, label: "نحب نعدي كومند", text: "نحب نعدي كومند", color: "#0070BA", emoji: "🛒" },
+  { icon: CurrencyDollar, label: "احسبلي سعر", text: "احسبلي سعر منتوج", color: "#00A651", emoji: "🧮" },
+  { icon: Package, label: "وقتاش الأريفاج؟", text: "وقتاش الأريفاج القادم؟", color: "#F5A623", emoji: "📦" },
+  { icon: Truck, label: "وين كومندتي؟", text: "نحب نتبع كومندتي", color: "#9B59B6", emoji: "🔍" },
+  { icon: CurrencyDollar, label: "كيفاش نخلص؟", text: "كيفاش نخلص؟", color: "#E74C3C", emoji: "💳" },
+  { icon: ChatCircleText, label: "شنوة bysis؟", text: "شنوة bysis وكيفاش تخدم؟", color: "#003087", emoji: "ℹ️" },
 ];
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -384,7 +384,7 @@ export default function FloatingChat({
           onClick={() => setIsOpen(true)}
           className="fixed bottom-24 right-4 z-50 h-14 w-14 rounded-2xl flex items-center justify-center"
           style={{
-            background: "linear-gradient(135deg, #131921 0%, #232F3E 60%, #37475A 100%)",
+            background: "linear-gradient(135deg, #003087 0%, #0070BA 60%, #009CDE 100%)",
             boxShadow: "0 4px 20px rgba(0,112,186,0.45)",
             animation: "chat-pulse 2.5s ease-in-out infinite",
           }}
@@ -428,14 +428,14 @@ export default function FloatingChat({
               <div
                 className="flex items-center justify-between px-5 py-4 flex-shrink-0 relative overflow-hidden"
                 style={{
-                  background: "linear-gradient(135deg, #0F1111 0%, #131921 40%, #232F3E 80%, #37475A 100%)",
+                  background: "linear-gradient(135deg, #002060 0%, #003087 40%, #0070BA 80%, #009CDE 100%)",
                 }}
               >
                 {/* Shimmer effect */}
                 <div
                   className="absolute top-0 bottom-0 w-20 pointer-events-none"
                   style={{
-                    background: "linear-gradient(90deg, transparent, rgba(255,153,0,0.15), transparent)",
+                    background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent)",
                     animation: "header-shimmer 5s linear infinite",
                   }}
                 />
@@ -450,7 +450,7 @@ export default function FloatingChat({
                         سيسي
                       </p>
                       <div className="flex items-center gap-1 px-2 py-0.5 rounded-full" style={{ background: "rgba(255,255,255,0.15)" }}>
-                        <Star size={9} weight="fill" style={{ color: "#FF9900" }} />
+                        <Star size={9} weight="fill" style={{ color: "#FFD700" }} />
                         <span className="text-[10px] font-semibold text-white">AI</span>
                       </div>
                     </div>
@@ -485,7 +485,7 @@ export default function FloatingChat({
               <div
                 ref={scrollRef}
                 className="flex-1 overflow-y-auto p-5 space-y-4"
-                style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,153,0,0.3) transparent", background: "#F6F9FC" }}
+                style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(0,112,186,0.2) transparent", background: "#F6F9FC" }}
               >
                 {/* ── Welcome screen ── */}
                 {messages.length === 0 && (
@@ -501,7 +501,7 @@ export default function FloatingChat({
                       {/* Card header gradient */}
                       <div
                         className="px-5 pt-5 pb-4 flex items-start gap-3"
-                        style={{ background: "linear-gradient(135deg, #0F1111 0%, #131921 50%, #232F3E 100%)" }}
+                        style={{ background: "linear-gradient(135deg, #002060 0%, #003087 50%, #0070BA 100%)" }}
                       >
                         <div style={{ animation: "welcome-float 3s ease-in-out infinite" }}>
                           <div className="w-12 h-12 rounded-2xl flex items-center justify-center"
@@ -515,8 +515,8 @@ export default function FloatingChat({
                               أهلاً! أنا سيسي 👋
                             </p>
                             <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full" style={{ background: "rgba(255,215,0,0.2)", border: "1px solid rgba(255,215,0,0.4)" }}>
-                              <Sparkle size={9} weight="fill" style={{ color: "#FF9900" }} />
-                              <span className="text-[9px] font-bold" style={{ color: "#FF9900" }}>AI</span>
+                              <Sparkle size={9} weight="fill" style={{ color: "#FFD700" }} />
+                              <span className="text-[9px] font-bold" style={{ color: "#FFD700" }}>AI</span>
                             </div>
                           </div>
                           <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.80)", fontFamily: "Inter,sans-serif" }}>
@@ -616,7 +616,7 @@ export default function FloatingChat({
                     {msg.role === "assistant" && !msg.isTyping && <BotAvatar size="sm" />}
                     {msg.role === "user" && (
                       <div className="h-8 w-8 rounded-2xl flex items-center justify-center flex-shrink-0"
-                        style={{ background: "linear-gradient(135deg, #FF9900, #E68A00)" }}>
+                        style={{ background: "linear-gradient(135deg, #0070BA, #003087)" }}>
                         <User className="h-4 w-4 text-white" />
                       </div>
                     )}
@@ -629,7 +629,7 @@ export default function FloatingChat({
                         style={
                           msg.role === "user"
                             ? {
-                                background: "linear-gradient(135deg, #FF9900, #E68A00)",
+                                background: "linear-gradient(135deg, #0070BA, #003087)",
                                 color: "#FFFFFF",
                                 fontFamily: "Inter, sans-serif",
                                 boxShadow: "0 2px 8px rgba(0,112,186,0.25)",
@@ -786,7 +786,7 @@ export default function FloatingChat({
                     disabled={sendMessage.isPending || (!input.trim() && !imageBase64 && !pendingFile)}
                     className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-150 active:scale-90 disabled:opacity-40"
                     style={{
-                      background: "linear-gradient(135deg, #FF9900, #E68A00)",
+                      background: "linear-gradient(135deg, #0070BA, #003087)",
                       boxShadow: "0 2px 8px rgba(0,112,186,0.30)",
                     }}
                   >
