@@ -1,67 +1,38 @@
 import { useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
 import AppLayout from '@/components/AppLayout';
 import { useBgColor } from '@/contexts/BgColorContext';
 
-/* ── Image URLs ───────────────────────────────────────────────────────────── */
-const IMGS = {
-  boutique: '/manus-storage/BluePlayfulTypographicComingSoonFashionPoster-3_47ac2e8d.png',
-};
-
 /* ── Dominant color extracted from boutique image ────────────────────────── */
 // python3: Average color = #8d847c (warm gray/beige)
-const SLIDE_COLORS = ['#8d847c'];
+const HERO_COLOR = '#8d847c';
+const HERO_IMG = '/manus-storage/BluePlayfulTypographicComingSoonFashionPoster-3_47ac2e8d.png';
 
 /* ── Home Component ───────────────────────────────────────────────────────── */
 function HomeContent() {
   const { setBgColor } = useBgColor();
 
-  // Set initial background color on mount
   useEffect(() => {
-    setBgColor(SLIDE_COLORS[0]);
+    setBgColor(HERO_COLOR);
   }, []);
 
-  const handleSlideChange = (swiper: any) => {
-    setBgColor(SLIDE_COLORS[swiper.realIndex % SLIDE_COLORS.length]);
-  };
-
   return (
-    <div className="w-full overflow-hidden">
-      {/* HERO CAROUSEL */}
-      <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden">
-        <Swiper
-          modules={[Autoplay, Pagination]}
-          autoplay={{ delay: 2500, disableOnInteraction: false }}
-          pagination={{ clickable: false }}
-          navigation={false}
-          loop={false}
-          onSlideChange={handleSlideChange}
-          className="w-full h-full"
-        >
-          <SwiperSlide>
-            <div className="relative w-full h-full">
-              <img
-                src={IMGS.boutique}
-                alt="Boutique Bysis - Coming Soon"
-                className="w-full h-full object-cover"
-                loading="eager"
-                decoding="async"
-              />
-            </div>
-          </SwiperSlide>
-        </Swiper>
-      </section>
+    <div className="w-full">
+      {/* HERO IMAGE — full width, no gap */}
+      <div className="w-full" style={{ aspectRatio: '3/4', maxHeight: '75vh', overflow: 'hidden' }}>
+        <img
+          src={HERO_IMG}
+          alt="Bysis - Nouvelle Collection"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          loading="eager"
+        />
+      </div>
 
-      {/* FOOTER SECTION */}
-      <section className="w-full py-12 px-6 md:px-12 text-center bg-white">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800">
+      {/* SECTION BELOW */}
+      <section className="w-full py-10 px-5 text-center bg-white">
+        <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#1A1A1A', marginBottom: '0.5rem' }}>
           Pourquoi choisir Bysis?
         </h2>
-        <p className="text-base md:text-lg mb-8 text-gray-600">
+        <p style={{ fontSize: '0.9rem', color: '#666', lineHeight: 1.6 }}>
           Votre partenaire de confiance pour vos achats en ligne
         </p>
       </section>
