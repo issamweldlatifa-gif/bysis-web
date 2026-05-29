@@ -255,3 +255,13 @@
 - [x] Background color now reflects image color accurately (gray #C0C0C0) - FIXED
 - [x] Logo and icons properly positioned and styled - FIXED
 - [x] All tests passing (22/22) - VERIFIED
+
+## Phase 8: Amazon Lens-Style Camera Scanner (NEW)
+- [ ] Scanner page: full-screen camera view (black background)
+- [ ] Scanner header: back arrow + "lens ai✦" title + flash icon + help (?) icon
+- [ ] Scanner bottom: upload image button (left) + capture/search button (center) + barcode scanner (right)
+- [ ] Scanner hint text: "Prendre une photo pour rechercher des produits"
+- [ ] Flash toggle (on/off)
+- [ ] Barcode scanner mode (html5-qrcode)
+- [ ] Help page (?) with black background explaining how camera search works
+- [ ] Route from Google Lens icon in search bar to new Scanner page

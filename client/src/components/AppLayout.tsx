@@ -212,7 +212,7 @@ function AppLayoutInner({ children, showNav = true }: AppLayoutProps) {
         <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
         <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
 
-        <AppHeader onScanClick={() => navigate('/calculator')} />
+        <AppHeader onScanClick={() => navigate('/scanner')} />
 
         <main
           className="flex-1 overflow-y-auto"
