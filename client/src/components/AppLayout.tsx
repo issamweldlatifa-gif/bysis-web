@@ -1,7 +1,7 @@
 import { useState, ReactNode } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { Home, Grid3x3, ShoppingCart, User, Search, Camera } from 'lucide-react';
+import { Home, Grid3x3, ShoppingCart, User, Search } from 'lucide-react';
 import AuthGateModal from '@/components/AuthGateModal';
 import ProfileSheet from '@/components/ProfileSheet';
 import { useCart } from '@/contexts/CartContext';
@@ -15,93 +15,69 @@ interface AppLayoutProps {
   onChatOpen?: () => void;
 }
 
-/* ── Helper: detect if a hex color is dark ─────────────────────────────── */
-function isColorDark(hex: string): boolean {
-  try {
-    const h = hex.replace('#', '');
-    if (h.length < 6) return false;
-    const r = parseInt(h.slice(0, 2), 16);
-    const g = parseInt(h.slice(2, 4), 16);
-    const b = parseInt(h.slice(4, 6), 16);
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return luminance < 0.5;
-  } catch {
-    return false;
-  }
+/* ── Google Lens SVG Icon (exact match) ─────────────────────────────────── */
+function GoogleLensIcon({ size = 22 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Camera body */}
+      <rect x="2" y="6" width="20" height="14" rx="3" ry="3" stroke="#1A1A1A" strokeWidth="1.8" fill="none"/>
+      {/* Lens circle */}
+      <circle cx="12" cy="13" r="4" stroke="#1A1A1A" strokeWidth="1.8" fill="none"/>
+      {/* Sparkle star top-right */}
+      <path d="M18 4 L18.5 5.5 L20 6 L18.5 6.5 L18 8 L17.5 6.5 L16 6 L17.5 5.5 Z" fill="#1A1A1A"/>
+    </svg>
+  );
 }
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
-function AppHeader({ onProfileClick, onScanClick }: { onProfileClick: () => void; onScanClick: () => void }) {
+function AppHeader({ onScanClick }: { onScanClick: () => void }) {
   const { bgColor } = useBgColor();
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
-
-  const isDarkBg = isDark || isColorDark(bgColor);
-  
-  // Header background: semi-transparent with blur
-  const headerBg = isDark
-    ? 'rgba(13,13,15,0.85)'
-    : `rgba(192,192,192,0.85)`;
-
-  const textColor = isDarkBg ? '#FFFFFF' : '#1A1A1A';
-  const searchBg = '#FFFFFF';
-  const searchPlaceholder = '#999999';
-  const searchBorder = '#DDDDDD';
 
   return (
     <header
       className="sticky top-0 z-40 w-full px-4 py-3 transition-all duration-500"
       style={{
-        background: headerBg,
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        borderBottom: `1px solid ${isDarkBg ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+        background: `${bgColor}CC`,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
       }}
     >
-      <div className="flex items-center justify-between gap-3">
-        {/* Logo */}
-        <img
-          src="/manus-storage/IMG_7012_25df5175.PNG"
-          alt="Bysis"
-          className="h-8 flex-shrink-0"
-          style={{ objectFit: 'contain' }}
+      {/* Search bar - exact Amazon style */}
+      <div
+        className="flex items-center gap-3 px-4 h-11 rounded-full bg-white"
+        style={{
+          border: '1.5px solid #CCCCCC',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        }}
+      >
+        {/* Search icon left */}
+        <Search
+          size={20}
+          strokeWidth={2.2}
+          style={{ color: '#1A1A1A', flexShrink: 0 }}
         />
 
-        {/* Search bar - Professional Amazon style */}
-        <div
-          className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-300"
-          style={{
-            background: searchBg,
-            border: `1.5px solid ${searchBorder}`,
-            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
-          }}
+        {/* Placeholder text */}
+        <span
+          className="flex-1 text-sm select-none"
+          style={{ color: '#999999', fontWeight: 400 }}
         >
-          <Search size={18} strokeWidth={2} style={{ color: searchPlaceholder, flexShrink: 0 }} />
-          <input
-            type="text"
-            placeholder="Rechercher ou poser une question"
-            className="flex-1 bg-transparent text-sm outline-none"
-            style={{ color: '#1A1A1A' }}
-            disabled
-          />
-          {/* Google Lens / Camera button */}
-          <button
-            onClick={onScanClick}
-            className="flex-shrink-0 p-1.5 hover:bg-gray-100 rounded-full transition-colors"
-            style={{ color: '#1A1A1A' }}
-            title="Scanner avec Google Lens"
-          >
-            <Camera size={18} strokeWidth={2} />
-          </button>
-        </div>
+          Rechercher ou poser une question
+        </span>
 
-        {/* Profile */}
+        {/* Google Lens icon right */}
         <button
-          onClick={onProfileClick}
-          className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90 flex-shrink-0"
-          style={{ color: textColor }}
+          onClick={onScanClick}
+          className="flex-shrink-0 flex items-center justify-center"
+          style={{ background: 'transparent', border: 'none', padding: 0 }}
         >
-          <User size={20} strokeWidth={1.8} />
+          <GoogleLensIcon size={22} />
         </button>
       </div>
     </header>
@@ -111,10 +87,8 @@ function AppHeader({ onProfileClick, onScanClick }: { onProfileClick: () => void
 /* ── Bottom Nav ─────────────────────────────────────────────────────────── */
 function BottomNav({
   onProfileClick,
-  onScanClick,
 }: {
   onProfileClick: () => void;
-  onScanClick: () => void;
 }) {
   const [location, navigate] = useLocation();
   const { totalItems } = useCart();
@@ -203,8 +177,8 @@ function BottomNav({
   );
 }
 
-/* ── Inner Layout (uses BgColorContext) ─────────────────────────────────── */
-function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps) {
+/* ── Inner Layout ───────────────────────────────────────────────────────── */
+function AppLayoutInner({ children, showNav = true }: AppLayoutProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const [authOpen, setAuthOpen]       = useState(false);
   const { bgColor }                   = useBgColor();
@@ -224,18 +198,15 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
       {/* Full-screen dynamic background */}
       <div
         className="fixed inset-0 z-0 transition-colors duration-500"
-        style={{
-          background: pageBg,
-          pointerEvents: 'none',
-        }}
+        style={{ background: pageBg, pointerEvents: 'none' }}
       />
 
-      {/* Content wrapper */}
+      {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
         <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
 
-        <AppHeader onProfileClick={() => setProfileOpen(true)} onScanClick={handleScanClick} />
+        <AppHeader onScanClick={handleScanClick} />
 
         <main
           className="flex-1 overflow-y-auto"
@@ -245,10 +216,7 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
         </main>
 
         {showNav && (
-          <BottomNav
-            onProfileClick={() => setProfileOpen(true)}
-            onScanClick={handleScanClick}
-          />
+          <BottomNav onProfileClick={() => setProfileOpen(true)} />
         )}
       </div>
     </div>
