@@ -93,33 +93,144 @@ export default function Home() {
             loop={true}
             className="w-full h-full"
           >
+            {/* Slide 1: Thank You */}
             <SwiperSlide>
-              <img
-                src={IMGS.thankyou}
-                alt="Merci - Thank You"
-                className="w-full h-full object-cover"
-              />
+              <div className="relative w-full h-full">
+                <img
+                  src={IMGS.thankyou}
+                  alt="Merci - Thank You"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </SwiperSlide>
+
+            {/* Slide 2: Collection with Overlay */}
             <SwiperSlide>
-              <img
-                src={IMGS.carousel1}
-                alt="Collection - Mode & Accessoires"
-                className="w-full h-full object-cover"
-              />
+              <div className="relative w-full h-full">
+                <img
+                  src={IMGS.carousel1}
+                  alt="Collection - Mode & Accessoires"
+                  className="w-full h-full object-cover"
+                />
+                {/* Overlay Banner */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="absolute inset-0 flex items-center justify-between px-6 md:px-12"
+                  style={{ background: 'rgba(0,0,0,0.3)' }}
+                >
+                  {/* Left Content */}
+                  <div className="flex flex-col justify-center gap-4 max-w-xs">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white" style={{ color: COLORS.white }}>
+                      Collection Mode
+                    </h2>
+                    <p className="text-sm md:text-base text-white opacity-90">
+                      Découvrez nos dernières tendances en mode et accessoires
+                    </p>
+                    <button
+                      className="px-6 py-2 rounded-lg font-bold text-white transition-all hover:shadow-lg"
+                      style={{ background: COLORS.blue }}
+                    >
+                      Découvrir
+                    </button>
+                  </div>
+
+                  {/* Right Product Images */}
+                  <div className="hidden md:flex gap-4">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      className="w-32 h-40 rounded-xl overflow-hidden shadow-lg"
+                    >
+                      <img
+                        src={IMGS.unboxing1}
+                        alt="Product 1"
+                        className="w-full h-full object-cover"
+                      />
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      className="w-32 h-40 rounded-xl overflow-hidden shadow-lg"
+                    >
+                      <img
+                        src={IMGS.unboxing2}
+                        alt="Product 2"
+                        className="w-full h-full object-cover"
+                      />
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </div>
             </SwiperSlide>
+
+            {/* Slide 3: Livraison with Overlay */}
             <SwiperSlide>
-              <img
-                src={IMGS.carousel2}
-                alt="Livraison Rapide"
-                className="w-full h-full object-cover"
-              />
+              <div className="relative w-full h-full">
+                <img
+                  src={IMGS.carousel2}
+                  alt="Livraison Rapide"
+                  className="w-full h-full object-cover"
+                />
+                {/* Overlay Banner */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="absolute inset-0 flex items-center justify-between px-6 md:px-12"
+                  style={{ background: 'rgba(0,0,0,0.3)' }}
+                >
+                  {/* Left Content */}
+                  <div className="flex flex-col justify-center gap-4 max-w-xs">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white">
+                      Livraison Rapide
+                    </h2>
+                    <p className="text-sm md:text-base text-white opacity-90">
+                      20-25 jours de livraison directe en Tunisie
+                    </p>
+                    <button
+                      className="px-6 py-2 rounded-lg font-bold text-white transition-all hover:shadow-lg"
+                      style={{ background: COLORS.blue }}
+                    >
+                      Commander
+                    </button>
+                  </div>
+
+                  {/* Right Product Images */}
+                  <div className="hidden md:flex gap-4">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      className="w-32 h-40 rounded-xl overflow-hidden shadow-lg"
+                    >
+                      <img
+                        src={IMGS.unboxing3}
+                        alt="Product 3"
+                        className="w-full h-full object-cover"
+                      />
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      className="w-32 h-40 rounded-xl overflow-hidden shadow-lg"
+                    >
+                      <img
+                        src={IMGS.couple}
+                        alt="Product 4"
+                        className="w-full h-full object-cover"
+                      />
+                    </motion.div>
+                  </div>
+                </motion.div>
+              </div>
             </SwiperSlide>
+
+            {/* Slide 4: Coming Soon */}
             <SwiperSlide>
-              <img
-                src={IMGS.carousel3}
-                alt="Boutique Bysis - Coming Soon"
-                className="w-full h-full object-cover"
-              />
+              <div className="relative w-full h-full">
+                <img
+                  src={IMGS.carousel3}
+                  alt="Boutique Bysis - Coming Soon"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </SwiperSlide>
           </Swiper>
         </section>
