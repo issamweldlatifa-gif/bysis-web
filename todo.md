@@ -245,3 +245,10 @@
 - [x] Add micro-interactions to buttons and CTAs
 - [ ] Update all pages with dynamic components
 - [ ] Test animations on mobile devices
+
+## Phase 6.5: Amazon-Style Header & Navigation (NEW)
+- [x] Dynamic background covers entire screen from top (behind header)
+- [x] Search bar redesigned: white background, rounded borders, search icon left, Google Lens camera icon right
+- [x] Scanner functionality moved from Bottom Nav FAB to camera icon in search bar
+- [x] Bottom Nav simplified: removed Scanner FAB, now 4 tabs (Home, Boutiques, Cart, Profile)
+- [x] Dynamic background color transitions smoothly with blur effect on header

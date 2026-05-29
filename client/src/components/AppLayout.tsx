@@ -1,7 +1,7 @@
 import { useState, ReactNode } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { Home, Grid3x3, ShoppingCart, User, Plus, Search } from 'lucide-react';
+import { Home, Grid3x3, ShoppingCart, User, Plus, Search, Camera } from 'lucide-react';
 import AuthGateModal from '@/components/AuthGateModal';
 import ProfileSheet from '@/components/ProfileSheet';
 import { useCart } from '@/contexts/CartContext';
@@ -31,7 +31,7 @@ function isColorDark(hex: string): boolean {
 }
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
-function AppHeader({ onProfileClick }: { onProfileClick: () => void }) {
+function AppHeader({ onProfileClick, onScanClick }: { onProfileClick: () => void; onScanClick: () => void }) {
   const { bgColor } = useBgColor();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -41,8 +41,8 @@ function AppHeader({ onProfileClick }: { onProfileClick: () => void }) {
     ? 'rgba(13,13,15,0.95)'
     : `${bgColor}F0`;
   const textColor = isDarkBg ? '#FFFFFF' : '#1A1A1A';
-  const searchBg  = isDarkBg ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.07)';
-  const searchText = isDarkBg ? 'rgba(255,255,255,0.55)' : '#999';
+  const searchBg  = isDarkBg ? '#FFFFFF' : '#FFFFFF';
+  const searchText = isDarkBg ? '#999' : '#999';
 
   return (
     <header
@@ -62,15 +62,23 @@ function AppHeader({ onProfileClick }: { onProfileClick: () => void }) {
         style={{ objectFit: 'contain' }}
       />
 
-      {/* Search bar */}
+      {/* Search bar - Amazon style with Google Lens */}
       <div
         className="flex-1 mx-3 flex items-center gap-2 px-3 h-8 rounded-full transition-colors duration-500"
-        style={{ background: searchBg }}
+        style={{ background: searchBg, border: '1px solid #E0E0E0' }}
       >
         <Search size={15} strokeWidth={1.8} style={{ color: searchText }} />
-        <span className="text-xs transition-colors duration-500" style={{ color: searchText }}>
-          Rechercher...
+        <span className="text-xs transition-colors duration-500 flex-1" style={{ color: searchText }}>
+          Rechercher ou poser une question
         </span>
+        {/* Google Lens / Camera button */}
+        <button
+          onClick={onScanClick}
+          className="flex-shrink-0 p-1 hover:opacity-80 transition-opacity"
+          style={{ color: '#1A1A1A' }}
+        >
+          <Camera size={16} strokeWidth={2} />
+        </button>
       </div>
 
       {/* Profile */}
@@ -107,7 +115,6 @@ function BottomNav({
   const tabs = [
     { id: 'home',      label: t('nav_home'),      Icon: Home,         href: '/' },
     { id: 'boutiques', label: t('nav_boutiques'),  Icon: Grid3x3,      href: '/arrivage' },
-    { id: 'scan',      label: t('nav_scan'),       Icon: null,         href: null },
     { id: 'panier',    label: t('nav_panier'),     Icon: ShoppingCart, href: '/panier' },
     { id: 'moi',       label: t('nav_moi'),        Icon: User,         href: null },
   ];
@@ -127,26 +134,6 @@ function BottomNav({
       <div className="flex items-center justify-around pt-2 px-1">
         {tabs.map((tab) => {
 
-          /* ── Scan FAB ── */
-          if (tab.id === 'scan') {
-            return (
-              <div key="scan" className="flex flex-col items-center" style={{ marginTop: '-20px' }}>
-                <motion.button
-                  onClick={onScanClick}
-                  whileTap={{ scale: 0.88 }}
-                  className="w-[52px] h-[52px] rounded-full flex items-center justify-center shadow-lg"
-                  style={{ background: '#0047AB', boxShadow: '0 4px 14px rgba(0,71,171,0.40)' }}
-                >
-                  <Plus size={26} strokeWidth={1.8} color="white" />
-                </motion.button>
-                <span className="text-[10px] mt-1 font-medium" style={{ color: inactive }}>
-                  {tab.label}
-                </span>
-              </div>
-            );
-          }
-
-          /* ── Moi ── */
           if (tab.id === 'moi') {
             return (
               <motion.button
@@ -162,7 +149,6 @@ function BottomNav({
             );
           }
 
-          /* ── Regular tab ── */
           const { Icon } = tab;
           const isActive = location === tab.href;
           const isPanier = tab.id === 'panier';
@@ -224,21 +210,33 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
       <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
       <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
 
-      <AppHeader onProfileClick={() => setProfileOpen(true)} />
+      {/* Dynamic background extends behind header */}
+      <div
+        className="fixed inset-0 z-0 transition-colors duration-500"
+        style={{
+          background: pageBg,
+          pointerEvents: 'none',
+        }}
+      />
 
-      <main
-        className="flex-1 overflow-y-auto"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
-      >
-        {children}
-      </main>
+      {/* Content wrapper with relative positioning */}
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <AppHeader onProfileClick={() => setProfileOpen(true)} onScanClick={handleScanClick} />
 
-      {showNav && (
-        <BottomNav
-          onProfileClick={() => setProfileOpen(true)}
-          onScanClick={handleScanClick}
-        />
-      )}
+        <main
+          className="flex-1 overflow-y-auto"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
+        >
+          {children}
+        </main>
+
+        {showNav && (
+          <BottomNav
+            onProfileClick={() => setProfileOpen(true)}
+            onScanClick={handleScanClick}
+          />
+        )}
+      </div>
     </div>
   );
 }
