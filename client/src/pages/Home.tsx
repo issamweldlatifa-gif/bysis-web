@@ -1,37 +1,39 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { useBgColor } from '@/contexts/BgColorContext';
-import { useImageColor } from '@/hooks/useImageColor';
 
 /* ── Carousel Images (4 colors) ───────────────────────────────────────────── */
-const CAROUSEL_IMAGES = [
+const CAROUSEL_IMAGES = useMemo(() => [
   {
     url: '/manus-storage/PublicationInstagramPrisedeRendez-VousInstitutMinimalisteBeigeMarronNoir_0bce6d06.png',
-    bgColor: '#B8E6A0', // Lime green
+    bgColor: '#B8E6A0',
     label: 'Collection Verte'
   },
   {
     url: '/manus-storage/PublicationInstagramPrisedeRendez-VousInstitutMinimalisteBeigeMarronNoir_01_39d923ba.png',
-    bgColor: '#17A2B8', // Teal/Cyan
+    bgColor: '#17A2B8',
     label: 'Collection Bleue'
   },
   {
     url: '/manus-storage/PublicationInstagramPrisedeRendez-VousInstitutMinimalisteBeigeMarronNoir_02_f8a07893.png',
-    bgColor: '#FF5252', // Red
+    bgColor: '#FF5252',
     label: 'Collection Rouge'
   },
   {
     url: '/manus-storage/PublicationInstagramPrisedeRendez-VousInstitutMinimalisteBeigeMarronNoir_03_f78e6c6a.png',
-    bgColor: '#003D82', // Navy blue
+    bgColor: '#003D82',
     label: 'Collection Marine'
   }
-];
+], []);
 
 /* ── Home Component ───────────────────────────────────────────────────────── */
 function HomeContent() {
   const { setBgColor } = useBgColor();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const lastScrollRef = useRef<number>(0);
+
   const currentImage = CAROUSEL_IMAGES[currentIndex];
 
   // Set background color on mount and when index changes
@@ -39,47 +41,65 @@ function HomeContent() {
     setBgColor(currentImage.bgColor);
   }, [currentIndex, setBgColor, currentImage.bgColor]);
 
-  // Try dynamic extraction as fallback
-  const handleColor = useCallback(
-    (hex: string) => {
-      setBgColor(hex);
-    },
-    [setBgColor]
-  );
-
-  useImageColor(currentImage.url, handleColor);
-
-  // Handle scroll snapping
-  const handleScroll = () => {
+  // Optimized scroll handler with RAF throttling
+  const handleScroll = useCallback(() => {
     if (!scrollContainerRef.current) return;
-    const container = scrollContainerRef.current;
-    const scrollLeft = container.scrollLeft;
-    const itemWidth = container.offsetWidth;
-    const newIndex = Math.round(scrollLeft / itemWidth);
-    setCurrentIndex(Math.min(newIndex, CAROUSEL_IMAGES.length - 1));
-  };
+
+    // Cancel previous RAF if pending
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+
+    rafRef.current = requestAnimationFrame(() => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
+
+      const scrollLeft = container.scrollLeft;
+      const itemWidth = container.offsetWidth;
+      const newIndex = Math.round(scrollLeft / itemWidth);
+      
+      // Only update if index actually changed
+      if (newIndex !== currentIndex && newIndex < CAROUSEL_IMAGES.length) {
+        setCurrentIndex(newIndex);
+      }
+      lastScrollRef.current = scrollLeft;
+    });
+  }, [currentIndex, CAROUSEL_IMAGES.length]);
+
+  // Cleanup RAF on unmount
+  useEffect(() => {
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  // Dot click handler
+  const handleDotClick = useCallback((idx: number) => {
+    if (!scrollContainerRef.current) return;
+    const itemWidth = scrollContainerRef.current.offsetWidth;
+    scrollContainerRef.current.scrollTo({
+      left: itemWidth * idx,
+      behavior: 'smooth'
+    });
+    setCurrentIndex(idx);
+  }, []);
 
   return (
     <div className="w-full">
       {/* HORIZONTAL SCROLL CAROUSEL — snap-to-center */}
       <div
         ref={scrollContainerRef}
-        className="w-full overflow-x-auto snap-x snap-mandatory scroll-smooth"
+        className="w-full overflow-x-auto snap-x snap-mandatory"
         style={{
           aspectRatio: '3/4',
           maxHeight: '55vh',
           scrollBehavior: 'smooth',
           WebkitOverflowScrolling: 'touch',
-          msOverflowStyle: 'none', // Hide scrollbar on IE/Edge
-          scrollbarWidth: 'none' // Hide scrollbar on Firefox
+          msOverflowStyle: 'none',
+          scrollbarWidth: 'none'
         }}
         onScroll={handleScroll}
       >
         <style>{`
-          /* Hide scrollbar on Chrome/Safari */
-          div::-webkit-scrollbar {
-            display: none;
-          }
+          div::-webkit-scrollbar { display: none; }
         `}</style>
         
         <div className="flex" style={{ width: `${CAROUSEL_IMAGES.length * 100}%` }}>
@@ -101,6 +121,7 @@ function HomeContent() {
                 }}
                 loading={idx === 0 ? 'eager' : 'lazy'}
                 crossOrigin="anonymous"
+                decoding="async"
               />
             </div>
           ))}
@@ -112,16 +133,7 @@ function HomeContent() {
         {CAROUSEL_IMAGES.map((_, idx) => (
           <button
             key={idx}
-            onClick={() => {
-              if (scrollContainerRef.current) {
-                const itemWidth = scrollContainerRef.current.offsetWidth;
-                scrollContainerRef.current.scrollTo({
-                  left: itemWidth * idx,
-                  behavior: 'smooth'
-                });
-                setCurrentIndex(idx);
-              }
-            }}
+            onClick={() => handleDotClick(idx)}
             className={`w-2 h-2 rounded-full transition-all ${
               idx === currentIndex ? 'bg-black w-6' : 'bg-gray-300'
             }`}
