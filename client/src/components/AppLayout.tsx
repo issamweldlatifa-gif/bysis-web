@@ -23,7 +23,7 @@ const SHEIN_BLACK  = '#1A1A1A';
 /* ── Bysis Logo ─────────────────────────────────────────────────────────── */
 const IconBysis = () => (
   <img
-    src="/manus-storage/IMG_6552_44bbd56d.PNG"
+    src="/manus-storage/IMG_7012_25df5175.PNG"
     alt="Bysis Logo"
     className="h-10 md:h-12 flex-shrink-0"
     style={{ objectFit: 'contain' }}
