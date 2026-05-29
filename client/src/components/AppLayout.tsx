@@ -15,22 +15,23 @@ interface AppLayoutProps {
   onChatOpen?: () => void;
 }
 
-/* ── Google Lens Icon (exact: camera body + sparkle star top-right) ──────── */
+/* ── Google Lens Icon (exact match: square camera body + 4-point star top-right) */
 function GoogleLensIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Camera body */}
+      {/* Square camera body with rounded corners - open top-right */}
       <path
-        d="M2 9C2 7.34315 3.34315 6 5 6H7.5L9 4H15L16.5 6H19C20.6569 6 22 7.34315 22 9V18C22 19.6569 20.6569 21 19 21H5C3.34315 21 2 19.6569 2 18V9Z"
+        d="M17 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V7"
         stroke="#1A1A1A"
-        strokeWidth="1.8"
+        strokeWidth="2.2"
+        strokeLinecap="round"
         fill="none"
       />
-      {/* Lens circle */}
-      <circle cx="12" cy="13" r="3.5" stroke="#1A1A1A" strokeWidth="1.8" fill="none" />
-      {/* Sparkle ✦ top-right */}
+      {/* Inner circle (lens) */}
+      <circle cx="12" cy="13" r="3.5" stroke="#1A1A1A" strokeWidth="2" fill="none" />
+      {/* 4-point sparkle star top-right corner */}
       <path
-        d="M19.5 3.5 L20 5 L21.5 5.5 L20 6 L19.5 7.5 L19 6 L17.5 5.5 L19 5 Z"
+        d="M20 2 L20.6 4.4 L23 5 L20.6 5.6 L20 8 L19.4 5.6 L17 5 L19.4 4.4 Z"
         fill="#1A1A1A"
       />
     </svg>

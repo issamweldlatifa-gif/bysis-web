@@ -29,11 +29,11 @@ function HomeContent() {
   return (
     <div className="w-full">
       {/* HERO IMAGE — full width, no gap */}
-      <div className="w-full" style={{ aspectRatio: '3/4', maxHeight: '75vh', overflow: 'hidden' }}>
+      <div className="w-full" style={{ aspectRatio: '3/4', maxHeight: '55vh', overflow: 'hidden' }}>
         <img
           src={HERO_IMG}
           alt="Bysis - Nouvelle Collection"
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', background: HERO_BG_COLOR }}
           loading="eager"
           crossOrigin="anonymous"
         />
