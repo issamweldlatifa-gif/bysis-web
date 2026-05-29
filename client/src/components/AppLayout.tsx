@@ -15,81 +15,75 @@ interface AppLayoutProps {
   onChatOpen?: () => void;
 }
 
-/* ── Google Lens SVG Icon (exact match) ─────────────────────────────────── */
-function GoogleLensIcon({ size = 22 }: { size?: number }) {
+/* ── Google Lens Icon (exact: camera body + sparkle star top-right) ──────── */
+function GoogleLensIcon() {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       {/* Camera body */}
-      <rect x="2" y="6" width="20" height="14" rx="3" ry="3" stroke="#1A1A1A" strokeWidth="1.8" fill="none"/>
+      <path
+        d="M2 9C2 7.34315 3.34315 6 5 6H7.5L9 4H15L16.5 6H19C20.6569 6 22 7.34315 22 9V18C22 19.6569 20.6569 21 19 21H5C3.34315 21 2 19.6569 2 18V9Z"
+        stroke="#1A1A1A"
+        strokeWidth="1.8"
+        fill="none"
+      />
       {/* Lens circle */}
-      <circle cx="12" cy="13" r="4" stroke="#1A1A1A" strokeWidth="1.8" fill="none"/>
-      {/* Sparkle star top-right */}
-      <path d="M18 4 L18.5 5.5 L20 6 L18.5 6.5 L18 8 L17.5 6.5 L16 6 L17.5 5.5 Z" fill="#1A1A1A"/>
+      <circle cx="12" cy="13" r="3.5" stroke="#1A1A1A" strokeWidth="1.8" fill="none" />
+      {/* Sparkle ✦ top-right */}
+      <path
+        d="M19.5 3.5 L20 5 L21.5 5.5 L20 6 L19.5 7.5 L19 6 L17.5 5.5 L19 5 Z"
+        fill="#1A1A1A"
+      />
     </svg>
   );
 }
 
-/* ── Header ─────────────────────────────────────────────────────────────── */
+/* ── Header: search bar only, full width ────────────────────────────────── */
 function AppHeader({ onScanClick }: { onScanClick: () => void }) {
   const { bgColor } = useBgColor();
 
   return (
     <header
-      className="sticky top-0 z-40 w-full px-4 py-3 transition-all duration-500"
+      className="sticky top-0 z-40 w-full"
       style={{
-        background: `${bgColor}CC`,
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        background: bgColor,
+        paddingTop: 'env(safe-area-inset-top, 0px)',
       }}
     >
-      {/* Search bar - exact Amazon style */}
-      <div
-        className="flex items-center gap-3 px-4 h-11 rounded-full bg-white"
-        style={{
-          border: '1.5px solid #CCCCCC',
-          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-        }}
-      >
-        {/* Search icon left */}
-        <Search
-          size={20}
-          strokeWidth={2.2}
-          style={{ color: '#1A1A1A', flexShrink: 0 }}
-        />
-
-        {/* Placeholder text */}
-        <span
-          className="flex-1 text-sm select-none"
-          style={{ color: '#999999', fontWeight: 400 }}
+      <div className="w-full px-3 py-2.5">
+        {/* Search bar — full width, white, rounded pill */}
+        <div
+          className="flex items-center gap-2 px-4 bg-white rounded-full"
+          style={{
+            height: '46px',
+            border: '1.5px solid #D0D0D0',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+          }}
         >
-          Rechercher ou poser une question
-        </span>
+          {/* Search icon */}
+          <Search size={20} strokeWidth={2.2} color="#1A1A1A" style={{ flexShrink: 0 }} />
 
-        {/* Google Lens icon right */}
-        <button
-          onClick={onScanClick}
-          className="flex-shrink-0 flex items-center justify-center"
-          style={{ background: 'transparent', border: 'none', padding: 0 }}
-        >
-          <GoogleLensIcon size={22} />
-        </button>
+          {/* Placeholder */}
+          <span className="flex-1 text-sm" style={{ color: '#999', userSelect: 'none' }}>
+            Rechercher ou poser une question
+          </span>
+
+          {/* Google Lens button */}
+          <button
+            onClick={onScanClick}
+            className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition-colors active:scale-90"
+            style={{ border: 'none', background: 'transparent' }}
+            aria-label="Scanner avec Google Lens"
+          >
+            <GoogleLensIcon />
+          </button>
+        </div>
       </div>
     </header>
   );
 }
 
 /* ── Bottom Nav ─────────────────────────────────────────────────────────── */
-function BottomNav({
-  onProfileClick,
-}: {
-  onProfileClick: () => void;
-}) {
+function BottomNav({ onProfileClick }: { onProfileClick: () => void }) {
   const [location, navigate] = useLocation();
   const { totalItems } = useCart();
   const { t } = useI18n();
@@ -102,10 +96,10 @@ function BottomNav({
   const inactive = isDark ? 'rgba(255,255,255,0.38)' : '#AAAAAA';
 
   const tabs = [
-    { id: 'home',      label: t('nav_home'),      Icon: Home,         href: '/' },
-    { id: 'boutiques', label: t('nav_boutiques'),  Icon: Grid3x3,      href: '/arrivage' },
-    { id: 'panier',    label: t('nav_panier'),     Icon: ShoppingCart, href: '/panier' },
-    { id: 'moi',       label: t('nav_moi'),        Icon: User,         href: null },
+    { id: 'home',      label: t('nav_home'),     Icon: Home,         href: '/' },
+    { id: 'boutiques', label: t('nav_boutiques'), Icon: Grid3x3,      href: '/arrivage' },
+    { id: 'panier',    label: t('nav_panier'),    Icon: ShoppingCart, href: '/panier' },
+    { id: 'moi',       label: t('nav_moi'),       Icon: User,         href: null },
   ];
 
   return (
@@ -150,7 +144,7 @@ function BottomNav({
               style={{ color: isActive ? active : inactive }}
             >
               <span className="relative">
-                {Icon && <Icon size={22} strokeWidth={isActive ? 2 : 1.6} />}
+                <Icon size={22} strokeWidth={isActive ? 2 : 1.6} />
                 {isPanier && totalItems > 0 && (
                   <span
                     className="absolute -top-1.5 -right-2 w-[16px] h-[16px] rounded-full text-[9px] font-bold text-white flex items-center justify-center"
@@ -188,14 +182,12 @@ function AppLayoutInner({ children, showNav = true }: AppLayoutProps) {
 
   const pageBg = isDark ? '#0D0D0F' : bgColor;
 
-  const handleScanClick = () => navigate('/calculator');
-
   return (
     <div
       className="min-h-screen flex flex-col"
       style={{ fontFamily: '"Inter", -apple-system, sans-serif' }}
     >
-      {/* Full-screen dynamic background */}
+      {/* Full-screen background — same color as header */}
       <div
         className="fixed inset-0 z-0 transition-colors duration-500"
         style={{ background: pageBg, pointerEvents: 'none' }}
@@ -206,7 +198,7 @@ function AppLayoutInner({ children, showNav = true }: AppLayoutProps) {
         <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
         <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
 
-        <AppHeader onScanClick={handleScanClick} />
+        <AppHeader onScanClick={() => navigate('/calculator')} />
 
         <main
           className="flex-1 overflow-y-auto"
@@ -215,9 +207,7 @@ function AppLayoutInner({ children, showNav = true }: AppLayoutProps) {
           {children}
         </main>
 
-        {showNav && (
-          <BottomNav onProfileClick={() => setProfileOpen(true)} />
-        )}
+        {showNav && <BottomNav onProfileClick={() => setProfileOpen(true)} />}
       </div>
     </div>
   );

@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination } from 'swiper/modules';
 import 'swiper/css';
@@ -8,51 +7,41 @@ import 'swiper/css/pagination';
 import AppLayout from '@/components/AppLayout';
 import { useBgColor } from '@/contexts/BgColorContext';
 
-/* ── Color Palette ────────────────────────────────────────────────────────── */
-const COLORS = {
-  black: '#0A0A0A',
-  white: '#FFFFFF',
-  blue: '#0047AB',
-  charcoal: '#2D2D2D',
-  darkGray: '#4A4A4A',
-  lightGray: '#E0E0E0',
-  success: '#28A745',
-  warning: '#FFC107',
-  error: '#DC3545',
-};
-
 /* ── Image URLs ───────────────────────────────────────────────────────────── */
 const IMGS = {
   boutique: '/manus-storage/BluePlayfulTypographicComingSoonFashionPoster-3_47ac2e8d.png',
 };
 
-/* ── Slide Background Colors ──────────────────────────────────────────────── */
-const SLIDE_COLORS = ['#C0C0C0']; // Gray for boutique image (matching the image color)
+/* ── Dominant color extracted from boutique image ────────────────────────── */
+// python3: Average color = #8d847c (warm gray/beige)
+const SLIDE_COLORS = ['#8d847c'];
 
 /* ── Home Component ───────────────────────────────────────────────────────── */
 function HomeContent() {
   const { setBgColor } = useBgColor();
+
+  // Set initial background color on mount
+  useEffect(() => {
+    setBgColor(SLIDE_COLORS[0]);
+  }, []);
 
   const handleSlideChange = (swiper: any) => {
     setBgColor(SLIDE_COLORS[swiper.realIndex % SLIDE_COLORS.length]);
   };
 
   return (
-    <div className="w-full overflow-hidden bg-white">
-      {/* ═══════════════════════════════════════════════════════════════════════════ */}
-      {/* HERO CAROUSEL ─ Single Boutique Image ═════════════════════════════════════ */}
-      {/* ═══════════════════════════════════════════════════════════════════════════ */}
+    <div className="w-full overflow-hidden">
+      {/* HERO CAROUSEL */}
       <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden">
         <Swiper
           modules={[Autoplay, Pagination]}
           autoplay={{ delay: 2500, disableOnInteraction: false }}
-          pagination={{ clickable: true }}
+          pagination={{ clickable: false }}
           navigation={false}
-          loop={true}
+          loop={false}
           onSlideChange={handleSlideChange}
           className="w-full h-full"
         >
-          {/* Slide: Boutique Bysis */}
           <SwiperSlide>
             <div className="relative w-full h-full">
               <img
@@ -67,14 +56,12 @@ function HomeContent() {
         </Swiper>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════════════ */}
-      {/* FOOTER SECTION ═══════════════════════════════════════════════════════════ */}
-      {/* ═══════════════════════════════════════════════════════════════════════════ */}
+      {/* FOOTER SECTION */}
       <section className="w-full py-12 px-6 md:px-12 text-center bg-white">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: COLORS.charcoal }}>
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-800">
           Pourquoi choisir Bysis?
         </h2>
-        <p className="text-base md:text-lg mb-8" style={{ color: COLORS.darkGray }}>
+        <p className="text-base md:text-lg mb-8 text-gray-600">
           Votre partenaire de confiance pour vos achats en ligne
         </p>
       </section>
