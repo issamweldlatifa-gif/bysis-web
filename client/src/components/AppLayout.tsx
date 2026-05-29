@@ -1,16 +1,13 @@
-import { useState, ReactNode, createContext, useContext } from 'react';
+import { useState, ReactNode } from 'react';
 import { useLocation } from 'wouter';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Home, Grid3x3, TrendingUp, ShoppingCart, User, Plus, Search } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Home, Grid3x3, ShoppingCart, User, Plus, Search } from 'lucide-react';
 import AuthGateModal from '@/components/AuthGateModal';
 import ProfileSheet from '@/components/ProfileSheet';
 import { useCart } from '@/contexts/CartContext';
 import { useI18n } from '@/contexts/I18nContext';
 import { useTheme } from '@/contexts/ThemeContext';
-
-// Dynamic Background Color Context
-const BgColorContext = createContext<{ bgColor: string; setBgColor: (color: string) => void }>({ bgColor: '#FFFFFF', setBgColor: () => {} });
-export const useBgColor = () => useContext(BgColorContext);
+import { BgColorProvider, useBgColor } from '@/contexts/BgColorContext';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -18,62 +15,69 @@ interface AppLayoutProps {
   onChatOpen?: () => void;
 }
 
-/* ── Shein Design Tokens ────────────────────────────────────────────────── */
-const SHEIN_RED    = '#1A1A1A';
-const SHEIN_BLACK  = '#1A1A1A';
-
-/* ── Lucide React Icons — Shein-style line icons ────────────────────────── */
-
-/* ── Bysis Logo ─────────────────────────────────────────────────────────── */
-const IconBysis = () => (
-  <img
-    src="/manus-storage/IMG_7012_25df5175.PNG"
-    alt="Bysis Logo"
-    className="h-10 md:h-12 flex-shrink-0"
-    style={{ objectFit: 'contain' }}
-  />
-);
-
-
+/* ── Helper: detect if a hex color is dark ─────────────────────────────── */
+function isColorDark(hex: string): boolean {
+  try {
+    const h = hex.replace('#', '');
+    if (h.length < 6) return false;
+    const r = parseInt(h.slice(0, 2), 16);
+    const g = parseInt(h.slice(2, 4), 16);
+    const b = parseInt(h.slice(4, 6), 16);
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance < 0.5;
+  } catch {
+    return false;
+  }
+}
 
 /* ── Header ─────────────────────────────────────────────────────────────── */
 function AppHeader({ onProfileClick }: { onProfileClick: () => void }) {
+  const { bgColor } = useBgColor();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const bg     = isDark ? '#1C1C1E' : '#FFFFFF';
-  const border = isDark ? 'rgba(255,255,255,0.08)' : '#E5E5E5';
-  const text   = isDark ? '#FFFFFF' : SHEIN_BLACK;
+
+  const isDarkBg = isDark || isColorDark(bgColor);
+  const headerBg = isDark
+    ? 'rgba(13,13,15,0.95)'
+    : `${bgColor}F0`;
+  const textColor = isDarkBg ? '#FFFFFF' : '#1A1A1A';
+  const searchBg  = isDarkBg ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.07)';
+  const searchText = isDarkBg ? 'rgba(255,255,255,0.55)' : '#999';
 
   return (
     <header
-      className="sticky top-0 z-40 flex items-center justify-between px-4 h-12"
+      className="sticky top-0 z-40 flex items-center justify-between px-4 h-12 transition-colors duration-500"
       style={{
-        background: bg,
-        borderBottom: `1px solid ${border}`,
-        paddingTop: 'env(safe-area-inset-top, 0px)',
+        background: headerBg,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: `1px solid ${isDarkBg ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
       }}
     >
       {/* Logo */}
-      <div className="flex items-center gap-2">
-        <IconBysis />
-      </div>
+      <img
+        src="/manus-storage/IMG_7012_25df5175.PNG"
+        alt="Bysis"
+        className="h-9 flex-shrink-0"
+        style={{ objectFit: 'contain' }}
+      />
 
-      {/* Search bar — Shein style */}
+      {/* Search bar */}
       <div
-        className="flex-1 mx-3 flex items-center gap-2 px-3 h-8 rounded-full"
-        style={{ background: isDark ? 'rgba(255,255,255,0.08)' : '#F5F5F5' }}
+        className="flex-1 mx-3 flex items-center gap-2 px-3 h-8 rounded-full transition-colors duration-500"
+        style={{ background: searchBg }}
       >
-        <Search size={18} strokeWidth={1.8} style={{ color: isDark ? 'rgba(255,255,255,0.4)' : '#999' }} />
-        <span className="text-xs" style={{ color: isDark ? 'rgba(255,255,255,0.4)' : '#999' }}>
+        <Search size={15} strokeWidth={1.8} style={{ color: searchText }} />
+        <span className="text-xs transition-colors duration-500" style={{ color: searchText }}>
           Rechercher...
         </span>
       </div>
 
-      {/* Profile button */}
+      {/* Profile */}
       <button
         onClick={onProfileClick}
         className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-90"
-        style={{ color: isDark ? 'rgba(255,255,255,0.7)' : '#666' }}
+        style={{ color: textColor }}
       >
         <User size={22} strokeWidth={1.6} />
       </button>
@@ -82,7 +86,10 @@ function AppHeader({ onProfileClick }: { onProfileClick: () => void }) {
 }
 
 /* ── Bottom Nav ─────────────────────────────────────────────────────────── */
-function BottomNav({ onProfileClick, onScanClick }: {
+function BottomNav({
+  onProfileClick,
+  onScanClick,
+}: {
   onProfileClick: () => void;
   onScanClick: () => void;
 }) {
@@ -94,15 +101,15 @@ function BottomNav({ onProfileClick, onScanClick }: {
 
   const bg       = isDark ? '#1C1C1E' : '#FFFFFF';
   const border   = isDark ? 'rgba(255,255,255,0.08)' : '#E5E5E5';
-  const active   = SHEIN_RED;
+  const active   = '#1A1A1A';
   const inactive = isDark ? 'rgba(255,255,255,0.38)' : '#AAAAAA';
 
   const tabs = [
-    { id: 'home',      label: t('nav_home'),     Icon: Home,       href: '/' },
-    { id: 'boutiques', label: t('nav_boutiques'), Icon: Grid3x3, href: '/arrivage' },
-    { id: 'scan',      label: t('nav_scan'),      Icon: null,           href: null },
-    { id: 'panier',    label: t('nav_panier'),    Icon: ShoppingCart,       href: '/panier' },
-    { id: 'moi',       label: t('nav_moi'),       Icon: User,       href: null },
+    { id: 'home',      label: t('nav_home'),      Icon: Home,         href: '/' },
+    { id: 'boutiques', label: t('nav_boutiques'),  Icon: Grid3x3,      href: '/arrivage' },
+    { id: 'scan',      label: t('nav_scan'),       Icon: null,         href: null },
+    { id: 'panier',    label: t('nav_panier'),     Icon: ShoppingCart, href: '/panier' },
+    { id: 'moi',       label: t('nav_moi'),        Icon: User,         href: null },
   ];
 
   return (
@@ -114,14 +121,13 @@ function BottomNav({ onProfileClick, onScanClick }: {
       style={{
         background: bg,
         borderTop: `1px solid ${border}`,
-        /* Shein-style: lift above safe area with extra 12px */
         paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
       }}
     >
-      <div className="flex items-center justify-around pt-2 pb-0 px-1">
+      <div className="flex items-center justify-around pt-2 px-1">
         {tabs.map((tab) => {
 
-          /* ── Scan FAB (center) ── */
+          /* ── Scan FAB ── */
           if (tab.id === 'scan') {
             return (
               <div key="scan" className="flex flex-col items-center" style={{ marginTop: '-20px' }}>
@@ -129,10 +135,7 @@ function BottomNav({ onProfileClick, onScanClick }: {
                   onClick={onScanClick}
                   whileTap={{ scale: 0.88 }}
                   className="w-[52px] h-[52px] rounded-full flex items-center justify-center shadow-lg"
-                  style={{
-                    background: '#0047AB',
-                    boxShadow: `0 4px 14px rgba(0,71,171,0.40)`,
-                  }}
+                  style={{ background: '#0047AB', boxShadow: '0 4px 14px rgba(0,71,171,0.40)' }}
                 >
                   <Plus size={26} strokeWidth={1.8} color="white" />
                 </motion.button>
@@ -143,7 +146,7 @@ function BottomNav({ onProfileClick, onScanClick }: {
             );
           }
 
-          /* ── Moi button ── */
+          /* ── Moi ── */
           if (tab.id === 'moi') {
             return (
               <motion.button
@@ -177,14 +180,13 @@ function BottomNav({ onProfileClick, onScanClick }: {
                 {isPanier && totalItems > 0 && (
                   <span
                     className="absolute -top-1.5 -right-2 w-[16px] h-[16px] rounded-full text-[9px] font-bold text-white flex items-center justify-center"
-                    style={{ background: '#0047AB', lineHeight: 1 }}
+                    style={{ background: '#0047AB' }}
                   >
                     {totalItems > 9 ? '9+' : totalItems}
                   </span>
                 )}
               </span>
-              <span className="text-[10px] font-medium relative z-10">{tab.label}</span>
-              {/* Active indicator — thin red underline like Shein */}
+              <span className="text-[10px] font-medium">{tab.label}</span>
               {isActive && (
                 <motion.span
                   layoutId="navActiveBar"
@@ -201,31 +203,33 @@ function BottomNav({ onProfileClick, onScanClick }: {
   );
 }
 
-/* ── Main Layout ─────────────────────────────────────────────────────────── */
-export default function AppLayout({ children, showNav = true }: AppLayoutProps) {
+/* ── Inner Layout (uses BgColorContext) ─────────────────────────────────── */
+function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const [authOpen, setAuthOpen]       = useState(false);
-  const [bgColor, setBgColor]         = useState('#FFFFFF');
+  const { bgColor }                   = useBgColor();
   const [, navigate]                  = useLocation();
   const { theme }                     = useTheme();
   const isDark                        = theme === 'dark';
-  const pageBg                        = isDark ? '#0D0D0F' : bgColor;
+
+  const pageBg = isDark ? '#0D0D0F' : bgColor;
 
   const handleScanClick = () => navigate('/calculator');
 
   return (
-    <BgColorContext.Provider value={{ bgColor, setBgColor }}>
-      <div
-        className="min-h-screen flex flex-col transition-colors duration-500"
-        style={{ background: pageBg, fontFamily: '"Inter", -apple-system, sans-serif' }}
-      >
+    <div
+      className="min-h-screen flex flex-col transition-colors duration-500"
+      style={{ background: pageBg, fontFamily: '"Inter", -apple-system, sans-serif' }}
+    >
       <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
       <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
 
       <AppHeader onProfileClick={() => setProfileOpen(true)} />
 
-      {/* Content — bottom padding accounts for nav height + safe area */}
-      <main className="flex-1 overflow-y-auto" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}>
+      <main
+        className="flex-1 overflow-y-auto"
+        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
+      >
         {children}
       </main>
 
@@ -235,7 +239,15 @@ export default function AppLayout({ children, showNav = true }: AppLayoutProps) 
           onScanClick={handleScanClick}
         />
       )}
-      </div>
-    </BgColorContext.Provider>
+    </div>
+  );
+}
+
+/* ── Public export ─────────────────────────────────────────────────────── */
+export default function AppLayout(props: AppLayoutProps) {
+  return (
+    <BgColorProvider>
+      <AppLayoutInner {...props} />
+    </BgColorProvider>
   );
 }

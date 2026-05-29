@@ -9,7 +9,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import AppLayout from '@/components/AppLayout';
-import { useBgColor } from '@/components/AppLayout';
+import { useBgColor } from '@/contexts/BgColorContext';
 import { ArrowRight, Check, Star, Truck, Shield, Zap, Users, Globe } from 'lucide-react';
 
 /* ── Color Palette ────────────────────────────────────────────────────────── */
