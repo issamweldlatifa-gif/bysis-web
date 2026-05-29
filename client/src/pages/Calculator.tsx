@@ -58,6 +58,30 @@ export default function Calculator() {
 
   const extractPrice = trpc.calculator.extractPrice.useMutation();
 
+  // Accept image from Scanner page via sessionStorage
+  useEffect(() => {
+    const scannerImage = sessionStorage.getItem('scannerImage');
+    if (scannerImage) {
+      sessionStorage.removeItem('scannerImage');
+      // Convert blob URL to base64
+      fetch(scannerImage)
+        .then(r => r.blob())
+        .then(blob => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const base64 = ev.target?.result as string;
+            setImageBase64(base64);
+            setImagePreview(base64);
+            setMode('result');
+            startScanning(base64);
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(() => {});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Stable device ID — used to isolate scan history per browser
   const deviceId = (() => {
     const KEY = 'bysis_device_id';
