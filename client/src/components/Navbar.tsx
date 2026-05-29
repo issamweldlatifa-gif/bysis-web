@@ -54,7 +54,7 @@ export default function Navbar() {
   const navLinks = [
     { href: "/", label: "Accueil", icon: House },
     { href: "/arrivage", label: "Arrivage", icon: Package },
-    { href: "/calculator", label: "Calculatrice", icon: Calculator },
+    { href: "/scanner", label: "Scanner", icon: Calculator },
     { href: "/track", label: "Suivi", icon: MagnifyingGlass },
   ];
 

@@ -265,3 +265,9 @@
 - [ ] Barcode scanner mode (html5-qrcode)
 - [ ] Help page (?) with black background explaining how camera search works
 - [ ] Route from Google Lens icon in search bar to new Scanner page
+
+## Bug Fix: FloatingChat Quick Action (May 2026)
+- [x] Fix FloatingChat.tsx: change `setIsCalculatorModalOpen(true)` to `navigate('/scanner')` when user clicks "احسبلي سعر منتوج" quick action
+- [x] Remove dead code: CalculatorModal import, isCalculatorModalOpen state, CalculatorModal JSX block
+- [x] Remove unused Calculator icon import from @phosphor-icons/react
+- [x] All 22 tests still passing after fix

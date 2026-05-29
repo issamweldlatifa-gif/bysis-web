@@ -14,7 +14,6 @@ import {
   Package,
   CurrencyDollar,
   Truck,
-  Calculator,
   ChatCircleText,
   User,
   Sparkle,
@@ -23,7 +22,6 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import PushNotificationBanner from "./PushNotificationBanner";
-import CalculatorModal from "./CalculatorModal";
 import AuthGateModal from "./AuthGateModal";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { useLocation } from "wouter";
@@ -190,7 +188,6 @@ export default function FloatingChat({
   const [unreadCount, setUnreadCount] = useState(0);
   const [showPushBanner, setShowPushBanner] = useState(false);
   const [lastOrderPhone] = useState<string | undefined>();
-  const [isCalculatorModalOpen, setIsCalculatorModalOpen] = useState(false);
   const [showAuthGate, setShowAuthGate] = useState(false);
   const { isAuthenticated } = useAuth();
 
@@ -557,7 +554,8 @@ export default function FloatingChat({
                             transition={{ delay: 0.15 + i * 0.07, duration: 0.25 }}
                             onClick={() => {
                               if (q.text === "احسبلي سعر منتوج") {
-                                setIsCalculatorModalOpen(true);
+                                setIsOpen(false);
+                                navigate('/scanner');
                               } else {
                                 handleSuggestion(q.text);
                               }
@@ -801,11 +799,6 @@ export default function FloatingChat({
         )}
       </AnimatePresence>
 
-      {/* Calculator modal */}
-      <CalculatorModal
-        isOpen={isCalculatorModalOpen}
-        onClose={() => setIsCalculatorModalOpen(false)}
-      />
 
       {/* Auth Gate Modal — shown when unauthenticated user tries to place an order via chat */}
       <AuthGateModal
