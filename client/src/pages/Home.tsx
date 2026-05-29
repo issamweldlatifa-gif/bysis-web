@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -35,6 +36,14 @@ const IMGS = {
   couple: '/manus-storage/couple-phone_771f441d.jpg',
   womanPhone: '/manus-storage/woman-shopping-phone_0ed1d14c.jpg',
 };
+
+/* ── Slide Background Colors (Predefined) ────────────────────────────────── */
+const SLIDE_COLORS = [
+  '#1a1a2e', // Dark blue for thankyou
+  '#e8f4f8', // Light cyan for carousel1
+  '#0047AB', // Blue for carousel2
+  '#1a5f3f', // Green for carousel3
+];
 
 /* ── Animation Variants ───────────────────────────────────────────────────── */
 const fadeInUp = {
@@ -78,19 +87,26 @@ function FeatureCard({ icon: Icon, title, description }: { icon: any; title: str
 }
 
 export default function Home() {
+  const [bgColor, setBgColor] = useState(SLIDE_COLORS[0]);
+
+  const handleSlideChange = (swiper: any) => {
+    setBgColor(SLIDE_COLORS[swiper.realIndex % SLIDE_COLORS.length]);
+  };
+
   return (
     <AppLayout>
-      <div className="w-full bg-white overflow-hidden">
+      <div className="w-full overflow-hidden" style={{ backgroundColor: bgColor }}>
         {/* ═══════════════════════════════════════════════════════════════════════════ */}
         {/* HERO CAROUSEL ─ 3 Dynamic Rotating Images ═════════════════════════════════ */}
         {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden bg-white">
+        <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden transition-colors duration-500" style={{ backgroundColor: bgColor }}>
           <Swiper
             modules={[Autoplay, Pagination]}
             autoplay={{ delay: 2500, disableOnInteraction: false }}
             pagination={{ clickable: true }}
             navigation={false}
             loop={true}
+            onSlideChange={handleSlideChange}
             className="w-full h-full"
           >
             {/* Slide 1: Thank You */}
@@ -140,7 +156,7 @@ export default function Home() {
                   <div className="hidden md:flex gap-3">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
-                      className="w-24 h-32 rounded-lg overflow-hidden shadow-md opacity-75"
+                      className="w-20 h-28 rounded-lg overflow-hidden shadow-md opacity-75"
                     >
                       <img
                         src={IMGS.unboxing1}
@@ -150,7 +166,7 @@ export default function Home() {
                     </motion.div>
                     <motion.div
                       whileHover={{ scale: 1.05 }}
-                      className="w-24 h-32 rounded-lg overflow-hidden shadow-md opacity-75"
+                      className="w-20 h-28 rounded-lg overflow-hidden shadow-md opacity-75"
                     >
                       <img
                         src={IMGS.unboxing2}
@@ -158,48 +174,9 @@ export default function Home() {
                         className="w-full h-full object-cover"
                       />
                     </motion.div>
-                  </div>
-                </motion.div>
-              </div>
-            </SwiperSlide>
-
-            {/* Slide 3: Livraison with Overlay */}
-            <SwiperSlide>
-              <div className="relative w-full h-full">
-                <img
-                  src={IMGS.carousel2}
-                  alt="Livraison Rapide"
-                  className="w-full h-full object-cover"
-                />
-                {/* Overlay Banner */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  className="absolute inset-0 flex items-center justify-between px-6 md:px-12"
-                  style={{ background: 'rgba(0,0,0,0.3)' }}
-                >
-                  {/* Left Content */}
-                  <div className="flex flex-col justify-center gap-4 max-w-xs">
-                    <h2 className="text-3xl md:text-4xl font-bold text-white">
-                      Livraison Rapide
-                    </h2>
-                    <p className="text-sm md:text-base text-white opacity-90">
-                      20-25 jours de livraison directe en Tunisie
-                    </p>
-                    <button
-                      className="px-6 py-2 rounded-lg font-bold text-white transition-all hover:shadow-lg"
-                      style={{ background: COLORS.blue }}
-                    >
-                      Commander
-                    </button>
-                  </div>
-
-                  {/* Right Product Images */}
-                  <div className="hidden md:flex gap-3">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
-                      className="w-24 h-32 rounded-lg overflow-hidden shadow-md opacity-75"
+                      className="w-20 h-28 rounded-lg overflow-hidden shadow-md opacity-75"
                     >
                       <img
                         src={IMGS.unboxing3}
@@ -207,13 +184,59 @@ export default function Home() {
                         className="w-full h-full object-cover"
                       />
                     </motion.div>
+                  </div>
+                </motion.div>
+              </div>
+            </SwiperSlide>
+
+            {/* Slide 3: Promo */}
+            <SwiperSlide>
+              <div className="relative w-full h-full">
+                <img
+                  src={IMGS.carousel2}
+                  alt="Promo - Offres Spéciales"
+                  className="w-full h-full object-cover"
+                />
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="absolute inset-0 flex items-center justify-between px-6 md:px-12"
+                  style={{ background: 'rgba(0,0,0,0.3)' }}
+                >
+                  <div className="flex flex-col justify-center gap-4 max-w-xs">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white">
+                      Offres Spéciales
+                    </h2>
+                    <p className="text-sm md:text-base text-white opacity-90">
+                      Profitez de réductions exceptionnelles sur vos produits préférés
+                    </p>
+                    <button
+                      className="px-6 py-2 rounded-lg font-bold text-white transition-all hover:shadow-lg"
+                      style={{ background: COLORS.warning }}
+                    >
+                      Voir les Offres
+                    </button>
+                  </div>
+
+                  <div className="hidden md:flex gap-3">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
-                      className="w-24 h-32 rounded-lg overflow-hidden shadow-md opacity-75"
+                      className="w-20 h-28 rounded-lg overflow-hidden shadow-md opacity-75"
                     >
                       <img
                         src={IMGS.couple}
                         alt="Product 4"
+                        className="w-full h-full object-cover"
+                      />
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      className="w-20 h-28 rounded-lg overflow-hidden shadow-md opacity-75"
+                    >
+                      <img
+                        src={IMGS.womanPhone}
+                        alt="Product 5"
                         className="w-full h-full object-cover"
                       />
                     </motion.div>
@@ -222,39 +245,84 @@ export default function Home() {
               </div>
             </SwiperSlide>
 
-            {/* Slide 4: Coming Soon */}
+            {/* Slide 4: New Collection */}
             <SwiperSlide>
               <div className="relative w-full h-full">
                 <img
                   src={IMGS.carousel3}
-                  alt="Boutique Bysis - Coming Soon"
+                  alt="New Collection"
                   className="w-full h-full object-cover"
                 />
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="absolute inset-0 flex items-center justify-between px-6 md:px-12"
+                  style={{ background: 'rgba(0,0,0,0.3)' }}
+                >
+                  <div className="flex flex-col justify-center gap-4 max-w-xs">
+                    <h2 className="text-3xl md:text-4xl font-bold text-white">
+                      Nouvelle Collection
+                    </h2>
+                    <p className="text-sm md:text-base text-white opacity-90">
+                      Explorez nos dernières créations et tendances du moment
+                    </p>
+                    <button
+                      className="px-6 py-2 rounded-lg font-bold text-white transition-all hover:shadow-lg"
+                      style={{ background: COLORS.success }}
+                    >
+                      Explorer
+                    </button>
+                  </div>
+
+                  <div className="hidden md:flex gap-3">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      className="w-20 h-28 rounded-lg overflow-hidden shadow-md opacity-75"
+                    >
+                      <img
+                        src={IMGS.unboxing1}
+                        alt="Product 6"
+                        className="w-full h-full object-cover"
+                      />
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      className="w-20 h-28 rounded-lg overflow-hidden shadow-md opacity-75"
+                    >
+                      <img
+                        src={IMGS.unboxing3}
+                        alt="Product 7"
+                        className="w-full h-full object-cover"
+                      />
+                    </motion.div>
+                  </div>
+                </motion.div>
               </div>
             </SwiperSlide>
           </Swiper>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        {/* FEATURES SECTION ═════════════════════════════════════════════════════════ */}
+        {/* WHY CHOOSE BYSIS ─ Feature Section ═════════════════════════════════════════ */}
         {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        <section className="py-16 px-4 md:px-8 bg-white">
-          <div className="max-w-6xl mx-auto">
-            <motion.h2
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              className="text-3xl md:text-4xl font-bold text-center mb-12"
-              style={{ color: COLORS.charcoal }}
-            >
+        <section className="py-16 md:py-24 px-4 md:px-8 bg-white">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            className="max-w-6xl mx-auto"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: COLORS.charcoal }}>
               Pourquoi choisir Bysis?
-            </motion.h2>
+            </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <FeatureCard
                 icon={Truck}
                 title="Livraison Rapide"
-                description="20-25 jours de livraison directe en Tunisie"
+                description="Livraison gratuite et rapide partout en Tunisie"
               />
               <FeatureCard
                 icon={Shield}
@@ -263,95 +331,45 @@ export default function Home() {
               />
               <FeatureCard
                 icon={Zap}
-                title="Prix Compétitifs"
-                description="Meilleurs prix en dinars tunisiens"
+                title="Qualité Premium"
+                description="Produits sélectionnés avec soin"
               />
               <FeatureCard
                 icon={Users}
-                title="Support Client"
-                description="Assistance 24/7 en français et arabe"
+                title="Support 24/7"
+                description="Équipe dédiée à votre service"
               />
             </div>
-          </div>
+          </motion.div>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        {/* HOW IT WORKS SECTION ═════════════════════════════════════════════════════ */}
+        {/* CTA SECTION ──────────────────────────────────────────────────────────────── */}
         {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        <section className="py-16 px-4 md:px-8" style={{ backgroundColor: COLORS.lightGray }}>
-          <div className="max-w-6xl mx-auto">
-            <motion.h2
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              className="text-3xl md:text-4xl font-bold text-center mb-12"
-              style={{ color: COLORS.charcoal }}
-            >
-              Comment ça marche?
-            </motion.h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                { step: 1, title: 'Choisissez', description: 'Sélectionnez vos produits sur Shein, AliExpress ou Temu' },
-                { step: 2, title: 'Payez', description: 'Versez le montant en dinars tunisiens' },
-                { step: 3, title: 'Recevez', description: 'Nous livrons directement chez vous en 20-25 jours' },
-              ].map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: idx * 0.2 }}
-                  className="text-center"
-                >
-                  <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-2xl"
-                    style={{ backgroundColor: COLORS.blue }}
-                  >
-                    {item.step}
-                  </div>
-                  <h3 className="text-xl font-bold mb-2" style={{ color: COLORS.charcoal }}>
-                    {item.title}
-                  </h3>
-                  <p style={{ color: COLORS.darkGray }}>{item.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        {/* CTA SECTION ═══════════════════════════════════════════════════════════════ */}
-        {/* ═══════════════════════════════════════════════════════════════════════════ */}
-        <section className="py-16 px-4 md:px-8 bg-white">
-          <div className="max-w-4xl mx-auto text-center">
-            <motion.h2
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-              className="text-3xl md:text-4xl font-bold mb-6"
-              style={{ color: COLORS.charcoal }}
-            >
-              Prêt à commander?
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg mb-8"
-              style={{ color: COLORS.darkGray }}
-            >
-              Commencez votre shopping maintenant et recevez vos produits directement chez vous!
-            </motion.p>
+        <section className="py-16 md:py-24 px-4 md:px-8" style={{ background: COLORS.blue }}>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            className="max-w-4xl mx-auto text-center"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">
+              Prêt à commencer?
+            </h2>
+            <p className="text-lg text-white opacity-90 mb-8">
+              Rejoignez des milliers de clients satisfaits et découvrez notre sélection exclusive
+            </p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 text-white font-bold rounded-lg text-lg transition-all hover:shadow-lg"
-              style={{ background: COLORS.blue }}
+              className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:shadow-lg flex items-center gap-2 mx-auto"
+              style={{ background: COLORS.white, color: COLORS.blue }}
             >
-              Commander maintenant
-              <ArrowRight className="inline-block ml-2" size={20} />
+              Commencer maintenant
+              <ArrowRight size={20} />
             </motion.button>
-          </div>
+          </motion.div>
         </section>
       </div>
     </AppLayout>
