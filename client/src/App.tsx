@@ -85,9 +85,10 @@ function Router() {
 
 function FloatingChatWrapper({ chatOpen, setChatOpen }: { chatOpen: boolean; setChatOpen: (v: boolean) => void }) {
   const [location] = useLocation();
-  // Hide floating button on home page — it has its own chat button in the hero
+  // Hide floating button on home page and scanner page
   const hideOnHome = location === "/";
-  if (hideOnHome && !chatOpen) return null;
+  const hideOnScanner = location === "/scanner";
+  if ((hideOnHome || hideOnScanner) && !chatOpen) return null;
   return <FloatingChat externalOpen={chatOpen} onExternalOpenChange={setChatOpen} />;
 }
 
