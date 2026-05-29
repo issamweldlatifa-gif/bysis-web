@@ -86,10 +86,10 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════════════════════ */}
         <section className="relative w-full h-[600px] md:h-[700px] overflow-hidden bg-white">
           <Swiper
-            modules={[Autoplay, Pagination, Navigation]}
-            autoplay={{ delay: 5000, disableOnInteraction: false }}
+            modules={[Autoplay, Pagination]}
+            autoplay={{ delay: 2500, disableOnInteraction: false }}
             pagination={{ clickable: true }}
-            navigation={true}
+            navigation={false}
             loop={true}
             className="w-full h-full"
           >
@@ -137,10 +137,10 @@ export default function Home() {
                   </div>
 
                   {/* Right Product Images */}
-                  <div className="hidden md:flex gap-4">
+                  <div className="hidden md:flex gap-3">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
-                      className="w-32 h-40 rounded-xl overflow-hidden shadow-lg"
+                      className="w-24 h-32 rounded-lg overflow-hidden shadow-md opacity-75"
                     >
                       <img
                         src={IMGS.unboxing1}
@@ -150,7 +150,7 @@ export default function Home() {
                     </motion.div>
                     <motion.div
                       whileHover={{ scale: 1.05 }}
-                      className="w-32 h-40 rounded-xl overflow-hidden shadow-lg"
+                      className="w-24 h-32 rounded-lg overflow-hidden shadow-md opacity-75"
                     >
                       <img
                         src={IMGS.unboxing2}
@@ -196,10 +196,10 @@ export default function Home() {
                   </div>
 
                   {/* Right Product Images */}
-                  <div className="hidden md:flex gap-4">
+                  <div className="hidden md:flex gap-3">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
-                      className="w-32 h-40 rounded-xl overflow-hidden shadow-lg"
+                      className="w-24 h-32 rounded-lg overflow-hidden shadow-md opacity-75"
                     >
                       <img
                         src={IMGS.unboxing3}
@@ -209,7 +209,7 @@ export default function Home() {
                     </motion.div>
                     <motion.div
                       whileHover={{ scale: 1.05 }}
-                      className="w-32 h-40 rounded-xl overflow-hidden shadow-lg"
+                      className="w-24 h-32 rounded-lg overflow-hidden shadow-md opacity-75"
                     >
                       <img
                         src={IMGS.couple}
