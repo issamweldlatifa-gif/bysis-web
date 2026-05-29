@@ -44,10 +44,10 @@ function AppHeader({ onScanClick }: { onScanClick: () => void }) {
   return (
     <header
       className="sticky top-0 z-40 w-full"
-      style={{ background: 'var(--app-bg-color, #dcd7ce)' }}
+      style={{ background: 'var(--app-bg-color, #cadfe2)' }}
     >
       {/* Safe-area spacer — fills iOS status bar with the same bg color */}
-      <div style={{ height: 'env(safe-area-inset-top, 0px)', background: 'var(--app-bg-color, #dcd7ce)' }} />
+      <div style={{ height: 'env(safe-area-inset-top, 0px)', background: 'var(--app-bg-color, #cadfe2)' }} />
       <div className="w-full px-3 py-2.5">
         {/* Search bar — full width, white, rounded pill */}
         <div
@@ -179,7 +179,7 @@ function AppLayoutInner({ children, showNav = true }: AppLayoutProps) {
   const { theme }                     = useTheme();
   const isDark                        = theme === 'dark';
 
-  const pageBg = isDark ? '#0D0D0F' : 'var(--app-bg-color, #dcd7ce)';
+  const pageBg = isDark ? '#0D0D0F' : 'var(--app-bg-color, #cadfe2)';
 
   return (
     <div

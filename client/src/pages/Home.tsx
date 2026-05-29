@@ -3,9 +3,9 @@ import AppLayout from '@/components/AppLayout';
 import { useBgColor } from '@/contexts/BgColorContext';
 import { useImageColor } from '@/hooks/useImageColor';
 
-const HERO_IMG = '/manus-storage/BluePlayfulTypographicComingSoonFashionPoster-3_47ac2e8d.png';
-// Correct background color extracted from the hero image corners (cream/warm white)
-const HERO_BG_COLOR = '#dcd7ce';
+const HERO_IMG = '/manus-storage/BluePlayfulTypographicComingSoonFashionPoster-1_a27baff4.png';
+// Background color extracted from image corners (light blue/sky)
+const HERO_BG_COLOR = '#cadfe2';
 
 /* ── Home Component ───────────────────────────────────────────────────────── */
 function HomeContent() {
