@@ -27,7 +27,7 @@ const IMGS = {
 };
 
 /* ── Slide Background Colors ──────────────────────────────────────────────── */
-const SLIDE_COLORS = ['#8B7355']; // Brown/Tan for boutique image
+const SLIDE_COLORS = ['#C0C0C0']; // Gray for boutique image (matching the image color)
 
 /* ── Home Component ───────────────────────────────────────────────────────── */
 function HomeContent() {

@@ -1,7 +1,7 @@
 import { useState, ReactNode } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { Home, Grid3x3, ShoppingCart, User, Plus, Search, Camera } from 'lucide-react';
+import { Home, Grid3x3, ShoppingCart, User, Search, Camera } from 'lucide-react';
 import AuthGateModal from '@/components/AuthGateModal';
 import ProfileSheet from '@/components/ProfileSheet';
 import { useCart } from '@/contexts/CartContext';
@@ -37,58 +37,73 @@ function AppHeader({ onProfileClick, onScanClick }: { onProfileClick: () => void
   const isDark = theme === 'dark';
 
   const isDarkBg = isDark || isColorDark(bgColor);
+  
+  // Header background: semi-transparent with blur
   const headerBg = isDark
-    ? 'rgba(13,13,15,0.95)'
-    : `${bgColor}F0`;
+    ? 'rgba(13,13,15,0.85)'
+    : `rgba(192,192,192,0.85)`;
+
   const textColor = isDarkBg ? '#FFFFFF' : '#1A1A1A';
-  const searchBg  = isDarkBg ? '#FFFFFF' : '#FFFFFF';
-  const searchText = isDarkBg ? '#999' : '#999';
+  const searchBg = '#FFFFFF';
+  const searchPlaceholder = '#999999';
+  const searchBorder = '#DDDDDD';
 
   return (
     <header
-      className="sticky top-0 z-40 flex items-center justify-between px-4 h-12 transition-colors duration-500"
+      className="sticky top-0 z-40 w-full px-4 py-3 transition-all duration-500"
       style={{
         background: headerBg,
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: `1px solid ${isDarkBg ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        borderBottom: `1px solid ${isDarkBg ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
       }}
     >
-      {/* Logo */}
-      <img
-        src="/manus-storage/IMG_7012_25df5175.PNG"
-        alt="Bysis"
-        className="h-9 flex-shrink-0"
-        style={{ objectFit: 'contain' }}
-      />
+      <div className="flex items-center justify-between gap-3">
+        {/* Logo */}
+        <img
+          src="/manus-storage/IMG_7012_25df5175.PNG"
+          alt="Bysis"
+          className="h-8 flex-shrink-0"
+          style={{ objectFit: 'contain' }}
+        />
 
-      {/* Search bar - Amazon style with Google Lens */}
-      <div
-        className="flex-1 mx-3 flex items-center gap-2 px-3 h-8 rounded-full transition-colors duration-500"
-        style={{ background: searchBg, border: '1px solid #E0E0E0' }}
-      >
-        <Search size={15} strokeWidth={1.8} style={{ color: searchText }} />
-        <span className="text-xs transition-colors duration-500 flex-1" style={{ color: searchText }}>
-          Rechercher ou poser une question
-        </span>
-        {/* Google Lens / Camera button */}
-        <button
-          onClick={onScanClick}
-          className="flex-shrink-0 p-1 hover:opacity-80 transition-opacity"
-          style={{ color: '#1A1A1A' }}
+        {/* Search bar - Professional Amazon style */}
+        <div
+          className="flex-1 flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-300"
+          style={{
+            background: searchBg,
+            border: `1.5px solid ${searchBorder}`,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+          }}
         >
-          <Camera size={16} strokeWidth={2} />
+          <Search size={18} strokeWidth={2} style={{ color: searchPlaceholder, flexShrink: 0 }} />
+          <input
+            type="text"
+            placeholder="Rechercher ou poser une question"
+            className="flex-1 bg-transparent text-sm outline-none"
+            style={{ color: '#1A1A1A' }}
+            disabled
+          />
+          {/* Google Lens / Camera button */}
+          <button
+            onClick={onScanClick}
+            className="flex-shrink-0 p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            style={{ color: '#1A1A1A' }}
+            title="Scanner avec Google Lens"
+          >
+            <Camera size={18} strokeWidth={2} />
+          </button>
+        </div>
+
+        {/* Profile */}
+        <button
+          onClick={onProfileClick}
+          className="w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90 flex-shrink-0"
+          style={{ color: textColor }}
+        >
+          <User size={20} strokeWidth={1.8} />
         </button>
       </div>
-
-      {/* Profile */}
-      <button
-        onClick={onProfileClick}
-        className="w-8 h-8 rounded-full flex items-center justify-center transition-all active:scale-90"
-        style={{ color: textColor }}
-      >
-        <User size={22} strokeWidth={1.6} />
-      </button>
     </header>
   );
 }
@@ -133,7 +148,6 @@ function BottomNav({
     >
       <div className="flex items-center justify-around pt-2 px-1">
         {tabs.map((tab) => {
-
           if (tab.id === 'moi') {
             return (
               <motion.button
@@ -204,13 +218,10 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
 
   return (
     <div
-      className="min-h-screen flex flex-col transition-colors duration-500"
-      style={{ background: pageBg, fontFamily: '"Inter", -apple-system, sans-serif' }}
+      className="min-h-screen flex flex-col"
+      style={{ fontFamily: '"Inter", -apple-system, sans-serif' }}
     >
-      <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
-      <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
-
-      {/* Dynamic background extends behind header */}
+      {/* Full-screen dynamic background */}
       <div
         className="fixed inset-0 z-0 transition-colors duration-500"
         style={{
@@ -219,8 +230,11 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
         }}
       />
 
-      {/* Content wrapper with relative positioning */}
+      {/* Content wrapper */}
       <div className="relative z-10 flex flex-col min-h-screen">
+        <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
+        <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
+
         <AppHeader onProfileClick={() => setProfileOpen(true)} onScanClick={handleScanClick} />
 
         <main
