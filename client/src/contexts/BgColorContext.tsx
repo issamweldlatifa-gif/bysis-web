@@ -6,12 +6,12 @@ interface BgColorContextType {
 }
 
 const BgColorContext = createContext<BgColorContextType>({
-  bgColor: '#8d847c',
+  bgColor: '#dcd7ce',
   setBgColor: () => {},
 });
 
 export function BgColorProvider({ children }: { children: ReactNode }) {
-  const [bgColor, setBgColor] = useState('#8d847c');
+  const [bgColor, setBgColor] = useState('#dcd7ce');
 
   // Update meta theme-color AND html CSS variable dynamically
   const setColorAndMeta = (color: string) => {

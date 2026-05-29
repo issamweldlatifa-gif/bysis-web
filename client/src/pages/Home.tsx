@@ -1,19 +1,30 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { useBgColor } from '@/contexts/BgColorContext';
+import { useImageColor } from '@/hooks/useImageColor';
 
-/* ── Dominant color extracted from boutique image ────────────────────────── */
-// python3: Average color = #8d847c (warm gray/beige)
-const HERO_COLOR = '#8d847c';
 const HERO_IMG = '/manus-storage/BluePlayfulTypographicComingSoonFashionPoster-3_47ac2e8d.png';
+// Correct background color extracted from the hero image corners (cream/warm white)
+const HERO_BG_COLOR = '#dcd7ce';
 
 /* ── Home Component ───────────────────────────────────────────────────────── */
 function HomeContent() {
   const { setBgColor } = useBgColor();
 
+  // Set correct color immediately on mount (no CORS delay)
   useEffect(() => {
-    setBgColor(HERO_COLOR);
-  }, []);
+    setBgColor(HERO_BG_COLOR);
+  }, [setBgColor]);
+
+  // Also try dynamic extraction (will override if CORS allows)
+  const handleColor = useCallback(
+    (hex: string) => {
+      setBgColor(hex);
+    },
+    [setBgColor]
+  );
+
+  useImageColor(HERO_IMG, handleColor);
 
   return (
     <div className="w-full">
@@ -24,6 +35,7 @@ function HomeContent() {
           alt="Bysis - Nouvelle Collection"
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           loading="eager"
+          crossOrigin="anonymous"
         />
       </div>
 

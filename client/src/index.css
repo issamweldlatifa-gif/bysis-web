@@ -67,6 +67,8 @@
   --safe-area-bottom: env(safe-area-inset-bottom, 0);
   --safe-area-left: env(safe-area-inset-left, 0);
   --safe-area-right: env(safe-area-inset-right, 0);
+  /* Dynamic background color — updated by BgColorContext via JS */
+  --app-bg-color: #dcd7ce;
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -161,7 +163,7 @@
   }
   html {
     /* Dynamic background extends into iOS status bar area — like SHEIN */
-    background-color: var(--app-bg-color, #8d847c);
+    background-color: var(--app-bg-color, #dcd7ce);
     font-optical-sizing: auto;
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
@@ -180,14 +182,14 @@
     letter-spacing: -0.005em;
     color: #333333;
     /* Body also takes dynamic bg so no white flash */
-    background-color: var(--app-bg-color, #8d847c);
+    background-color: var(--app-bg-color, #dcd7ce);
     min-height: 100%;
     margin: 0;
   }
   #root {
     min-height: 100vh;
     min-height: 100dvh;
-    background-color: var(--app-bg-color, #8d847c);
+    background-color: var(--app-bg-color, #dcd7ce);
   }
 
   /* ── Shein Typography Scale ─────────────────────────────────────────── */
