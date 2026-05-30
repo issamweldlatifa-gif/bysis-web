@@ -1,7 +1,7 @@
 import { useState, ReactNode } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { Home, Grid3x3, ShoppingCart, User, Search, Menu } from 'lucide-react';
+import { Home, ShoppingCart, User, Search, Menu } from 'lucide-react';
 import AuthGateModal from '@/components/AuthGateModal';
 import ProfileSheet from '@/components/ProfileSheet';
 import { useCart } from '@/contexts/CartContext';
@@ -38,153 +38,102 @@ function GoogleLensIcon() {
   );
 }
 
-/* ── Header: Icons + Logo ────────────────────────────────────────────────────── */
-function AppHeader({ onScanClick }: { onScanClick: () => void }) {
+/* ── Top Header: Search Bar ────────────────────────────────────────────────────── */
+function TopHeader() {
   const [, navigate] = useLocation();
-  const { bgColor } = useBgColor();
 
   return (
-    <header
-      className="sticky top-0 z-40 w-full bg-white border-b border-gray-200"
-    >
+    <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-200">
       {/* Safe-area spacer */}
       <div style={{ height: 'env(safe-area-inset-top, 0px)', background: '#FFFFFF' }} />
       
-      {/* Header content */}
-      <div className="w-full px-4 py-3 flex items-center justify-between">
-        {/* Left icons: Home + User */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate('/')}
-            className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
-            aria-label="Accueil"
-          >
-            <Home size={24} strokeWidth={1.5} color="#1A1A1A" />
-          </button>
-          
-          <button
-            className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
-            aria-label="Profil"
-          >
-            <User size={24} strokeWidth={1.5} color="#1A1A1A" />
-          </button>
-        </div>
-        
-        {/* Center: Logo */}
-        <div className="flex-shrink-0">
-          <img
-            src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_91b2841d.png"
-            alt="Bysis AI"
-            className="w-8 h-8 object-contain"
-          />
-        </div>
-        
-        {/* Right icons: Cart + Menu */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate('/panier')}
-            className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
-            aria-label="Panier"
-          >
-            <ShoppingCart size={24} strokeWidth={1.5} color="#1A1A1A" />
-          </button>
-          
-          <button
-            className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
-            aria-label="Menu"
-          >
-            <Menu size={24} strokeWidth={1.5} color="#1A1A1A" />
-          </button>
-        </div>
+      {/* Search bar */}
+      <div className="w-full px-4 py-3 flex items-center gap-3">
+        <Search size={20} color="#999" />
+        <input
+          type="text"
+          placeholder="Rechercher ou poser une question"
+          className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm outline-none"
+        />
+        <button
+          onClick={() => navigate('/scanner')}
+          className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
+          aria-label="Scanner"
+        >
+          <GoogleLensIcon />
+        </button>
       </div>
     </header>
   );
 }
 
-/* ── Bottom Nav ─────────────────────────────────────────────────────────── */
+/* ── Bottom Nav: Header Icons + Logo ─────────────────────────────────────────────── */
 function BottomNav({ onProfileClick }: { onProfileClick: () => void }) {
-  const [location, navigate] = useLocation();
+  const [, navigate] = useLocation();
   const { totalItems } = useCart();
-  const { t } = useI18n();
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
-
-  const bg       = isDark ? '#1C1C1E' : '#FFFFFF';
-  const border   = isDark ? 'rgba(255,255,255,0.08)' : '#E5E5E5';
-  const active   = '#1A1A1A';
-  const inactive = isDark ? 'rgba(255,255,255,0.38)' : '#AAAAAA';
-
-  const tabs = [
-    { id: 'home',      label: t('nav_home'),     Icon: Home,         href: '/' },
-    { id: 'boutiques', label: t('nav_boutiques'), Icon: Grid3x3,      href: '/arrivage' },
-    { id: 'panier',    label: t('nav_panier'),    Icon: ShoppingCart, href: '/panier' },
-    { id: 'moi',       label: t('nav_moi'),       Icon: User,         href: null },
-  ];
 
   return (
     <motion.nav
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
-      className="fixed bottom-0 left-0 right-0 z-40"
+      className="w-full"
       style={{
-        background: bg,
-        borderTop: `1px solid ${border}`,
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)',
+        background: '#FFFFFF',
+        borderTop: '1px solid #E5E5E5',
       }}
     >
-      <div className="flex items-center justify-around pt-2 px-1">
-        {tabs.map((tab) => {
-          if (tab.id === 'moi') {
-            return (
-              <motion.button
-                key="moi"
-                onClick={onProfileClick}
-                whileTap={{ scale: 0.90 }}
-                className="flex flex-col items-center gap-0.5 px-3 py-1 min-w-[52px]"
-                style={{ color: inactive }}
-              >
-                <User size={22} strokeWidth={1.6} />
-                <span className="text-[10px] font-medium">{tab.label}</span>
-              </motion.button>
-            );
-          }
+      <div className="flex items-center justify-between px-4 py-3">
+        {/* Left: Home icon */}
+        <motion.button
+          whileTap={{ scale: 0.90 }}
+          onClick={() => navigate('/')}
+          className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
+          aria-label="Accueil"
+        >
+          <Home size={24} strokeWidth={1.5} color="#1A1A1A" />
+        </motion.button>
 
-          const { Icon } = tab;
-          const isActive = location === tab.href;
-          const isPanier = tab.id === 'panier';
+        {/* Center-left: User icon */}
+        <motion.button
+          whileTap={{ scale: 0.90 }}
+          onClick={onProfileClick}
+          className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
+          aria-label="Profil"
+        >
+          <User size={24} strokeWidth={1.5} color="#1A1A1A" />
+        </motion.button>
 
-          return (
-            <motion.button
-              key={tab.id}
-              onClick={() => tab.href && navigate(tab.href)}
-              whileTap={{ scale: 0.90 }}
-              className="flex flex-col items-center gap-0.5 px-3 py-1 min-w-[52px] relative"
-              style={{ color: isActive ? active : inactive }}
-            >
-              <span className="relative">
-                <Icon size={22} strokeWidth={isActive ? 2 : 1.6} />
-                {isPanier && totalItems > 0 && (
-                  <span
-                    className="absolute -top-1.5 -right-2 w-[16px] h-[16px] rounded-full text-[9px] font-bold text-white flex items-center justify-center"
-                    style={{ background: '#0047AB' }}
-                  >
-                    {totalItems > 9 ? '9+' : totalItems}
-                  </span>
-                )}
-              </span>
-              <span className="text-[10px] font-medium">{tab.label}</span>
-              {isActive && (
-                <motion.span
-                  layoutId="navActiveBar"
-                  className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-5 rounded-full"
-                  style={{ background: active }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                />
-              )}
-            </motion.button>
-          );
-        })}
+        {/* Center: Cart with badge */}
+        <motion.button
+          whileTap={{ scale: 0.90 }}
+          onClick={() => navigate('/panier')}
+          className="relative flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
+          aria-label="Panier"
+        >
+          <ShoppingCart size={24} strokeWidth={1.5} color="#1A1A1A" />
+          {totalItems > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
+              {totalItems > 9 ? '9+' : totalItems}
+            </span>
+          )}
+        </motion.button>
+
+        {/* Center-right: Menu icon */}
+        <motion.button
+          whileTap={{ scale: 0.90 }}
+          className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
+          aria-label="Menu"
+        >
+          <Menu size={24} strokeWidth={1.5} color="#1A1A1A" />
+        </motion.button>
+
+        {/* Right: Logo Bysis */}
+        <img
+          src="/manus-storage/IMG_7134_d4e5f6g7.png"
+          alt="Bysis"
+          className="w-6 h-6 object-contain ml-auto"
+        />
       </div>
     </motion.nav>
   );
@@ -231,7 +180,7 @@ function AppLayoutInner({ children, showNav = true }: AppLayoutProps) {
         <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
         <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
 
-        <AppHeader onScanClick={() => navigate('/scanner')} />
+        <TopHeader />
 
         <main
           className="flex-1 overflow-y-auto"
@@ -240,7 +189,12 @@ function AppLayoutInner({ children, showNav = true }: AppLayoutProps) {
           {children}
         </main>
 
-        {showNav && <BottomNav onProfileClick={() => setProfileOpen(true)} />}
+        {showNav && (
+          <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col bg-white">
+            <BottomNav onProfileClick={() => setProfileOpen(true)} />
+            <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
+          </div>
+        )}
       </div>
     </div>
   );
