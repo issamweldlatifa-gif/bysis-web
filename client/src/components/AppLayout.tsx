@@ -1,7 +1,7 @@
 import { useState, ReactNode } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
-import { Home, Grid3x3, ShoppingCart, User, Search } from 'lucide-react';
+import { Home, Grid3x3, ShoppingCart, User, Search, Menu } from 'lucide-react';
 import AuthGateModal from '@/components/AuthGateModal';
 import ProfileSheet from '@/components/ProfileSheet';
 import { useCart } from '@/contexts/CartContext';
@@ -38,43 +38,62 @@ function GoogleLensIcon() {
   );
 }
 
-/* ── Header: search bar only, full width ────────────────────────────────── */
+/* ── Header: Icons + Logo ────────────────────────────────────────────────────── */
 function AppHeader({ onScanClick }: { onScanClick: () => void }) {
+  const [, navigate] = useLocation();
   const { bgColor } = useBgColor();
 
   return (
     <header
-      className="sticky top-0 z-40 w-full"
-      style={{ background: 'var(--app-bg-color, #cadfe2)' }}
+      className="sticky top-0 z-40 w-full bg-white border-b border-gray-200"
     >
-      {/* Safe-area spacer — fills iOS status bar with the same bg color */}
-      <div style={{ height: 'env(safe-area-inset-top, 0px)', background: 'var(--app-bg-color, #cadfe2)' }} />
-      <div className="w-full px-3 py-2.5">
-        {/* Search bar — full width, white, rounded pill */}
-        <div
-          className="flex items-center gap-2 px-4 bg-white rounded-full"
-          style={{
-            height: '46px',
-            border: '1.5px solid #D0D0D0',
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-          }}
-        >
-          {/* Search icon */}
-          <Search size={20} strokeWidth={2.2} color="#1A1A1A" style={{ flexShrink: 0 }} />
-
-          {/* Placeholder */}
-          <span className="flex-1 text-sm" style={{ color: '#999', userSelect: 'none' }}>
-            Rechercher ou poser une question
-          </span>
-
-          {/* Google Lens button */}
+      {/* Safe-area spacer */}
+      <div style={{ height: 'env(safe-area-inset-top, 0px)', background: '#FFFFFF' }} />
+      
+      {/* Header content */}
+      <div className="w-full px-4 py-3 flex items-center justify-between">
+        {/* Left icons: Home + User */}
+        <div className="flex items-center gap-4">
           <button
-            onClick={onScanClick}
-            className="flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-full hover:bg-gray-100 transition-colors active:scale-90"
-            style={{ border: 'none', background: 'transparent' }}
-            aria-label="Scanner avec Google Lens"
+            onClick={() => navigate('/')}
+            className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
+            aria-label="Accueil"
           >
-            <GoogleLensIcon />
+            <Home size={24} strokeWidth={1.5} color="#1A1A1A" />
+          </button>
+          
+          <button
+            className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
+            aria-label="Profil"
+          >
+            <User size={24} strokeWidth={1.5} color="#1A1A1A" />
+          </button>
+        </div>
+        
+        {/* Center: Logo */}
+        <div className="flex-shrink-0">
+          <img
+            src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_91b2841d.png"
+            alt="Bysis AI"
+            className="w-8 h-8 object-contain"
+          />
+        </div>
+        
+        {/* Right icons: Cart + Menu */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/panier')}
+            className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
+            aria-label="Panier"
+          >
+            <ShoppingCart size={24} strokeWidth={1.5} color="#1A1A1A" />
+          </button>
+          
+          <button
+            className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
+            aria-label="Menu"
+          >
+            <Menu size={24} strokeWidth={1.5} color="#1A1A1A" />
           </button>
         </div>
       </div>
