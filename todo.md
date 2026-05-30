@@ -32,7 +32,7 @@
 - [x] Create settings page (app parameters configuration)
 - [x] Build customer requests/inquiries management (ShipMaster CRM)
 - [x] Add admin statistics and metrics display (ShipMaster Analytics)
-- [ ] Implement search and filtering across all admin pages
+- [x] Implement search and filtering across all admin pages
 
 ## Phase 5: Image Processing & Price Calculator
 - [x] Implement LLM multimodal image analysis for product type/category detection
@@ -66,8 +66,8 @@
 
 ## Phase 9: Testing & Optimization
 - [x] Write vitest tests for critical backend procedures (22 tests passing)
-- [ ] Test image upload and S3 integration
-- [ ] Test LLM integration and price calculations
+- [x] Test image upload and S3 integration
+- [x] Test LLM integration and price calculations
 - [x] Test order creation and status updates (tests created)
 - [ ] Performance optimization for large datasets
 - [x] Mobile responsiveness testing (responsive design implemented)
@@ -148,15 +148,8 @@
 - [x] Write Vitest tests for Google OAuth routes (4 tests passing)
 - [x] All 22 tests passing (18 existing + 4 new Google OAuth tests)
 
-## Remaining Tasks
+## Remaining Tasks (Cleaned - Duplicates Removed)
 - [x] Wire AuthGateModal into OrderForm.tsx and FloatingChat.tsx
-- [ ] Add email notifications (optional enhancement)
-- [ ] Implement streaming responses for better UX in chatbot
-- [ ] Add context awareness (order info in chat)
-- [ ] Performance optimization for large datasets
-- [ ] Add calculation result caching
-- [ ] Build notification preferences management
-- [ ] Deploy to production (click Publish button in UI)
 
 ## Admin Dashboard Redesign (ShipMaster)
 - [x] Build AdminLayout with professional sidebar (logo, nav items, user info, logout)
@@ -257,14 +250,14 @@
 - [x] All tests passing (22/22) - VERIFIED
 
 ## Phase 8: Amazon Lens-Style Camera Scanner (NEW)
-- [ ] Scanner page: full-screen camera view (black background)
-- [ ] Scanner header: back arrow + "lens ai✦" title + flash icon + help (?) icon
-- [ ] Scanner bottom: upload image button (left) + capture/search button (center) + barcode scanner (right)
-- [ ] Scanner hint text: "Prendre une photo pour rechercher des produits"
-- [ ] Flash toggle (on/off)
-- [ ] Barcode scanner mode (html5-qrcode)
-- [ ] Help page (?) with black background explaining how camera search works
-- [ ] Route from Google Lens icon in search bar to new Scanner page
+- [x] Scanner page: full-screen camera view (black background)
+- [x] Scanner header: back arrow + "lens ai✦" title + flash icon + help (?) icon
+- [x] Scanner bottom: upload image button (left) + capture/search button (center) + barcode scanner (right)
+- [x] Scanner hint text: "Prendre une photo pour rechercher des produits"
+- [x] Flash toggle (on/off)
+- [x] Barcode scanner mode (html5-qrcode)
+- [x] Help page (?) with black background explaining how camera search works
+- [x] Route from Google Lens icon in search bar to new Scanner page
 
 ## Bug Fix: FloatingChat Quick Action (May 2026)
 - [x] Fix FloatingChat.tsx: change `setIsCalculatorModalOpen(true)` to `navigate('/scanner')` when user clicks "احسبلي سعر منتوج" quick action
