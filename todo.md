@@ -168,21 +168,21 @@
 - [x] Mobile hamburger menu support
 
 ## Phase: Bottom Nav + Profile Sheet + Panier (May 2026)
-- [ ] Replace bottom nav with 4 tabs: Accueil, Boutiques, Panier, Moi
-- [ ] Add iPhone safe-area-inset-bottom to bottom nav
-- [ ] Build ProfileSheet (Dribbble-style bottom sheet)
-  - [ ] Authenticated: avatar, name, email, Mes Commandes, Suivi, Historique, Déconnexion
-  - [ ] Guest: icon, Se connecter button, Suivre commande
-  - [ ] Dark/Light mode toggle (localStorage persisted)
-  - [ ] Language toggle FR/AR (i18n context, localStorage persisted)
-  - [ ] Termes & Conditions page
-  - [ ] Contacter nous → mailto:Iscof840@gmail.com
-- [ ] Build CartContext (add/remove/clear, persisted in localStorage)
-- [ ] Boutique page: "Ajouter au panier" button on each product
-- [ ] Panier page: list items, quantity control, total price, "Commander" CTA
-- [ ] Commander → pre-fill OrderForm with first cart item
-- [ ] Cart badge count on Panier tab icon
-- [ ] Apply i18n translations to all public pages (FR/AR)
+- [x] Replace bottom nav with 4 tabs: Accueil, Boutiques, Panier, Moi
+- [x] Add iPhone safe-area-inset-bottom to bottom nav
+- [x] Build ProfileSheet (Dribbble-style bottom sheet)
+  - [x] Authenticated: avatar, name, email, Mes Commandes, Suivi, Historique, Déconnexion
+  - [x] Guest: icon, Se connecter button, Suivre commande
+  - [x] Dark/Light mode toggle (localStorage persisted)
+  - [x] Language toggle FR/AR (i18n context, localStorage persisted)
+  - [x] Termes & Conditions page
+  - [x] Contacter nous → mailto:Iscof840@gmail.com
+- [x] Build CartContext (add/remove/clear, persisted in localStorage)
+- [x] Boutique page: "Ajouter au panier" button on each product
+- [x] Panier page: list items, quantity control, total price, "Commander" CTA
+- [x] Commander → pre-fill OrderForm with first cart item
+- [x] Cart badge count on Panier tab icon
+- [x] Apply i18n translations to all public pages (FR/AR)
 
 ## 🎨 Shein-Inspired Redesign (May 2026)
 - [x] Update index.css: Shein color palette (red #E8192C, white #FFFFFF, black #1A1A1A, green #00A650)
