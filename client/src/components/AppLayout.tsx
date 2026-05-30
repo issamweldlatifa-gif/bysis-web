@@ -38,7 +38,7 @@ function GoogleLensIcon() {
   );
 }
 
-/* ── Header: Logo + Search bar ────────────────────────────────────────────── */
+/* ── Header: search bar only, full width ────────────────────────────────── */
 function AppHeader({ onScanClick }: { onScanClick: () => void }) {
   const { bgColor } = useBgColor();
 
@@ -49,29 +49,6 @@ function AppHeader({ onScanClick }: { onScanClick: () => void }) {
     >
       {/* Safe-area spacer — fills iOS status bar with the same bg color */}
       <div style={{ height: 'env(safe-area-inset-top, 0px)', background: 'var(--app-bg-color, #cadfe2)' }} />
-      
-      {/* Logo bar with AI logo + brand colors */}
-      <div className="w-full px-3 py-2 flex items-center gap-2 border-b border-gray-200">
-        {/* AI Logo */}
-        <div className="flex-shrink-0">
-          <img
-            src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_18aa669b.png"
-            alt="Bysis AI"
-            className="w-8 h-8 object-contain"
-          />
-        </div>
-        
-        {/* Brand name with colors - Red, Blue, White */}
-        <div className="flex items-center gap-0.5 flex-shrink-0">
-          <span className="text-sm font-bold" style={{ color: '#FF0000' }}>B</span>
-          <span className="text-sm font-bold" style={{ color: '#0047AB' }}>y</span>
-          <span className="text-sm font-bold" style={{ color: '#FFFFFF', textShadow: '0 0 1px #000' }}>s</span>
-          <span className="text-sm font-bold" style={{ color: '#FF0000' }}>i</span>
-          <span className="text-sm font-bold" style={{ color: '#0047AB' }}>s</span>
-        </div>
-      </div>
-      
-      {/* Search bar */}
       <div className="w-full px-3 py-2.5">
         {/* Search bar — full width, white, rounded pill */}
         <div
