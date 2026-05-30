@@ -32,7 +32,7 @@
 - [x] Create settings page (app parameters configuration)
 - [x] Build customer requests/inquiries management (ShipMaster CRM)
 - [x] Add admin statistics and metrics display (ShipMaster Analytics)
-- [x] Implement search and filtering across all admin pages
+- [ ] Implement search and filtering across all admin pages
 
 ## Phase 5: Image Processing & Price Calculator
 - [x] Implement LLM multimodal image analysis for product type/category detection
@@ -66,8 +66,8 @@
 
 ## Phase 9: Testing & Optimization
 - [x] Write vitest tests for critical backend procedures (22 tests passing)
-- [x] Test image upload and S3 integration
-- [x] Test LLM integration and price calculations
+- [ ] Test image upload and S3 integration
+- [ ] Test LLM integration and price calculations
 - [x] Test order creation and status updates (tests created)
 - [ ] Performance optimization for large datasets
 - [x] Mobile responsiveness testing (responsive design implemented)
@@ -148,8 +148,15 @@
 - [x] Write Vitest tests for Google OAuth routes (4 tests passing)
 - [x] All 22 tests passing (18 existing + 4 new Google OAuth tests)
 
-## Remaining Tasks (Cleaned - Duplicates Removed)
+## Remaining Tasks
 - [x] Wire AuthGateModal into OrderForm.tsx and FloatingChat.tsx
+- [ ] Add email notifications (optional enhancement)
+- [ ] Implement streaming responses for better UX in chatbot
+- [ ] Add context awareness (order info in chat)
+- [ ] Performance optimization for large datasets
+- [ ] Add calculation result caching
+- [ ] Build notification preferences management
+- [ ] Deploy to production (click Publish button in UI)
 
 ## Admin Dashboard Redesign (ShipMaster)
 - [x] Build AdminLayout with professional sidebar (logo, nav items, user info, logout)
@@ -161,21 +168,21 @@
 - [x] Mobile hamburger menu support
 
 ## Phase: Bottom Nav + Profile Sheet + Panier (May 2026)
-- [x] Replace bottom nav with 4 tabs: Accueil, Boutiques, Panier, Moi
-- [x] Add iPhone safe-area-inset-bottom to bottom nav
-- [x] Build ProfileSheet (Dribbble-style bottom sheet)
-  - [x] Authenticated: avatar, name, email, Mes Commandes, Suivi, Historique, Déconnexion
-  - [x] Guest: icon, Se connecter button, Suivre commande
-  - [x] Dark/Light mode toggle (localStorage persisted)
-  - [x] Language toggle FR/AR (i18n context, localStorage persisted)
-  - [x] Termes & Conditions page
-  - [x] Contacter nous → mailto:Iscof840@gmail.com
-- [x] Build CartContext (add/remove/clear, persisted in localStorage)
-- [x] Boutique page: "Ajouter au panier" button on each product
-- [x] Panier page: list items, quantity control, total price, "Commander" CTA
-- [x] Commander → pre-fill OrderForm with first cart item
-- [x] Cart badge count on Panier tab icon
-- [x] Apply i18n translations to all public pages (FR/AR)
+- [ ] Replace bottom nav with 4 tabs: Accueil, Boutiques, Panier, Moi
+- [ ] Add iPhone safe-area-inset-bottom to bottom nav
+- [ ] Build ProfileSheet (Dribbble-style bottom sheet)
+  - [ ] Authenticated: avatar, name, email, Mes Commandes, Suivi, Historique, Déconnexion
+  - [ ] Guest: icon, Se connecter button, Suivre commande
+  - [ ] Dark/Light mode toggle (localStorage persisted)
+  - [ ] Language toggle FR/AR (i18n context, localStorage persisted)
+  - [ ] Termes & Conditions page
+  - [ ] Contacter nous → mailto:Iscof840@gmail.com
+- [ ] Build CartContext (add/remove/clear, persisted in localStorage)
+- [ ] Boutique page: "Ajouter au panier" button on each product
+- [ ] Panier page: list items, quantity control, total price, "Commander" CTA
+- [ ] Commander → pre-fill OrderForm with first cart item
+- [ ] Cart badge count on Panier tab icon
+- [ ] Apply i18n translations to all public pages (FR/AR)
 
 ## 🎨 Shein-Inspired Redesign (May 2026)
 - [x] Update index.css: Shein color palette (red #E8192C, white #FFFFFF, black #1A1A1A, green #00A650)
@@ -250,14 +257,14 @@
 - [x] All tests passing (22/22) - VERIFIED
 
 ## Phase 8: Amazon Lens-Style Camera Scanner (NEW)
-- [x] Scanner page: full-screen camera view (black background)
-- [x] Scanner header: back arrow + "lens ai✦" title + flash icon + help (?) icon
-- [x] Scanner bottom: upload image button (left) + capture/search button (center) + barcode scanner (right)
-- [x] Scanner hint text: "Prendre une photo pour rechercher des produits"
-- [x] Flash toggle (on/off)
-- [x] Barcode scanner mode (html5-qrcode)
-- [x] Help page (?) with black background explaining how camera search works
-- [x] Route from Google Lens icon in search bar to new Scanner page
+- [ ] Scanner page: full-screen camera view (black background)
+- [ ] Scanner header: back arrow + "lens ai✦" title + flash icon + help (?) icon
+- [ ] Scanner bottom: upload image button (left) + capture/search button (center) + barcode scanner (right)
+- [ ] Scanner hint text: "Prendre une photo pour rechercher des produits"
+- [ ] Flash toggle (on/off)
+- [ ] Barcode scanner mode (html5-qrcode)
+- [ ] Help page (?) with black background explaining how camera search works
+- [ ] Route from Google Lens icon in search bar to new Scanner page
 
 ## Bug Fix: FloatingChat Quick Action (May 2026)
 - [x] Fix FloatingChat.tsx: change `setIsCalculatorModalOpen(true)` to `navigate('/scanner')` when user clicks "احسبلي سعر منتوج" quick action
