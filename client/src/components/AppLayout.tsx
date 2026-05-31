@@ -83,8 +83,8 @@ function BottomNav({ onProfileClick }: { onProfileClick: () => void }) {
         borderTop: '1px solid #E5E5E5',
       }}
     >
-      <div className="flex items-center justify-between px-4 py-3">
-        {/* Left: Home icon */}
+      <div className="flex items-center justify-around px-4 py-3 gap-2">
+        {/* Home icon */}
         <motion.button
           whileTap={{ scale: 0.90 }}
           onClick={() => navigate('/')}
@@ -94,7 +94,7 @@ function BottomNav({ onProfileClick }: { onProfileClick: () => void }) {
           <Home size={24} strokeWidth={1.5} color="#1A1A1A" />
         </motion.button>
 
-        {/* Center-left: User icon */}
+        {/* User icon */}
         <motion.button
           whileTap={{ scale: 0.90 }}
           onClick={onProfileClick}
@@ -104,7 +104,7 @@ function BottomNav({ onProfileClick }: { onProfileClick: () => void }) {
           <User size={24} strokeWidth={1.5} color="#1A1A1A" />
         </motion.button>
 
-        {/* Center: Cart with badge */}
+        {/* Cart with badge */}
         <motion.button
           whileTap={{ scale: 0.90 }}
           onClick={() => navigate('/panier')}
@@ -119,7 +119,7 @@ function BottomNav({ onProfileClick }: { onProfileClick: () => void }) {
           )}
         </motion.button>
 
-        {/* Center-right: Menu icon */}
+        {/* Menu icon */}
         <motion.button
           whileTap={{ scale: 0.90 }}
           className="flex items-center justify-center w-8 h-8 hover:bg-gray-100 rounded transition-colors"
@@ -128,11 +128,11 @@ function BottomNav({ onProfileClick }: { onProfileClick: () => void }) {
           <Menu size={24} strokeWidth={1.5} color="#1A1A1A" />
         </motion.button>
 
-        {/* Right: Logo Bysis */}
+        {/* Logo Bysis */}
         <img
           src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_1887f3fe.png"
           alt="Bysis"
-          className="w-6 h-6 object-contain ml-auto"
+          className="w-6 h-6 object-contain"
         />
       </div>
     </motion.nav>
