@@ -42,7 +42,7 @@ function HomeContent() {
       {/* SECTION BELOW */}
       <section className="w-full py-10 px-5 text-center bg-white">
         <h2 style={{ fontSize: '1.4rem', fontWeight: 700, color: '#1A1A1A', marginBottom: '0.5rem' }}>
-          Pourquoi choisir Bysis?
+          Pourquoi choisir Bysis
         </h2>
         <p style={{ fontSize: '0.9rem', color: '#666', lineHeight: 1.6 }}>
           Votre partenaire de confiance pour vos achats en ligne

@@ -130,7 +130,7 @@ function BottomNav({ onProfileClick }: { onProfileClick: () => void }) {
 
         {/* Right: Logo Bysis */}
         <img
-          src="/manus-storage/IMG_7134_d4e5f6g7.png"
+          src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_1887f3fe.png"
           alt="Bysis"
           className="w-6 h-6 object-contain ml-auto"
         />
