@@ -128,10 +128,10 @@ function BottomNav({ onProfileClick }: { onProfileClick: () => void }) {
           <Menu size={24} strokeWidth={1.5} color="#1A1A1A" />
         </motion.button>
 
-        {/* Logo Bysis */}
+        {/* Logo Bysis AI */}
         <img
-          src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_1887f3fe.png"
-          alt="Bysis"
+          src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_7e8b089f.png"
+          alt="Bysis AI"
           className="w-6 h-6 object-contain"
         />
       </div>
@@ -143,6 +143,7 @@ function BottomNav({ onProfileClick }: { onProfileClick: () => void }) {
 function AppLayoutInner({ children, showNav = true }: AppLayoutProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const [authOpen, setAuthOpen]       = useState(false);
+  const [chatOpen, setChatOpen]       = useState(false);
   const { bgColor }                   = useBgColor();
   const [, navigate]                  = useLocation();
   const { theme }                     = useTheme();
@@ -194,6 +195,75 @@ function AppLayoutInner({ children, showNav = true }: AppLayoutProps) {
             <BottomNav onProfileClick={() => setProfileOpen(true)} />
             <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
           </div>
+        )}
+
+        {/* Floating Chat Button */}
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setChatOpen(!chatOpen)}
+          className="fixed z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-shadow"
+          style={{
+            bottom: `calc(env(safe-area-inset-bottom, 0px) + 90px)`,
+            right: '20px',
+            background: '#000000',
+          }}
+          aria-label="Chat"
+        >
+          <img
+            src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_7e8b089f.png"
+            alt="Bysis AI Chat"
+            className="w-7 h-7 object-contain"
+          />
+        </motion.button>
+
+        {/* Chat Window */}
+        {chatOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="fixed z-50 bottom-24 right-4 w-80 h-96 bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            style={{
+              bottom: `calc(env(safe-area-inset-bottom, 0px) + 100px)`,
+            }}
+          >
+            {/* Chat Header */}
+            <div className="bg-black text-white p-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <img
+                  src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_7e8b089f.png"
+                  alt="Bysis AI"
+                  className="w-5 h-5 object-contain"
+                />
+                <h3 className="font-semibold text-sm">Bysis AI</h3>
+              </div>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setChatOpen(false)}
+                className="text-white hover:bg-gray-700 rounded p-1 transition-colors"
+              >
+                ✕
+              </motion.button>
+            </div>
+
+            {/* Chat Content */}
+            <div className="flex-1 overflow-y-auto p-4 flex items-center justify-center text-gray-500 text-sm text-center">
+              <p>Bienvenue! Comment puis-je vous aider?</p>
+            </div>
+
+            {/* Chat Input */}
+            <div className="p-4 border-t border-gray-200">
+              <input
+                type="text"
+                placeholder="Écrivez votre message..."
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              />
+            </div>
+          </motion.div>
         )}
       </div>
     </div>
