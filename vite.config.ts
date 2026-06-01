@@ -167,6 +167,44 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Performance optimizations
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          // Vendor chunks
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) return 'vendor-react';
+            if (id.includes('@radix-ui')) return 'vendor-ui';
+            if (id.includes('framer-motion')) return 'vendor-animation';
+            if (id.includes('@trpc')) return 'vendor-trpc';
+            if (id.includes('zod') || id.includes('superjson')) return 'vendor-utils';
+            return 'vendor';
+          }
+        },
+            // Optimize chunk names
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        // Optimize asset names
+        assetFileNames: 'assets/[name]-[hash][extname]',
+      },
+    },
+    // Increase chunk size warning limit
+    chunkSizeWarningLimit: 2000,
+    // CSS code splitting
+    cssCodeSplit: true,
+    // Source maps only in dev
+    sourcemap: false,
+    // Optimize for production
+    target: 'esnext',
+    // Reduce initial load
+    reportCompressedSize: false,
   },
   server: {
     host: true,
@@ -183,5 +221,25 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    // Optimize dev server
+    middlewareMode: false,
+    hmr: {
+      protocol: 'wss',
+      host: 'localhost',
+      port: 5173,
+    },
+  },
+  // Optimize dependencies
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'framer-motion',
+      '@trpc/client',
+      '@trpc/react-query',
+    ],
+  },
+  define: {
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   },
 });

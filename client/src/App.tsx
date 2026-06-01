@@ -7,7 +7,7 @@ import { Route, Switch, useLocation } from "wouter";
 import { AnimatePresence } from "framer-motion";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import AIChat from "./components/AIChat";
+// AIChat is lazy loaded below
 
 // Context to allow any page to open AIChat
 export const ChatContext = createContext<{ openChat: () => void }>({ openChat: () => {} });
@@ -35,6 +35,9 @@ const ShipMasterDashboard = lazy(() => import("./pages/ShipMasterDashboard"));
 const Parametres = lazy(() => import("./pages/Parametres"));
 const Panier = lazy(() => import("./pages/Panier"));
 const Scanner = lazy(() => import("./pages/Scanner"));
+
+// Lazy load AIChat (only loaded when needed)
+const AIChatLazy = lazy(() => import("./components/AIChat"));
 
 // Import LoadingScreen
 import LoadingScreen from "./components/LoadingScreen";
@@ -76,7 +79,11 @@ function Router() {
 }
 
 function AIChatWrapper({ chatOpen, setChatOpen }: { chatOpen: boolean; setChatOpen: (v: boolean) => void }) {
-  return <AIChat isOpen={chatOpen} onClose={() => setChatOpen(false)} />;
+  return (
+    <Suspense fallback={null}>
+      <AIChatLazy isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+    </Suspense>
+  );
 }
 
 function App() {
