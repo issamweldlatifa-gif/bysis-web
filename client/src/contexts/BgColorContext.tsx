@@ -1,30 +1,39 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 interface BgColorContextType {
   bgColor: string;
   setBgColor: (color: string) => void;
+  /** Raw carousel color — used by header to match carousel */
+  carouselColor: string;
+  setCarouselColor: (color: string) => void;
 }
 
 const BgColorContext = createContext<BgColorContextType>({
-  bgColor: '#cadfe2',
+  bgColor: '#ffffff',
   setBgColor: () => {},
+  carouselColor: '#f5c518',
+  setCarouselColor: () => {},
 });
 
 export function BgColorProvider({ children }: { children: ReactNode }) {
-  const [bgColor, setBgColor] = useState('#cadfe2');
+  const [bgColor, setBgColorState] = useState('#ffffff');
+  const [carouselColor, setCarouselColorState] = useState('#f5c518');
 
-  // Update meta theme-color AND html CSS variable dynamically
-  const setColorAndMeta = (color: string) => {
-    setBgColor(color);
-    // Update meta theme-color for iOS status bar in Safari
+  const setBgColor = useCallback((color: string) => {
+    setBgColorState(color);
+    document.documentElement.style.setProperty('--app-bg-color', color);
+  }, []);
+
+  const setCarouselColor = useCallback((color: string) => {
+    setCarouselColorState(color);
+    // Update meta theme-color for iOS status bar
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', color);
-    // Update CSS variable on html element so background extends into safe-area
-    document.documentElement.style.setProperty('--app-bg-color', color);
-  };
+    document.documentElement.style.setProperty('--carousel-color', color);
+  }, []);
 
   return (
-    <BgColorContext.Provider value={{ bgColor, setBgColor: setColorAndMeta }}>
+    <BgColorContext.Provider value={{ bgColor, setBgColor, carouselColor, setCarouselColor }}>
       {children}
     </BgColorContext.Provider>
   );

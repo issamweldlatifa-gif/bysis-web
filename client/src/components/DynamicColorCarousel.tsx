@@ -32,6 +32,8 @@ export interface CarouselCard {
 
 interface DynamicColorCarouselProps {
   slides: CarouselSlide[];
+  /** Called on every scroll frame with the interpolated hex color */
+  onColorChange?: (color: string) => void;
 }
 
 /* ── Color helpers ─────────────────────────────────────────────────────────── */
@@ -61,7 +63,7 @@ function isLight(hex: string): boolean {
 }
 
 /* ── Component ─────────────────────────────────────────────────────────────── */
-export default function DynamicColorCarousel({ slides }: DynamicColorCarouselProps) {
+export default function DynamicColorCarousel({ slides, onColorChange }: DynamicColorCarouselProps) {
   const [heroBg, setHeroBg] = useState(slides[0]?.color ?? '#f5c518');
   const [activeIndex, setActiveIndex] = useState(0);
   const rafRef = useRef<number | null>(null);
@@ -92,6 +94,7 @@ export default function DynamicColorCarousel({ slides }: DynamicColorCarouselPro
 
     const color = lerpColor(slides[from].color, slides[to].color, t);
     setHeroBg(color);
+    onColorChange?.(color);
     setActiveIndex(emblaApi.selectedScrollSnap());
   }, [emblaApi, slides]);
 
@@ -99,6 +102,7 @@ export default function DynamicColorCarousel({ slides }: DynamicColorCarouselPro
     if (!emblaApi) return;
 
     setHeroBg(slides[0]?.color ?? '#f5c518');
+    onColorChange?.(slides[0]?.color ?? '#f5c518');
 
     const onScroll = () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -115,7 +119,7 @@ export default function DynamicColorCarousel({ slides }: DynamicColorCarouselPro
       emblaApi.off('select', syncColor);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [emblaApi, syncColor, slides]);
+  }, [emblaApi, syncColor, slides, onColorChange]);
 
   if (slides.length === 0) return null;
 

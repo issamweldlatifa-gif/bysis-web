@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { useBgColor } from '@/contexts/BgColorContext';
 import { useLocation } from 'wouter';
@@ -70,19 +69,17 @@ const FEATURES = [
 
 /* ── Home Component ───────────────────────────────────────────────────────── */
 function HomeContent() {
-  const { setBgColor } = useBgColor();
+  const { setCarouselColor } = useBgColor();
   const [, navigate] = useLocation();
   const { openChat } = useChatContext();
-
-  // Reset page background to white — hero handles its own color
-  useEffect(() => {
-    setBgColor('#ffffff');
-  }, [setBgColor]);
 
   return (
     <div className="w-full bg-white">
       {/* ── HERO CAROUSEL — color changes here only ─────────────────────── */}
-      <DynamicColorCarousel slides={CAROUSEL_SLIDES} />
+      <DynamicColorCarousel
+        slides={CAROUSEL_SLIDES}
+        onColorChange={setCarouselColor}
+      />
 
       {/* ── QUICK ACTIONS — white background ───────────────────────────── */}
       <section className="w-full px-4 py-4 bg-white">

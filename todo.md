@@ -312,3 +312,22 @@
 - [x] AppLayout: الخلفية بيضاء ثابتة (فقط Hero يتغير لونه)
 - [x] AIChat History Panel: Settings Panel + History Panel + Clear History
 - [x] Performance: code splitting + lazy loading + vite optimizations (كل شيء مُحسَّن)
+
+## 🎨 Advanced UX (June 2026 - v2)
+- [ ] Header شفاف يجلس فوق Carousel (لا قبله)
+- [ ] لون الـ Carousel يمتد خلف الـ header وحتى status bar
+- [ ] عند السكرول للأسفل: header يتحول أبيض تدريجياً
+- [ ] عند الرجوع للأعلى: header يرجع للون الـ Carousel
+- [ ] FAB (Bysis AI button) يختفي عند السكرول للأسفل
+- [ ] FAB يرجع فوراً عند أي سكرول للأعلى ولو بمقدار صغير
+- [ ] Chatbot كـ Bottom Sheet (نصف الشاشة) مع header صحيح
+- [ ] Color Extractor: tRPC procedure يستخرج اللون المسيطر من أي صورة
+- [ ] Color Extractor: يُستخدم تلقائياً عند رفع صورة جديدة للـ Carousel
+
+## 🎨 Advanced UX - Amazon-Style (June 2026)
+- [x] Header يتلون مع الـ Carousel (fade من لون الـ carousel إلى أبيض عند السكرول)
+- [x] Status bar (meta theme-color) تتبع لون الـ carousel
+- [x] FAB يختفي عند السكرول للأسفل ويرجع عند السكرول للأعلى
+- [x] Color Extractor utility (k-means clustering + React hook useDominantColor)
+- [x] BgColorContext: إضافة carouselColor منفصل عن bgColor
+- [x] DynamicColorCarousel: onColorChange callback لتمرير اللون للـ header
