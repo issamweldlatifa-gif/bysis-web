@@ -282,3 +282,12 @@
 - [x] Back button in each panel to navigate back
 - [x] Input area only visible in chat view
 - [x] TypeScript errors: 0, Tests: 22/22
+
+## 🎨 Dynamic Color Carousel - Amazon Style (Jun 2026)
+- [x] DynamicColorCarousel component with Embla Carousel
+- [x] Color interpolation between slides on scroll (lerpColor)
+- [x] 4 slides with uploaded images (red, blue, green, teal)
+- [x] Dot indicators that change color with active slide
+- [x] Quick Actions and Bysis AI banner below carousel
+- [x] Background color lightened by 25% for softer feel
+- [x] Glassmorphism effect on Quick Actions and Features sections

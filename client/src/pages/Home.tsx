@@ -1,12 +1,37 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { useBgColor } from '@/contexts/BgColorContext';
-import { useImageColor } from '@/hooks/useImageColor';
 import { useLocation } from 'wouter';
 import { useChatContext } from '@/App';
+import DynamicColorCarousel, { CarouselSlide } from '@/components/DynamicColorCarousel';
 
-const HERO_IMG = '/manus-storage/BluePlayfulTypographicComingSoonFashionPoster-1_a27baff4.png';
-const HERO_BG_COLOR = '#cadfe2';
+/* ── Carousel Slides — 4 sections with their dominant colors ─────────────── */
+const CAROUSEL_SLIDES: CarouselSlide[] = [
+  {
+    image: '/manus-storage/section-red_be523b8d.png',
+    color: '#ff3131',
+    title: 'Nouvelle Collection',
+    subtitle: 'Découvrez les dernières tendances',
+  },
+  {
+    image: '/manus-storage/section-blue_063dba4e.png',
+    color: '#003087',
+    title: 'Ventes Flash',
+    subtitle: 'Offres limitées — jusqu\'à -70%',
+  },
+  {
+    image: '/manus-storage/section-green_a71d002e.png',
+    color: '#c1ff72',
+    title: 'Arrivages Frais',
+    subtitle: 'Produits tout juste arrivés',
+  },
+  {
+    image: '/manus-storage/section-teal_a23365db.png',
+    color: '#0097b2',
+    title: 'Nos Best-Sellers',
+    subtitle: 'Les favoris de nos clients',
+  },
+];
 
 /* ── Feature Cards ─────────────────────────────────────────────────────────── */
 const FEATURES = [
@@ -30,48 +55,43 @@ function HomeContent() {
   const [, navigate] = useLocation();
   const { openChat } = useChatContext();
 
+  // Set initial background to first slide's color (lightened)
   useEffect(() => {
-    setBgColor(HERO_BG_COLOR);
+    setBgColor('#ffa8a8'); // lightened version of #ff3131
   }, [setBgColor]);
-
-  const handleColor = useCallback((hex: string) => {
-    setBgColor(hex);
-  }, [setBgColor]);
-
-  useImageColor(HERO_IMG, handleColor);
 
   return (
-    <div className="w-full bg-white">
-      {/* HERO IMAGE — optimized */}
-      <div className="w-full relative" style={{ aspectRatio: '3/4', maxHeight: '50vh', overflow: 'hidden', background: HERO_BG_COLOR }}>
-        <img
-          src={HERO_IMG}
-          alt="Bysis - Nouvelle Collection"
-          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-          loading="eager"
-          decoding="async"
-          crossOrigin="anonymous"
-        />
-      </div>
+    <div className="w-full">
+      {/* ── DYNAMIC COLOR CAROUSEL ─────────────────────────────────────────── */}
+      <DynamicColorCarousel
+        slides={CAROUSEL_SLIDES}
+        slideHeight="340px"
+        sectionTitle=""
+      />
 
-      {/* QUICK ACTIONS */}
-      <section className="w-full px-4 py-4 bg-white">
-        <div className="grid grid-cols-4 gap-2">
-          {QUICK_ACTIONS.map((action) => (
-            <button
-              key={action.path}
-              onClick={() => navigate(action.path)}
-              className="flex flex-col items-center gap-1 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 active:scale-95 transition-all"
-            >
-              <span className="text-2xl">{action.icon}</span>
-              <span className="text-xs font-medium text-gray-700">{action.label}</span>
-            </button>
-          ))}
+      {/* ── QUICK ACTIONS ──────────────────────────────────────────────────── */}
+      <section className="w-full px-4 py-4 mx-2">
+        <div
+          className="rounded-2xl p-3"
+          style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(12px)' }}
+        >
+          <div className="grid grid-cols-4 gap-2">
+            {QUICK_ACTIONS.map((action) => (
+              <button
+                key={action.path}
+                onClick={() => navigate(action.path)}
+                className="flex flex-col items-center gap-1 p-3 rounded-xl hover:bg-white/60 active:scale-95 transition-all"
+              >
+                <span className="text-2xl">{action.icon}</span>
+                <span className="text-xs font-medium text-gray-800">{action.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* BYSIS AI BANNER */}
-      <section className="mx-4 my-3 rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #1A1A1A 0%, #333 100%)' }}>
+      {/* ── BYSIS AI BANNER ────────────────────────────────────────────────── */}
+      <section className="mx-4 my-2 rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg, #1A1A1A 0%, #333 100%)' }}>
         <button
           onClick={openChat}
           className="w-full p-4 flex items-center gap-3 text-left"
@@ -89,17 +109,22 @@ function HomeContent() {
         </button>
       </section>
 
-      {/* WHY BYSIS */}
-      <section className="w-full px-4 py-4 bg-white">
+      {/* ── WHY BYSIS ──────────────────────────────────────────────────────── */}
+      <section className="w-full px-4 py-4">
         <h2 className="text-lg font-bold text-gray-900 mb-3">Pourquoi choisir Bysis ?</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {FEATURES.map((f) => (
-            <div key={f.title} className="p-3 rounded-xl border border-gray-100 bg-gray-50">
-              <div className="text-2xl mb-1">{f.icon}</div>
-              <div className="text-sm font-semibold text-gray-800">{f.title}</div>
-              <div className="text-xs text-gray-500 mt-0.5">{f.desc}</div>
-            </div>
-          ))}
+        <div
+          className="rounded-2xl p-3"
+          style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(12px)' }}
+        >
+          <div className="grid grid-cols-2 gap-3">
+            {FEATURES.map((f) => (
+              <div key={f.title} className="p-3 rounded-xl bg-white/60">
+                <div className="text-2xl mb-1">{f.icon}</div>
+                <div className="text-sm font-semibold text-gray-800">{f.title}</div>
+                <div className="text-xs text-gray-500 mt-0.5">{f.desc}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
