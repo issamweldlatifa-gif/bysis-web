@@ -8,6 +8,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useI18n } from '@/contexts/I18nContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { BgColorProvider, useBgColor } from '@/contexts/BgColorContext';
+import { useChatContext } from '@/App';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -154,6 +155,8 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
   const [, navigate]                  = useLocation();
   const { theme }                     = useTheme();
   const isDark                        = theme === 'dark';
+  const { openChat }                  = useChatContext();
+  const handleChatOpen                = onChatOpen ?? openChat;
 
   const pageBg = isDark ? '#0D0D0F' : 'var(--app-bg-color, #cadfe2)';
 
@@ -200,7 +203,7 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
           <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col bg-white">
             <BottomNav 
               onProfileClick={() => setProfileOpen(true)}
-              onAIChatClick={onChatOpen}
+              onAIChatClick={handleChatOpen}
             />
             <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
           </div>
