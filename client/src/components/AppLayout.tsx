@@ -15,6 +15,7 @@ interface AppLayoutProps {
   children: ReactNode;
   showNav?: boolean;
   onChatOpen?: () => void;
+  onHeaderColorChange?: (color: string) => void;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -124,14 +125,21 @@ function IcoAI({ size = 22 }: { size?: number }) {
 interface TopHeaderProps {
   chatVisible: boolean;
   onChatClick: () => void;
+  headerBgColor?: string;
 }
 
-function TopHeader({ chatVisible, onChatClick }: TopHeaderProps) {
+function TopHeader({ chatVisible, onChatClick, headerBgColor = '#FFFFFF' }: TopHeaderProps) {
   const [, navigate] = useLocation();
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white" style={{ borderBottom: '1px solid #F0F0F0' }}>
-      <div style={{ height: 'env(safe-area-inset-top, 0px)', background: '#FFFFFF' }} />
+    <header
+      className="sticky top-0 z-40 w-full transition-colors duration-500"
+      style={{
+        background: headerBgColor,
+        borderBottom: '1px solid rgba(0,0,0,0.06)',
+      }}
+    >
+      <div style={{ height: 'env(safe-area-inset-top, 0px)', background: headerBgColor }} />
       <div className="w-full px-3 py-2.5 flex items-center gap-2">
         {/* Search bar */}
         <button
@@ -140,7 +148,7 @@ function TopHeader({ chatVisible, onChatClick }: TopHeaderProps) {
           style={{ minHeight: 40 }}
         >
           <IcoSearch />
-          <span className="flex-1 text-sm text-gray-400 text-left select-none">
+          <span className="flex-1 text-sm text-left select-none" style={{ color: headerBgColor === '#FFFFFF' ? '#9CA3AF' : 'rgba(255,255,255,0.6)' }}>
             Rechercher ou poser une question
           </span>
           <AnimatePresence mode="popLayout">
@@ -276,6 +284,7 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
   const [profileOpen, setProfileOpen] = useState(false);
   const [authOpen,    setAuthOpen]    = useState(false);
   const [navVisible,  setNavVisible]  = useState(true);
+  const [headerBgColor, setHeaderBgColor] = useState('#FFFFFF');
 
   const { openChat }   = useChatContext();
   const handleChatOpen = onChatOpen ?? openChat;
@@ -312,13 +321,14 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
       <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
       <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
 
-      <TopHeader chatVisible={navVisible} onChatClick={handleChatOpen} />
+      <TopHeader chatVisible={navVisible} onChatClick={handleChatOpen} headerBgColor={headerBgColor} />
 
       <main
         ref={mainRef}
         className="flex-1 overflow-y-auto bg-white"
         style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
       >
+        {/* Wrap children to inject header color setter */}
         {children}
       </main>
 
