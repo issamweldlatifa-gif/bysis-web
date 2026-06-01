@@ -347,3 +347,15 @@
 - [x] لون Hero فقط (ليس الصفحة كلها)
 - [x] Color Extractor utility (k-means clustering + useDominantColor hook)
 - [x] BgColorContext: carouselColor منفصل عن bgColor
+
+## ✅ Bottom Nav + ProfileSheet + Panier (June 2026 - COMPLETED)
+- [x] Bottom Nav: 4 tabs (Accueil/Boutiques/Panier/Moi) with labels + active state
+- [x] iPhone safe-area-inset-bottom in Bottom Nav
+- [x] ProfileSheet: auth/guest states + dark/light toggle + FR/AR toggle + Terms + Contact
+- [x] CartContext: add/remove/updateQuantity/clear + localStorage persistence
+- [x] Arrivage page: "Ajouter au panier" button on each product
+- [x] Panier page: list items + quantity control + total price + Commander CTA
+- [x] Cart badge count on Panier tab icon
+- [x] I18nContext: FR/AR translations (nav, profile, cart, general)
+- [x] Scanner page: Amazon Lens-style with flash + barcode + help page
+- [x] Home.tsx: Quick Actions with colored icons + Boutiques section

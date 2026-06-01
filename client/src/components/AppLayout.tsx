@@ -8,11 +8,11 @@
  * 3. Bottom Nav hides on scroll-down, shows on scroll-up (same as chatbot button).
  * 4. BoutiqueMenu slides in from the left.
  * 5. The carousel hero area handles its own color — the header stays white.
+ * 6. Bottom Nav: 4 tabs (Accueil, Boutiques, Panier, Moi) with labels + active state.
  */
 import { useState, useRef, useCallback, useEffect, ReactNode } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Home, ShoppingCart, User, Menu } from 'lucide-react';
 import AuthGateModal from '@/components/AuthGateModal';
 import ProfileSheet from '@/components/ProfileSheet';
 import BoutiqueMenu from '@/components/BoutiqueMenu';
@@ -37,9 +37,100 @@ function BysisAIIcon({ size = 22 }: { size?: number }) {
   );
 }
 
+/* ── Bottom Nav Icons ───────────────────────────────────────────────────────── */
+function IconHome({ active }: { active: boolean }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M3 9.5L12 3L21 9.5V20C21 20.5523 20.5523 21 20 21H15V15H9V21H4C3.44772 21 3 20.5523 3 20V9.5Z"
+        fill={active ? '#0A0A0A' : 'none'}
+        stroke={active ? '#0A0A0A' : '#888'}
+        strokeWidth={active ? '0' : '1.8'}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function IconGrid({ active }: { active: boolean }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <rect x="3" y="3" width="8" height="8" rx="1.5"
+        fill={active ? '#0A0A0A' : 'none'}
+        stroke={active ? '#0A0A0A' : '#888'}
+        strokeWidth={active ? '0' : '1.8'}
+      />
+      <rect x="13" y="3" width="8" height="8" rx="1.5"
+        fill={active ? '#0A0A0A' : 'none'}
+        stroke={active ? '#0A0A0A' : '#888'}
+        strokeWidth={active ? '0' : '1.8'}
+      />
+      <rect x="3" y="13" width="8" height="8" rx="1.5"
+        fill={active ? '#0A0A0A' : 'none'}
+        stroke={active ? '#0A0A0A' : '#888'}
+        strokeWidth={active ? '0' : '1.8'}
+      />
+      <rect x="13" y="13" width="8" height="8" rx="1.5"
+        fill={active ? '#0A0A0A' : 'none'}
+        stroke={active ? '#0A0A0A' : '#888'}
+        strokeWidth={active ? '0' : '1.8'}
+      />
+    </svg>
+  );
+}
+
+function IconCart({ active, badge }: { active: boolean; badge?: number }) {
+  return (
+    <div className="relative">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
+          fill={active ? '#0A0A0A' : 'none'}
+          stroke={active ? '#0A0A0A' : '#888'}
+          strokeWidth={active ? '0' : '1.8'}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {!active && <line x1="3" y1="6" x2="21" y2="6" stroke="#888" strokeWidth="1.8" />}
+        {!active && <path d="M16 10a4 4 0 01-8 0" stroke="#888" strokeWidth="1.8" strokeLinecap="round" />}
+        {active && <line x1="3" y1="6" x2="21" y2="6" stroke="white" strokeWidth="1.8" />}
+        {active && <path d="M16 10a4 4 0 01-8 0" stroke="white" strokeWidth="1.8" strokeLinecap="round" />}
+      </svg>
+      {badge !== undefined && badge > 0 && (
+        <span
+          className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full text-white text-[10px] font-bold flex items-center justify-center"
+          style={{ background: '#E8192C', minWidth: '18px', minHeight: '18px', padding: '0 3px', lineHeight: 1 }}
+        >
+          {badge > 9 ? '9+' : badge}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function IconUser({ active }: { active: boolean }) {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <circle
+        cx="12" cy="8" r="4"
+        fill={active ? '#0A0A0A' : 'none'}
+        stroke={active ? '#0A0A0A' : '#888'}
+        strokeWidth={active ? '0' : '1.8'}
+      />
+      <path
+        d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
+        fill={active ? '#0A0A0A' : 'none'}
+        stroke={active ? '#0A0A0A' : '#888'}
+        strokeWidth={active ? '0' : '1.8'}
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 /* ── Top Header ────────────────────────────────────────────────────────────── */
 interface TopHeaderProps {
-  /** Whether the chatbot icon should be visible (hides on scroll-down) */
   chatVisible: boolean;
   onChatClick: () => void;
 }
@@ -122,9 +213,30 @@ interface BottomNavProps {
   visible: boolean;
 }
 
-function BottomNav({ onProfileClick, onMenuClick, visible }: BottomNavProps) {
-  const [, navigate] = useLocation();
+const NAV_TABS = [
+  { id: 'home',     path: '/',        label: 'Accueil' },
+  { id: 'boutique', path: '/arrivage', label: 'Boutiques' },
+  { id: 'panier',   path: '/panier',  label: 'Panier' },
+  { id: 'moi',      path: null,       label: 'Moi' },
+] as const;
+
+function BottomNav({ onProfileClick, onMenuClick: _onMenuClick, visible }: BottomNavProps) {
+  const [location, navigate] = useLocation();
   const { totalItems } = useCart();
+
+  const isActive = (path: string | null) => {
+    if (path === null) return false;
+    if (path === '/') return location === '/';
+    return location.startsWith(path);
+  };
+
+  const handleTab = (tab: typeof NAV_TABS[number]) => {
+    if (tab.id === 'moi') {
+      onProfileClick();
+    } else if (tab.path) {
+      navigate(tab.path);
+    }
+  };
 
   return (
     <motion.div
@@ -133,51 +245,34 @@ function BottomNav({ onProfileClick, onMenuClick, visible }: BottomNavProps) {
       animate={{ y: visible ? 0 : '100%' }}
       transition={{ type: 'spring', stiffness: 400, damping: 38, mass: 0.8 }}
     >
-      <div className="flex items-center justify-around px-4 py-3 gap-2">
-        {/* Home */}
-        <motion.button
-          whileTap={{ scale: 0.88 }}
-          onClick={() => navigate('/')}
-          className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-100 transition-colors"
-          aria-label="Accueil"
-        >
-          <Home size={24} strokeWidth={1.6} color="#1A1A1A" />
-        </motion.button>
+      <div className="flex items-stretch justify-around px-2 pt-2 pb-1 gap-1">
+        {NAV_TABS.map((tab) => {
+          const active = tab.id === 'moi' ? false : isActive(tab.path);
+          return (
+            <motion.button
+              key={tab.id}
+              whileTap={{ scale: 0.88 }}
+              onClick={() => handleTab(tab)}
+              className="flex flex-col items-center justify-center flex-1 py-1.5 rounded-xl gap-1 transition-colors"
+              style={{ minHeight: 52 }}
+              aria-label={tab.label}
+            >
+              {/* Icon */}
+              {tab.id === 'home' && <IconHome active={active} />}
+              {tab.id === 'boutique' && <IconGrid active={active} />}
+              {tab.id === 'panier' && <IconCart active={active} badge={totalItems} />}
+              {tab.id === 'moi' && <IconUser active={active} />}
 
-        {/* Profile */}
-        <motion.button
-          whileTap={{ scale: 0.88 }}
-          onClick={onProfileClick}
-          className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-100 transition-colors"
-          aria-label="Profil"
-        >
-          <User size={24} strokeWidth={1.6} color="#1A1A1A" />
-        </motion.button>
-
-        {/* Cart */}
-        <motion.button
-          whileTap={{ scale: 0.88 }}
-          onClick={() => navigate('/panier')}
-          className="relative flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-100 transition-colors"
-          aria-label="Panier"
-        >
-          <ShoppingCart size={24} strokeWidth={1.6} color="#1A1A1A" />
-          {totalItems > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
-              {totalItems > 9 ? '9+' : totalItems}
-            </span>
-          )}
-        </motion.button>
-
-        {/* Hamburger Menu */}
-        <motion.button
-          whileTap={{ scale: 0.88 }}
-          onClick={onMenuClick}
-          className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-gray-100 transition-colors"
-          aria-label="Menu"
-        >
-          <Menu size={24} strokeWidth={1.6} color="#1A1A1A" />
-        </motion.button>
+              {/* Label */}
+              <span
+                className="text-[10px] font-semibold leading-none"
+                style={{ color: active ? '#0A0A0A' : '#888888' }}
+              >
+                {tab.label}
+              </span>
+            </motion.button>
+          );
+        })}
       </div>
       {/* Safe area bottom */}
       <div style={{ height: 'env(safe-area-inset-bottom, 0px)', background: '#FFFFFF' }} />
@@ -189,7 +284,6 @@ function BottomNav({ onProfileClick, onMenuClick, visible }: BottomNavProps) {
 function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps) {
   const [profileOpen, setProfileOpen] = useState(false);
   const [authOpen, setAuthOpen]       = useState(false);
-  const [menuOpen, setMenuOpen]       = useState(false);
 
   // Both chatbot icon and bottom nav hide/show together on scroll
   const [navVisible, setNavVisible]   = useState(true);
@@ -234,7 +328,6 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
     >
       <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
       <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
-      <BoutiqueMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
 
       {/* ── White sticky header with chatbot icon inside search bar ── */}
       <TopHeader chatVisible={navVisible} onChatClick={handleChatOpen} />
@@ -252,7 +345,6 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
       {showNav && (
         <BottomNav
           onProfileClick={() => setProfileOpen(true)}
-          onMenuClick={() => setMenuOpen(true)}
           visible={navVisible}
         />
       )}
