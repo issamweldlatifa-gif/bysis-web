@@ -1,21 +1,12 @@
 /**
- * AppLayout — Main app shell (Amazon-style)
- *
- * Key behaviors:
- * 1. TopHeader is WHITE always — never changes color.
- * 2. Chatbot button (colored dots icon) lives INSIDE the search bar on the right.
- *    It disappears when user scrolls down, reappears on scroll up.
- * 3. Bottom Nav hides on scroll-down, shows on scroll-up (same as chatbot button).
- * 4. BoutiqueMenu slides in from the left.
- * 5. The carousel hero area handles its own color — the header stays white.
- * 6. Bottom Nav: 4 tabs (Accueil, Boutiques, Panier, Moi) with labels + active state.
+ * AppLayout — Main app shell
+ * All icons: clean Outline / Line-Art style, stroke 1.8px, Lucide-compatible
  */
 import { useState, useRef, useCallback, useEffect, ReactNode } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import AuthGateModal from '@/components/AuthGateModal';
 import ProfileSheet from '@/components/ProfileSheet';
-import BoutiqueMenu from '@/components/BoutiqueMenu';
 import { useCart } from '@/contexts/CartContext';
 import { BgColorProvider } from '@/contexts/BgColorContext';
 import { useChatContext } from '@/App';
@@ -26,81 +17,56 @@ interface AppLayoutProps {
   onChatOpen?: () => void;
 }
 
-/* ── Bysis AI Dots Icon (multi-colored, like Amazon Rufus) ─────────────────── */
-function BysisAIIcon({ size = 22 }: { size?: number }) {
+/* ─────────────────────────────────────────────────────────────────────────────
+   ICON SYSTEM — all outline, stroke="currentColor", strokeWidth="1.8"
+   Active color: #111111 (near-black)   Inactive color: #9CA3AF (gray-400)
+───────────────────────────────────────────────────────────────────────────── */
+
+const STROKE = '1.8';
+const ACTIVE_COLOR   = '#111111';
+const INACTIVE_COLOR = '#9CA3AF';
+
+/* Home */
+function IcoHome({ active }: { active: boolean }) {
+  const c = active ? ACTIVE_COLOR : INACTIVE_COLOR;
+  const sw = active ? '2.2' : STROKE;
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <circle cx="6"  cy="12" r="3.5" fill="#FF3131" />
-      <circle cx="12" cy="12" r="3.5" fill="#F5C518" />
-      <circle cx="18" cy="12" r="3.5" fill="#006A2E" />
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/>
+      <path d="M9 21V12h6v9"/>
     </svg>
   );
 }
 
-/* ── Bottom Nav Icons ───────────────────────────────────────────────────────── */
-function IconHome({ active }: { active: boolean }) {
+/* Grid / Boutiques */
+function IcoGrid({ active }: { active: boolean }) {
+  const c = active ? ACTIVE_COLOR : INACTIVE_COLOR;
+  const sw = active ? '2.2' : STROKE;
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M3 9.5L12 3L21 9.5V20C21 20.5523 20.5523 21 20 21H15V15H9V21H4C3.44772 21 3 20.5523 3 20V9.5Z"
-        fill={active ? '#0A0A0A' : 'none'}
-        stroke={active ? '#0A0A0A' : '#888'}
-        strokeWidth={active ? '0' : '1.8'}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+      <rect x="14" y="14" width="7" height="7" rx="1.5"/>
     </svg>
   );
 }
 
-function IconGrid({ active }: { active: boolean }) {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="3" width="8" height="8" rx="1.5"
-        fill={active ? '#0A0A0A' : 'none'}
-        stroke={active ? '#0A0A0A' : '#888'}
-        strokeWidth={active ? '0' : '1.8'}
-      />
-      <rect x="13" y="3" width="8" height="8" rx="1.5"
-        fill={active ? '#0A0A0A' : 'none'}
-        stroke={active ? '#0A0A0A' : '#888'}
-        strokeWidth={active ? '0' : '1.8'}
-      />
-      <rect x="3" y="13" width="8" height="8" rx="1.5"
-        fill={active ? '#0A0A0A' : 'none'}
-        stroke={active ? '#0A0A0A' : '#888'}
-        strokeWidth={active ? '0' : '1.8'}
-      />
-      <rect x="13" y="13" width="8" height="8" rx="1.5"
-        fill={active ? '#0A0A0A' : 'none'}
-        stroke={active ? '#0A0A0A' : '#888'}
-        strokeWidth={active ? '0' : '1.8'}
-      />
-    </svg>
-  );
-}
-
-function IconCart({ active, badge }: { active: boolean; badge?: number }) {
+/* Shopping Bag / Panier */
+function IcoBag({ active, badge }: { active: boolean; badge?: number }) {
+  const c = active ? ACTIVE_COLOR : INACTIVE_COLOR;
+  const sw = active ? '2.2' : STROKE;
   return (
     <div className="relative">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path
-          d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"
-          fill={active ? '#0A0A0A' : 'none'}
-          stroke={active ? '#0A0A0A' : '#888'}
-          strokeWidth={active ? '0' : '1.8'}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {!active && <line x1="3" y1="6" x2="21" y2="6" stroke="#888" strokeWidth="1.8" />}
-        {!active && <path d="M16 10a4 4 0 01-8 0" stroke="#888" strokeWidth="1.8" strokeLinecap="round" />}
-        {active && <line x1="3" y1="6" x2="21" y2="6" stroke="white" strokeWidth="1.8" />}
-        {active && <path d="M16 10a4 4 0 01-8 0" stroke="white" strokeWidth="1.8" strokeLinecap="round" />}
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 01-8 0"/>
       </svg>
       {badge !== undefined && badge > 0 && (
         <span
-          className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 rounded-full text-white text-[10px] font-bold flex items-center justify-center"
-          style={{ background: '#E8192C', minWidth: '18px', minHeight: '18px', padding: '0 3px', lineHeight: 1 }}
+          className="absolute -top-1.5 -right-1.5 flex items-center justify-center rounded-full text-white font-bold"
+          style={{ background: '#E8192C', fontSize: 9, minWidth: 16, height: 16, padding: '0 3px', lineHeight: 1 }}
         >
           {badge > 9 ? '9+' : badge}
         </span>
@@ -109,27 +75,52 @@ function IconCart({ active, badge }: { active: boolean; badge?: number }) {
   );
 }
 
-function IconUser({ active }: { active: boolean }) {
+/* User / Moi */
+function IcoUser({ active }: { active: boolean }) {
+  const c = active ? ACTIVE_COLOR : INACTIVE_COLOR;
+  const sw = active ? '2.2' : STROKE;
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <circle
-        cx="12" cy="8" r="4"
-        fill={active ? '#0A0A0A' : 'none'}
-        stroke={active ? '#0A0A0A' : '#888'}
-        strokeWidth={active ? '0' : '1.8'}
-      />
-      <path
-        d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
-        fill={active ? '#0A0A0A' : 'none'}
-        stroke={active ? '#0A0A0A' : '#888'}
-        strokeWidth={active ? '0' : '1.8'}
-        strokeLinecap="round"
-      />
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8" r="4"/>
+      <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7"/>
     </svg>
   );
 }
 
-/* ── Top Header ────────────────────────────────────────────────────────────── */
+/* Search */
+function IcoSearch() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth={STROKE} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="7"/>
+      <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+    </svg>
+  );
+}
+
+/* Camera / Scanner */
+function IcoCamera() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111111" strokeWidth={STROKE} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+      <circle cx="12" cy="13" r="4"/>
+    </svg>
+  );
+}
+
+/* Bysis AI dots (colored — brand identity, not a line icon) */
+function IcoAI({ size = 22 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <circle cx="6"  cy="12" r="3" fill="#FF3131"/>
+      <circle cx="12" cy="12" r="3" fill="#F5C518"/>
+      <circle cx="18" cy="12" r="3" fill="#006A2E"/>
+    </svg>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TOP HEADER
+───────────────────────────────────────────────────────────────────────────── */
 interface TopHeaderProps {
   chatVisible: boolean;
   onChatClick: () => void;
@@ -139,107 +130,80 @@ function TopHeader({ chatVisible, onChatClick }: TopHeaderProps) {
   const [, navigate] = useLocation();
 
   return (
-    <header
-      className="sticky top-0 z-40 w-full bg-white"
-      style={{ borderBottom: '1px solid #F0F0F0' }}
-    >
-      {/* Status bar safe area */}
+    <header className="sticky top-0 z-40 w-full bg-white" style={{ borderBottom: '1px solid #F0F0F0' }}>
       <div style={{ height: 'env(safe-area-inset-top, 0px)', background: '#FFFFFF' }} />
-
       <div className="w-full px-3 py-2.5 flex items-center gap-2">
-        {/* Search bar pill */}
-        <div
-          className="flex-1 flex items-center gap-2 px-3 py-2 rounded-full bg-gray-100"
+        {/* Search bar */}
+        <button
+          onClick={() => navigate('/search')}
+          className="flex-1 flex items-center gap-2 px-3 py-2 rounded-full bg-gray-100 active:bg-gray-200 transition-colors"
           style={{ minHeight: 40 }}
         >
-          {/* Search icon */}
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0 text-gray-400">
-            <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2.2" />
-            <path d="M16.5 16.5L21 21" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-          </svg>
-
-          {/* Placeholder text */}
-          <span
-            className="flex-1 text-sm text-gray-400 select-none"
-            onClick={() => navigate('/search')}
-          >
+          <IcoSearch />
+          <span className="flex-1 text-sm text-gray-400 text-left select-none">
             Rechercher ou poser une question
           </span>
-
-          {/* Chatbot button — hides on scroll-down */}
           <AnimatePresence mode="popLayout">
             {chatVisible && (
-              <motion.button
-                key="chat-btn"
+              <motion.span
+                key="ai-dots"
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.5, opacity: 0 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 32 }}
-                whileTap={{ scale: 0.85 }}
                 onClick={(e) => { e.stopPropagation(); onChatClick(); }}
                 className="shrink-0 flex items-center justify-center"
-                aria-label="Bysis AI"
               >
-                <BysisAIIcon size={22} />
-              </motion.button>
+                <IcoAI size={20} />
+              </motion.span>
             )}
           </AnimatePresence>
-        </div>
+        </button>
 
-        {/* Scanner / Camera button */}
+        {/* Camera / Scanner button */}
         <button
           onClick={() => navigate('/scanner')}
           className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 active:bg-gray-200 transition-colors"
           aria-label="Scanner"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M17 3H5C3.89543 3 3 3.89543 3 5V19C3 20.1046 3.89543 21 5 21H19C20.1046 21 21 20.1046 21 19V7"
-              stroke="#1A1A1A" strokeWidth="2" strokeLinecap="round" fill="none"
-            />
-            <circle cx="12" cy="13" r="3" stroke="#1A1A1A" strokeWidth="2" fill="none" />
-            <path d="M20 2 L20.5 4 L22.5 4.5 L20.5 5 L20 7 L19.5 5 L17.5 4.5 L19.5 4 Z" fill="#1A1A1A" />
-          </svg>
+          <IcoCamera />
         </button>
       </div>
     </header>
   );
 }
 
-/* ── Bottom Nav ─────────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   BOTTOM NAV — 5 tabs: Accueil | Boutiques | [AI FAB] | Panier | Moi
+───────────────────────────────────────────────────────────────────────────── */
 interface BottomNavProps {
   onProfileClick: () => void;
-  onMenuClick?: () => void;
   onChatClick: () => void;
   visible: boolean;
 }
 
 const NAV_TABS = [
-  { id: 'home',     path: '/',        label: 'Accueil' },
+  { id: 'home',     path: '/',         label: 'Accueil'   },
   { id: 'boutique', path: '/arrivage', label: 'Boutiques' },
-  { id: 'chat',     path: null,       label: 'Bysis AI' },
-  { id: 'panier',   path: '/panier',  label: 'Panier' },
-  { id: 'moi',      path: null,       label: 'Moi' },
+  { id: 'chat',     path: null,        label: 'AI'        },
+  { id: 'panier',   path: '/panier',   label: 'Panier'    },
+  { id: 'moi',      path: null,        label: 'Moi'       },
 ] as const;
 
-function BottomNav({ onProfileClick, onMenuClick: _onMenuClick, visible, onChatClick }: BottomNavProps & { onChatClick: () => void }) {
+function BottomNav({ onProfileClick, onChatClick, visible }: BottomNavProps) {
   const [location, navigate] = useLocation();
   const { totalItems } = useCart();
 
   const isActive = (path: string | null) => {
-    if (path === null) return false;
+    if (!path) return false;
     if (path === '/') return location === '/';
     return location.startsWith(path);
   };
 
   const handleTab = (tab: typeof NAV_TABS[number]) => {
-    if (tab.id === 'moi') {
-      onProfileClick();
-    } else if (tab.id === 'chat') {
-      onChatClick();
-    } else if (tab.path) {
-      navigate(tab.path);
-    }
+    if (tab.id === 'moi')  { onProfileClick(); return; }
+    if (tab.id === 'chat') { onChatClick();    return; }
+    if (tab.path) navigate(tab.path);
   };
 
   return (
@@ -249,34 +213,30 @@ function BottomNav({ onProfileClick, onMenuClick: _onMenuClick, visible, onChatC
       animate={{ y: visible ? 0 : '100%' }}
       transition={{ type: 'spring', stiffness: 400, damping: 38, mass: 0.8 }}
     >
-      <div className="flex items-end justify-around px-2 pt-2 pb-1 gap-1">
+      <div className="flex items-end justify-around px-1 pt-2 pb-1">
         {NAV_TABS.map((tab) => {
-          const active = tab.id === 'moi' || tab.id === 'chat' ? false : isActive(tab.path);
+          const active = isActive(tab.path);
 
-          /* ── Chatbot FAB (raised center button) ── */
+          /* ── AI FAB (center) ── */
           if (tab.id === 'chat') {
             return (
-              <div key="chat" className="flex flex-col items-center justify-end flex-1" style={{ minHeight: 52 }}>
+              <div key="chat" className="flex flex-col items-center justify-end flex-1">
                 <motion.button
                   whileTap={{ scale: 0.85 }}
-                  onClick={() => handleTab(tab)}
-                  className="flex items-center justify-center rounded-full shadow-lg mb-1"
+                  onClick={onChatClick}
+                  className="flex items-center justify-center rounded-full"
                   style={{
-                    width: 52,
-                    height: 52,
-                    background: 'linear-gradient(135deg, #0A0A0A 0%, #1A1A2E 100%)',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
-                    marginBottom: 6,
+                    width: 50,
+                    height: 50,
+                    background: '#111111',
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.22)',
+                    marginBottom: 4,
                   }}
                   aria-label="Bysis AI"
                 >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <circle cx="6"  cy="12" r="3" fill="#FF3131" />
-                    <circle cx="12" cy="12" r="3" fill="#F5C518" />
-                    <circle cx="18" cy="12" r="3" fill="#006A2E" />
-                  </svg>
+                  <IcoAI size={22} />
                 </motion.button>
-                <span className="text-[10px] font-semibold leading-none" style={{ color: '#888888' }}>AI</span>
+                <span className="text-[10px] font-semibold" style={{ color: INACTIVE_COLOR }}>AI</span>
               </div>
             );
           }
@@ -286,20 +246,17 @@ function BottomNav({ onProfileClick, onMenuClick: _onMenuClick, visible, onChatC
               key={tab.id}
               whileTap={{ scale: 0.88 }}
               onClick={() => handleTab(tab)}
-              className="flex flex-col items-center justify-center flex-1 py-1.5 rounded-xl gap-1 transition-colors"
+              className="flex flex-col items-center justify-center flex-1 py-1.5 gap-1"
               style={{ minHeight: 52 }}
               aria-label={tab.label}
             >
-              {/* Icon */}
-              {tab.id === 'home' && <IconHome active={active} />}
-              {tab.id === 'boutique' && <IconGrid active={active} />}
-              {tab.id === 'panier' && <IconCart active={active} badge={totalItems} />}
-              {tab.id === 'moi' && <IconUser active={active} />}
-
-              {/* Label */}
+              {tab.id === 'home'     && <IcoHome     active={active} />}
+              {tab.id === 'boutique' && <IcoGrid     active={active} />}
+              {tab.id === 'panier'   && <IcoBag      active={active} badge={totalItems} />}
+              {tab.id === 'moi'      && <IcoUser     active={active} />}
               <span
                 className="text-[10px] font-semibold leading-none"
-                style={{ color: active ? '#0A0A0A' : '#888888' }}
+                style={{ color: active ? ACTIVE_COLOR : INACTIVE_COLOR }}
               >
                 {tab.label}
               </span>
@@ -307,28 +264,26 @@ function BottomNav({ onProfileClick, onMenuClick: _onMenuClick, visible, onChatC
           );
         })}
       </div>
-      {/* Safe area bottom */}
       <div style={{ height: 'env(safe-area-inset-bottom, 0px)', background: '#FFFFFF' }} />
     </motion.div>
   );
 }
 
-/* ── Inner Layout ─────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   INNER LAYOUT
+───────────────────────────────────────────────────────────────────────────── */
 function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps) {
   const [profileOpen, setProfileOpen] = useState(false);
-  const [authOpen, setAuthOpen]       = useState(false);
+  const [authOpen,    setAuthOpen]    = useState(false);
+  const [navVisible,  setNavVisible]  = useState(true);
 
-  // Both chatbot icon and bottom nav hide/show together on scroll
-  const [navVisible, setNavVisible]   = useState(true);
-
-  const { openChat }      = useChatContext();
-  const handleChatOpen    = onChatOpen ?? openChat;
+  const { openChat }   = useChatContext();
+  const handleChatOpen = onChatOpen ?? openChat;
 
   const mainRef     = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef(0);
   const rafRef      = useRef<number | null>(null);
 
-  /* ── Scroll handler ───────────────────────────────────────────────────── */
   const handleScroll = useCallback(() => {
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(() => {
@@ -337,8 +292,6 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
       const scrollY = el.scrollTop;
       const delta = scrollY - lastScrollY.current;
       lastScrollY.current = scrollY;
-
-      // Hide on scroll-down (delta > 4px), show on any upward scroll (delta < -1px)
       if (delta > 4)       setNavVisible(false);
       else if (delta < -1) setNavVisible(true);
     });
@@ -355,17 +308,12 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
   }, [handleScroll]);
 
   return (
-    <div
-      className="min-h-screen flex flex-col bg-white"
-      style={{ fontFamily: '"Inter", -apple-system, sans-serif' }}
-    >
+    <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: '"Inter", -apple-system, sans-serif' }}>
       <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
       <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
 
-      {/* ── White sticky header with chatbot icon inside search bar ── */}
       <TopHeader chatVisible={navVisible} onChatClick={handleChatOpen} />
 
-      {/* ── Main scrollable content ── */}
       <main
         ref={mainRef}
         className="flex-1 overflow-y-auto bg-white"
@@ -374,7 +322,6 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
         {children}
       </main>
 
-      {/* ── Bottom Nav — hides/shows with scroll ── */}
       {showNav && (
         <BottomNav
           onProfileClick={() => setProfileOpen(true)}
@@ -386,7 +333,9 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
   );
 }
 
-/* ── Public export ─────────────────────────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────────────────────────
+   PUBLIC EXPORT
+───────────────────────────────────────────────────────────────────────────── */
 export default function AppLayout(props: AppLayoutProps) {
   return (
     <BgColorProvider>

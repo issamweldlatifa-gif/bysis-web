@@ -20,7 +20,7 @@ function EmptyCart({ t, isDark }: { t: (k: any) => string; isDark: boolean }) {
         className="w-24 h-24 rounded-3xl flex items-center justify-center mb-6"
         style={{ background: isDark ? 'rgba(26,26,26,0.15)' : '#F5F5F5' }}
       >
-        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke={BLUE} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke={BLUE} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
           <path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/>
         </svg>
