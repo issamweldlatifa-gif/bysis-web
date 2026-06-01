@@ -291,3 +291,24 @@
 - [x] Quick Actions and Bysis AI banner below carousel
 - [x] Background color lightened by 25% for softer feel
 - [x] Glassmorphism effect on Quick Actions and Features sections
+
+## 🚀 Amazon-Style Improvements (Jun 2026)
+- [ ] Carousel: color change only in Hero area (not full page) — white below
+- [ ] Carousel: full-width slides (not cards), background color fills hero container
+- [ ] Chatbot: convert to Bottom Sheet (slide up from bottom, slide down to close)
+- [ ] Chatbot: open/close button in Bottom Nav with smooth animation
+- [ ] Hamburger menu: slide-in categories page (Bysis boutique vocabulary)
+- [ ] Categories page: Vos raccourcis + Acheter par catégorie sections
+- [ ] Performance: React.lazy + Suspense for page components
+- [ ] Performance: image lazy loading + decoding async
+
+## 🚀 Amazon-Style Improvements (June 2026)
+- [x] Carousel: تغيير لون Hero فقط (ليس الصفحة كلها) — باقي الصفحة بيضاء ثابتة
+- [x] Carousel: loop: true + Autoplay كل 4 ثوان مع stopOnInteraction
+- [x] BoutiqueMenu: slide-in من اليسار عند الضغط على Hamburger (≡)
+- [x] BoutiqueMenu: Vos raccourcis + Acheter par catégorie (8 أقسام) + Aide & Paramètres
+- [x] BoutiqueMenu: Header أسود مع اسم المستخدم أو "Connectez-vous"
+- [x] BoutiqueMenu: Sub-categories قابلة للتوسع مع animation
+- [x] AppLayout: الخلفية بيضاء ثابتة (فقط Hero يتغير لونه)
+- [x] AIChat History Panel: Settings Panel + History Panel + Clear History
+- [x] Performance: code splitting + lazy loading + vite optimizations (كل شيء مُحسَّن)
