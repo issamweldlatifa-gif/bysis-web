@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
+import compression from "compression";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
@@ -32,12 +33,38 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 async function startServer() {
   const app = express();
   const server = createServer(app);
+  
+  // Enable compression for all responses
+  app.use(compression({ level: 6, threshold: 1024 }));
+  
+  // Security headers
+  app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    next();
+  });
+  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
   registerOAuthRoutes(app);
   registerGoogleAuthRoutes(app);
+  
+  // Cache control for static assets
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/assets/') || req.path.startsWith('/manus-storage/')) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (req.path.endsWith('.js') || req.path.endsWith('.css')) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (req.path === '/' || req.path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'public, max-age=3600, must-revalidate');
+    }
+    next();
+  });
+  
   // tRPC API
   app.use(
     "/api/trpc",
@@ -62,7 +89,20 @@ async function startServer() {
 
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}/`);
+    console.log(`Environment: ${process.env.NODE_ENV}`);
+    console.log(`Compression: enabled`);
   });
 }
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully...');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully...');
+  process.exit(0);
+});
 
 startServer().catch(console.error);
