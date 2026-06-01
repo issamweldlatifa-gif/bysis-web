@@ -36,20 +36,12 @@ const Parametres = lazy(() => import("./pages/Parametres"));
 const Panier = lazy(() => import("./pages/Panier"));
 const Scanner = lazy(() => import("./pages/Scanner"));
 
-// Loading fallback — minimal spinner matching dark theme
+// Import LoadingScreen
+import LoadingScreen from "./components/LoadingScreen";
+
+// Loading fallback — professional Bysis AI loading screen
 function PageLoader() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[#EEF2F7]">
-      <div className="flex flex-col items-center gap-4">
-        <div className="h-10 w-10 rounded-xl flex items-center justify-center animate-pulse" style={{ background: "#0070BA" }}>
-          <span className="text-white font-black text-lg">B</span>
-        </div>
-        <div className="h-1 w-32 bg-white/10 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full animate-[loading_1.2s_ease-in-out_infinite]" />
-        </div>
-      </div>
-    </div>
-  );
+  return <LoadingScreen />;
 }
 
 function Router() {
