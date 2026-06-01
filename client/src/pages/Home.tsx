@@ -221,46 +221,7 @@ function HomeContent() {
         </div>
       </section>
 
-      {/* Bysis AI Banner */}
-      <section className="mx-4 mb-4">
-        <button
-          onClick={openChat}
-          className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl active:scale-[0.98] transition-transform duration-150"
-          style={{ background: 'linear-gradient(135deg, #111111 0%, #1A1A2E 100%)' }}
-        >
-          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(255,255,255,0.1)' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="6"  cy="12" r="3" fill="#FF3131"/>
-              <circle cx="12" cy="12" r="3" fill="#F5C518"/>
-              <circle cx="18" cy="12" r="3" fill="#006A2E"/>
-            </svg>
-          </div>
-          <div className="flex-1 text-left">
-            <p className="font-bold text-sm text-white">Bysis AI</p>
-            <p className="text-white/50 text-xs">Posez-moi une question...</p>
-          </div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeLinecap="round">
-            <path d="M9 18l6-6-6-6"/>
-          </svg>
-        </button>
-      </section>
 
-      {/* Boutiques / Arrivages */}
-      {availableItems.length > 0 && (
-        <section className="pb-4">
-          <div className="flex items-center justify-between px-4 mb-3">
-            <h2 className="text-base font-black text-gray-900">Boutiques</h2>
-            <button onClick={() => navigate('/arrivage')} className="text-xs font-semibold text-blue-600">
-              Voir tout
-            </button>
-          </div>
-          <div className="flex gap-3 px-4 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-            {availableItems.map((item: any) => (
-              <ArrivageCard key={item.id} item={item} onAdd={() => navigate('/arrivage')} />
-            ))}
-          </div>
-        </section>
-      )}
 
       {/* Why Bysis */}
       <section className="px-4 pb-6 bg-white">
