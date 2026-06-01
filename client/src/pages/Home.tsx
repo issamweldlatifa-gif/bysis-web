@@ -8,37 +8,48 @@ import DynamicColorCarousel, { CarouselSlide } from '@/components/DynamicColorCa
 /* ── Carousel Slides ─────────────────────────────────────────────────────── */
 const CAROUSEL_SLIDES: CarouselSlide[] = [
   {
-    image: '/manus-storage/section-red_be523b8d.png',
-    color: '#ff3131',
-    title: 'Nouvelle Collection',
-    subtitle: 'Découvrez les dernières tendances',
+    color: '#f5c518',        // Amazon yellow
+    title: 'Organisez-vous',
+    subtitle: 'Découvrez les meilleures ventes',
+    cards: [
+      { label: 'Commander' },
+      { label: 'Arrivages' },
+      { label: 'Suivre' },
+      { label: 'Calculer' },
+    ],
   },
   {
-    image: '/manus-storage/section-blue_063dba4e.png',
-    color: '#003087',
+    color: '#006a2e',        // Amazon green
+    title: 'Nos meilleures\nventes à\npetits prix',
+    cards: [
+      { label: 'Mode' },
+      { label: 'Électronique' },
+      { label: 'Maison' },
+      { label: 'Beauté' },
+    ],
+  },
+  {
+    color: '#1a3a5c',        // Amazon dark blue
+    title: 'Meilleures\nventes de livres',
+    subtitle: 'Découvrez maintenant',
+    cards: [
+      { label: 'Romans' },
+      { label: 'Sciences' },
+      { label: 'Enfants' },
+      { label: 'Cuisine' },
+    ],
+  },
+  {
+    color: '#ff3131',        // Bysis red
     title: 'Ventes Flash',
     subtitle: "Offres limitées — jusqu'à -70%",
+    cards: [
+      { label: 'Chaussures' },
+      { label: 'Sacs' },
+      { label: 'Vêtements' },
+      { label: 'Accessoires' },
+    ],
   },
-  {
-    image: '/manus-storage/section-green_a71d002e.png',
-    color: '#c1ff72',
-    title: 'Arrivages Frais',
-    subtitle: 'Produits tout juste arrivés',
-  },
-  {
-    image: '/manus-storage/section-teal_a23365db.png',
-    color: '#0097b2',
-    title: 'Nos Best-Sellers',
-    subtitle: 'Les favoris de nos clients',
-  },
-];
-
-/* ── Feature Cards ─────────────────────────────────────────────────────────── */
-const FEATURES = [
-  { icon: '🚀', title: 'Livraison Rapide', desc: 'Recevez vos commandes en un temps record' },
-  { icon: '🤖', title: 'Bysis AI', desc: 'Assistant intelligent pour vous aider' },
-  { icon: '🔒', title: 'Paiement Sécurisé', desc: 'Transactions 100% sécurisées' },
-  { icon: '📦', title: 'Suivi en Temps Réel', desc: 'Suivez votre colis à chaque étape' },
 ];
 
 /* ── Quick Actions ─────────────────────────────────────────────────────────── */
@@ -47,6 +58,14 @@ const QUICK_ACTIONS = [
   { icon: '📍', label: 'Suivre', path: '/track' },
   { icon: '📦', label: 'Arrivages', path: '/arrivage' },
   { icon: '🧮', label: 'Calculer', path: '/calculator' },
+];
+
+/* ── Features ─────────────────────────────────────────────────────────────── */
+const FEATURES = [
+  { icon: '🚀', title: 'Livraison Rapide', desc: 'Recevez vos commandes en un temps record' },
+  { icon: '🤖', title: 'Bysis AI', desc: 'Assistant intelligent pour vous aider' },
+  { icon: '🔒', title: 'Paiement Sécurisé', desc: 'Transactions 100% sécurisées' },
+  { icon: '📦', title: 'Suivi en Temps Réel', desc: 'Suivez votre colis à chaque étape' },
 ];
 
 /* ── Home Component ───────────────────────────────────────────────────────── */
@@ -63,7 +82,7 @@ function HomeContent() {
   return (
     <div className="w-full bg-white">
       {/* ── HERO CAROUSEL — color changes here only ─────────────────────── */}
-      <DynamicColorCarousel slides={CAROUSEL_SLIDES} height="56vw" />
+      <DynamicColorCarousel slides={CAROUSEL_SLIDES} />
 
       {/* ── QUICK ACTIONS — white background ───────────────────────────── */}
       <section className="w-full px-4 py-4 bg-white">
@@ -81,47 +100,38 @@ function HomeContent() {
         </div>
       </section>
 
-      {/* ── DIVIDER ─────────────────────────────────────────────────────── */}
-      <div className="h-2 bg-gray-100" />
-
       {/* ── BYSIS AI BANNER ─────────────────────────────────────────────── */}
-      <section className="bg-white px-4 py-3">
+      <section className="mx-4 mb-4">
         <button
           onClick={openChat}
-          className="w-full rounded-2xl overflow-hidden flex items-center gap-3 p-4 text-left active:scale-[0.98] transition-transform duration-150"
-          style={{ background: 'linear-gradient(135deg, #1A1A1A 0%, #2d2d2d 100%)' }}
+          className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-gray-900 text-white active:scale-[0.98] transition-transform duration-150"
         >
           <img
             src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_7e8b089f.png"
             alt="Bysis AI"
-            className="w-10 h-10 object-contain flex-none"
+            className="w-9 h-9 rounded-full object-cover"
           />
-          <div className="flex-1 min-w-0">
-            <div className="text-white font-bold text-sm">Bysis AI</div>
-            <div className="text-gray-400 text-xs mt-0.5">Posez-moi une question...</div>
+          <div className="flex-1 text-left">
+            <p className="font-bold text-sm">Bysis AI</p>
+            <p className="text-white/60 text-xs">Posez-moi une question...</p>
           </div>
-          <span className="text-white/60 text-xl flex-none">›</span>
+          <span className="text-white/40 text-lg">›</span>
         </button>
       </section>
 
-      {/* ── DIVIDER ─────────────────────────────────────────────────────── */}
-      <div className="h-2 bg-gray-100" />
-
       {/* ── WHY BYSIS ───────────────────────────────────────────────────── */}
-      <section className="w-full px-4 py-4 bg-white">
-        <h2 className="text-base font-bold text-gray-900 mb-3">Pourquoi choisir Bysis ?</h2>
+      <section className="px-4 pb-6 bg-white">
+        <h2 className="text-lg font-bold text-gray-900 mb-3">Pourquoi choisir Bysis ?</h2>
         <div className="grid grid-cols-2 gap-3">
           {FEATURES.map((f) => (
-            <div key={f.title} className="p-3 rounded-xl border border-gray-100 bg-gray-50">
-              <div className="text-2xl mb-1">{f.icon}</div>
-              <div className="text-sm font-semibold text-gray-800">{f.title}</div>
-              <div className="text-xs text-gray-500 mt-0.5">{f.desc}</div>
+            <div key={f.title} className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
+              <span className="text-2xl">{f.icon}</span>
+              <p className="mt-2 font-bold text-sm text-gray-900">{f.title}</p>
+              <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
       </section>
-
-      <div className="h-4" />
     </div>
   );
 }

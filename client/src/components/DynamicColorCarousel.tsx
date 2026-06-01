@@ -1,12 +1,13 @@
 /**
- * DynamicColorCarousel — Amazon Prime-style hero carousel
+ * DynamicColorCarousel — Amazon-style hero carousel
  *
- * Key behavior (matching Amazon exactly):
- *  - The HERO CONTAINER background changes color (not the whole page)
- *  - The rest of the page stays WHITE
- *  - Full-width slides, no card gaps — image fills the hero area
+ * Design (matching provided screenshots exactly):
+ *  - Full colored background (yellow / green / dark-blue)
+ *  - Bold large title top-left
+ *  - Smaller subtitle below title
+ *  - 2×2 grid of white-bordered rounded cards (product placeholders)
  *  - Smooth color interpolation tied to scroll progress
- *  - Dot indicators with active color matching current slide
+ *  - Dot indicators at the bottom
  */
 
 import { useEffect, useRef, useCallback, useState } from 'react';
@@ -15,16 +16,22 @@ import Autoplay from 'embla-carousel-autoplay';
 
 /* ── Types ─────────────────────────────────────────────────────────────────── */
 export interface CarouselSlide {
-  image: string;
-  color: string;
-  title?: string;
+  color: string;           // background color hex
+  textColor?: string;      // title/subtitle color (defaults to black or white based on bg)
+  title: string;
   subtitle?: string;
+  cards?: CarouselCard[];  // 4 product cards in 2×2 grid
+  onClick?: () => void;
+}
+
+export interface CarouselCard {
+  image?: string;
+  label?: string;
   onClick?: () => void;
 }
 
 interface DynamicColorCarouselProps {
   slides: CarouselSlide[];
-  height?: string;
 }
 
 /* ── Color helpers ─────────────────────────────────────────────────────────── */
@@ -46,9 +53,16 @@ function lerpColor(a: string, b: string, t: number): string {
   return `rgb(${r},${g},${bl})`;
 }
 
+/** Determine if a hex color is "light" so we can pick black or white text */
+function isLight(hex: string): boolean {
+  const [r, g, b] = hexToRgb(hex);
+  // Perceived luminance formula
+  return (r * 299 + g * 587 + b * 114) / 1000 > 155;
+}
+
 /* ── Component ─────────────────────────────────────────────────────────────── */
-export default function DynamicColorCarousel({ slides, height = '52vw' }: DynamicColorCarouselProps) {
-  const [heroBg, setHeroBg] = useState(slides[0]?.color ?? '#cadfe2');
+export default function DynamicColorCarousel({ slides }: DynamicColorCarouselProps) {
+  const [heroBg, setHeroBg] = useState(slides[0]?.color ?? '#f5c518');
   const [activeIndex, setActiveIndex] = useState(0);
   const rafRef = useRef<number | null>(null);
 
@@ -84,8 +98,7 @@ export default function DynamicColorCarousel({ slides, height = '52vw' }: Dynami
   useEffect(() => {
     if (!emblaApi) return;
 
-    // Initial color
-    setHeroBg(slides[0]?.color ?? '#cadfe2');
+    setHeroBg(slides[0]?.color ?? '#f5c518');
 
     const onScroll = () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
@@ -107,54 +120,104 @@ export default function DynamicColorCarousel({ slides, height = '52vw' }: Dynami
   if (slides.length === 0) return null;
 
   return (
-    <div className="w-full relative overflow-hidden" style={{ background: heroBg, transition: 'background 0.15s ease-out' }}>
-      {/* Embla viewport — full width, no padding */}
+    <div
+      className="w-full relative overflow-hidden"
+      style={{ background: heroBg, transition: 'background 0.12s ease-out' }}
+    >
+      {/* Embla viewport */}
       <div ref={emblaRef} className="overflow-hidden w-full">
         <div className="flex">
-          {slides.map((slide, i) => (
-            <div
-              key={i}
-              className="relative flex-none w-full cursor-pointer select-none"
-              style={{ height }}
-              onClick={slide.onClick}
-            >
-              {/* Slide background color (shows while image loads) */}
-              <div className="absolute inset-0" style={{ backgroundColor: slide.color }} />
+          {slides.map((slide, i) => {
+            const light = isLight(slide.color);
+            const titleColor = slide.textColor ?? (light ? '#0a0a0a' : '#ffffff');
+            const subtitleColor = light ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.8)';
+            const cardBorder = light ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.75)';
 
-              {/* Full-bleed image */}
-              <img
-                src={slide.image}
-                alt={slide.title ?? `Slide ${i + 1}`}
-                className="absolute inset-0 w-full h-full object-cover"
-                loading={i === 0 ? 'eager' : 'lazy'}
-                decoding="async"
-                draggable={false}
-              />
+            return (
+              <div
+                key={i}
+                className="relative flex-none w-full select-none"
+                style={{ backgroundColor: slide.color }}
+                onClick={slide.onClick}
+              >
+                {/* ── Slide content ─────────────────────────────────────── */}
+                <div className="px-4 pt-5 pb-4">
+                  {/* Title */}
+                  <h2
+                    className="font-black leading-tight"
+                    style={{
+                      color: titleColor,
+                      fontSize: 'clamp(1.6rem, 7vw, 2.2rem)',
+                      letterSpacing: '-0.02em',
+                      lineHeight: 1.1,
+                    }}
+                  >
+                    {slide.title}
+                  </h2>
 
-              {/* Bottom gradient for text */}
-              {(slide.title || slide.subtitle) && (
-                <>
-                  <div
-                    className="absolute inset-0"
-                    style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 55%)' }}
-                  />
-                  <div className="absolute bottom-0 left-0 right-0 px-4 pb-4">
-                    {slide.title && (
-                      <p className="text-white font-bold text-xl leading-tight drop-shadow-lg">{slide.title}</p>
-                    )}
-                    {slide.subtitle && (
-                      <p className="text-white/85 text-sm mt-0.5 drop-shadow">{slide.subtitle}</p>
-                    )}
+                  {/* Subtitle */}
+                  {slide.subtitle && (
+                    <p
+                      className="mt-1 font-medium"
+                      style={{
+                        color: subtitleColor,
+                        fontSize: 'clamp(0.85rem, 3.5vw, 1rem)',
+                      }}
+                    >
+                      {slide.subtitle}
+                    </p>
+                  )}
+
+                  {/* ── 2×2 Product Grid ──────────────────────────────── */}
+                  <div className="grid grid-cols-2 gap-3 mt-5 mb-2">
+                    {(slide.cards ?? Array(4).fill({})).slice(0, 4).map((card: CarouselCard, j: number) => (
+                      <button
+                        key={j}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          card.onClick?.();
+                        }}
+                        className="relative overflow-hidden active:scale-[0.97] transition-transform duration-150"
+                        style={{
+                          aspectRatio: '1 / 1',
+                          borderRadius: '14px',
+                          border: `2.5px solid ${cardBorder}`,
+                          backgroundColor: 'transparent',
+                        }}
+                      >
+                        {card.image ? (
+                          <img
+                            src={card.image}
+                            alt={card.label ?? `Product ${j + 1}`}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
+                            draggable={false}
+                          />
+                        ) : (
+                          /* Empty placeholder — matches the screenshots exactly */
+                          <div className="w-full h-full" />
+                        )}
+                        {card.label && (
+                          <span
+                            className="absolute bottom-2 left-2 right-2 text-xs font-semibold text-center truncate"
+                            style={{ color: titleColor }}
+                          >
+                            {card.label}
+                          </span>
+                        )}
+                      </button>
+                    ))}
                   </div>
-                </>
-              )}
-            </div>
-          ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Dot indicators — overlaid on bottom of hero */}
-      <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-1.5 pointer-events-none">
+      {/* ── Dot indicators ─────────────────────────────────────────────────── */}
+      <div className="flex items-center justify-center gap-1.5 py-3">
         {slides.map((_, i) => (
           <span
             key={i}
@@ -163,8 +226,15 @@ export default function DynamicColorCarousel({ slides, height = '52vw' }: Dynami
               height: '3px',
               width: i === activeIndex ? '22px' : '6px',
               borderRadius: '2px',
-              backgroundColor: i === activeIndex ? '#fff' : 'rgba(255,255,255,0.5)',
-              transition: 'width 0.25s cubic-bezier(0.23,1,0.32,1), background-color 0.25s ease',
+              backgroundColor:
+                i === activeIndex
+                  ? isLight(slides[activeIndex]?.color ?? '#fff')
+                    ? 'rgba(0,0,0,0.7)'
+                    : 'rgba(255,255,255,0.95)'
+                  : isLight(slides[activeIndex]?.color ?? '#fff')
+                  ? 'rgba(0,0,0,0.25)'
+                  : 'rgba(255,255,255,0.4)',
+              transition: 'width 0.25s cubic-bezier(0.23,1,0.32,1)',
             }}
           />
         ))}
