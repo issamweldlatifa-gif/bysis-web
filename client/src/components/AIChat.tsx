@@ -1,6 +1,6 @@
 import { motion, AnimatePresence, type Transition } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Mic, StopCircle, Upload, File, MoreHorizontal } from 'lucide-react';
+import { X, Send, Mic, StopCircle, Upload, File, MoreHorizontal, ChevronRight, ChevronLeft, MessageSquare, ExternalLink, Trash2, AlertTriangle } from 'lucide-react';
 import { Streamdown } from 'streamdown';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
@@ -54,10 +54,15 @@ const BACKDROP_VARIANTS = {
   exit: { opacity: 0, transition: { duration: 0.22 } },
 };
 
+// View types for navigation inside the chat panel
+type ChatView = 'chat' | 'settings' | 'manage-history';
+
 export default function AIChat({ isOpen, onClose }: AIChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [view, setView] = useState<ChatView>('chat');
+  const [confirmClear, setConfirmClear] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [pendingFile, setPendingFile] = useState<{ name: string; base64: string } | null>(null);
@@ -72,6 +77,21 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
   const audioChunksRef = useRef<Blob[]>([]);
   const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // History queries
+  const historyQuery = trpc.chatbot.getMyHistory.useQuery(
+    { sessionId },
+    { enabled: view === 'manage-history' }
+  );
+  const clearHistoryMutation = trpc.chatbot.clearMyHistory.useMutation({
+    onSuccess: () => {
+      setMessages([]);
+      historyQuery.refetch();
+      setConfirmClear(false);
+      toast.success('تم مسح سجل المحادثات');
+    },
+    onError: () => toast.error('حدث خطأ أثناء المسح'),
+  });
 
   const chatMutation = trpc.chatbot.sendMessage.useMutation({
     onSuccess: (response) => {
@@ -109,6 +129,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
   // Focus input when chat opens
   useEffect(() => {
     if (isOpen) {
+      setView('chat');
       setTimeout(() => inputRef.current?.focus(), 300);
     }
   }, [isOpen]);
@@ -265,12 +286,187 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                 <span className="text-[10px] text-gray-400 -mt-0.5">beta</span>
               </div>
 
-              <button className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+              <motion.button
+                whileTap={{ scale: 0.88 }}
+                onClick={() => setView('settings')}
+                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+              >
                 <MoreHorizontal size={22} className="text-black" />
-              </button>
+              </motion.button>
             </div>
 
+            {/* Settings Panel */}
+            {view === 'settings' && (
+              <motion.div
+                key="settings"
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 40 }}
+                transition={{ duration: 0.22 }}
+                className="flex-1 overflow-y-auto"
+              >
+                {/* Settings Header */}
+                <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+                  <motion.button
+                    whileTap={{ scale: 0.88 }}
+                    onClick={() => setView('chat')}
+                    className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors"
+                  >
+                    <ChevronLeft size={20} className="text-black" />
+                  </motion.button>
+                  <span className="text-[15px] font-semibold text-black">Paramètres</span>
+                </div>
+
+                {/* Settings Items */}
+                <div className="divide-y divide-gray-100">
+                  <motion.button
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setView('manage-history')}
+                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <MessageSquare size={18} className="text-black" />
+                      <span className="text-[14px] text-black">Gérer la discussion</span>
+                    </div>
+                    <ChevronRight size={18} className="text-gray-400" />
+                  </motion.button>
+
+                  <motion.button
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      setView('chat');
+                      setMessages([]);
+                    }}
+                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <ExternalLink size={18} className="text-black" />
+                      <span className="text-[14px] text-black">Pour commencer</span>
+                    </div>
+                    <ChevronRight size={18} className="text-gray-400" />
+                  </motion.button>
+                </div>
+
+                {/* Footer info */}
+                <div className="px-5 py-6">
+                  <p className="text-xs text-gray-400 text-center leading-relaxed">
+                    Bysis AI peut faire des erreurs. Vérifiez les informations importantes.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Manage History Panel */}
+            {view === 'manage-history' && (
+              <motion.div
+                key="manage-history"
+                initial={{ opacity: 0, x: 40 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 40 }}
+                transition={{ duration: 0.22 }}
+                className="flex-1 overflow-y-auto flex flex-col"
+              >
+                {/* History Header */}
+                <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+                  <motion.button
+                    whileTap={{ scale: 0.88 }}
+                    onClick={() => { setView('settings'); setConfirmClear(false); }}
+                    className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors"
+                  >
+                    <ChevronLeft size={20} className="text-black" />
+                  </motion.button>
+                  <span className="text-[15px] font-semibold text-black">Gérer la discussion</span>
+                </div>
+
+                {/* Clear History Button */}
+                <div className="px-4 py-3 border-b border-gray-100">
+                  {!confirmClear ? (
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => setConfirmClear(true)}
+                      className="w-full flex items-center gap-3 px-4 py-3 bg-red-50 hover:bg-red-100 rounded-xl transition-colors border border-red-100"
+                    >
+                      <Trash2 size={16} className="text-red-500" />
+                      <span className="text-[13px] text-red-600 font-medium">Effacer l'historique des discussions</span>
+                    </motion.button>
+                  ) : (
+                    <div className="bg-red-50 rounded-xl p-4 border border-red-100">
+                      <div className="flex items-start gap-2 mb-3">
+                        <AlertTriangle size={16} className="text-red-500 mt-0.5 flex-shrink-0" />
+                        <p className="text-[13px] text-red-700 leading-relaxed">
+                          Êtes-vous sûr de vouloir effacer tout l'historique ? Cette action est irréversible.
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => clearHistoryMutation.mutate({ sessionId })}
+                          disabled={clearHistoryMutation.isPending}
+                          className="flex-1 py-2 bg-red-500 hover:bg-red-600 text-white text-[13px] font-medium rounded-lg transition-colors disabled:opacity-60"
+                        >
+                          {clearHistoryMutation.isPending ? 'Suppression...' : 'Confirmer'}
+                        </motion.button>
+                        <motion.button
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setConfirmClear(false)}
+                          className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-black text-[13px] font-medium rounded-lg transition-colors"
+                        >
+                          Annuler
+                        </motion.button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Messages History */}
+                <div className="flex-1 overflow-y-auto">
+                  {historyQuery.isLoading ? (
+                    <div className="flex justify-center py-8">
+                      <div className="flex gap-1.5">
+                        {[0, 0.15, 0.3].map((delay, j) => (
+                          <motion.div
+                            key={j}
+                            className="w-2 h-2 rounded-full bg-gray-300"
+                            animate={{ y: [0, -5, 0] }}
+                            transition={{ repeat: Infinity, duration: 0.7, delay }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : historyQuery.data && historyQuery.data.messages.length > 0 ? (
+                    <div className="divide-y divide-gray-50">
+                      {historyQuery.data.messages.map((msg, i) => (
+                        <div key={i} className="px-4 py-3">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`text-[11px] font-semibold ${
+                              msg.role === 'user' ? 'text-black' : 'text-gray-500'
+                            }`}>
+                              {msg.role === 'user' ? 'Vous' : 'Bysis AI'}
+                            </span>
+                            <span className="text-[10px] text-gray-300">
+                              {new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                          <p className="text-[12px] text-gray-600 line-clamp-2 leading-relaxed">
+                            {msg.content}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-12 px-6">
+                      <MessageSquare size={32} className="text-gray-200 mb-3" />
+                      <p className="text-[13px] text-gray-400 text-center">
+                        Aucun historique de discussion
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
             {/* Chat Area */}
+            {view === 'chat' && (
             <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4" ref={scrollRef}>
               {messages.length === 0 ? (
                 <motion.div
@@ -362,9 +558,10 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                 ))
               )}
             </div>
+            )}
 
-            {/* Image Preview */}
-            {imagePreview && (
+            {/* Image Preview - only in chat view */}
+            {view === 'chat' && imagePreview && (
               <div className="px-4 py-2 border-t border-gray-100">
                 <div className="relative inline-block">
                   <img src={imagePreview} alt="preview" className="w-16 h-16 rounded-xl object-cover" />
@@ -378,8 +575,8 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
               </div>
             )}
 
-            {/* File Preview */}
-            {pendingFile && (
+            {/* File Preview - only in chat view */}
+            {view === 'chat' && pendingFile && (
               <div className="px-4 py-2 border-t border-gray-100">
                 <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-xl">
                   <File size={14} className="text-gray-600" />
@@ -389,7 +586,8 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
               </div>
             )}
 
-            {/* Input Area */}
+            {/* Input Area - only in chat view */}
+            {view === 'chat' && (
             <div className="px-4 py-3 border-t border-gray-100 bg-white">
               <div className="flex items-center gap-2 bg-gray-100 rounded-2xl px-3 py-2">
                 {/* Media buttons */}
@@ -456,6 +654,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                 )}
               </div>
             </div>
+            )}
 
             {/* Hidden file inputs */}
             <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />

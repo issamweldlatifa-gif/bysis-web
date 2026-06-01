@@ -323,6 +323,22 @@ export async function markConversationHasOrder(conversationId: number): Promise<
   await db.update(chatConversations).set({ hasOrder: 1 }).where(eq(chatConversations.id, conversationId));
 }
 
+export async function getConversationBySessionId(sessionId: string): Promise<ChatConversation | null> {
+  const db = await getDb();
+  if (!db) return null;
+  const result = await db.select().from(chatConversations).where(eq(chatConversations.sessionId, sessionId)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function clearConversationHistory(sessionId: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const conv = await getConversationBySessionId(sessionId);
+  if (!conv) return;
+  await db.delete(chatMessages).where(eq(chatMessages.conversationId, conv.id));
+  await db.update(chatConversations).set({ messageCount: 0, updatedAt: new Date() }).where(eq(chatConversations.id, conv.id));
+}
+
 export async function getAllConversations(): Promise<ChatConversation[]> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

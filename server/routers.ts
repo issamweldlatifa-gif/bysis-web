@@ -9,6 +9,7 @@ import {
   searchOrdersByCustomerName, searchOrdersByPhone,
   getOrCreateConversation, addChatMessage, updateConversationCustomer,
   markConversationHasOrder, getAllConversations, getConversationMessages,
+  getConversationBySessionId, clearConversationHistory,
   getSetting, setSetting,
   getAllArrivageItems, getAvailableArrivageItems, createArrivageItem, updateArrivageItem, deleteArrivageItem,
   saveCalculation, getCalculationHistory, getCalculationHistoryBySession,
@@ -723,6 +724,24 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         } catch (error: any) {
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Transcription failed: " + error.message });
         }
+      }),
+
+    // Public - get current session's conversation history
+    getMyHistory: publicProcedure
+      .input(z.object({ sessionId: z.string() }))
+      .query(async ({ input }) => {
+        const conv = await getConversationBySessionId(input.sessionId);
+        if (!conv) return { conversation: null, messages: [] };
+        const messages = await getConversationMessages(conv.id);
+        return { conversation: conv, messages };
+      }),
+
+    // Public - clear current session's conversation history
+    clearMyHistory: publicProcedure
+      .input(z.object({ sessionId: z.string() }))
+      .mutation(async ({ input }) => {
+        await clearConversationHistory(input.sessionId);
+        return { success: true };
       }),
 
     // Admin - list all conversations

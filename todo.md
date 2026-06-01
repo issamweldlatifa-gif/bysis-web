@@ -271,3 +271,14 @@
 - [x] Remove dead code: CalculatorModal import, isCalculatorModalOpen state, CalculatorModal JSX block
 - [x] Remove unused Calculator icon import from @phosphor-icons/react
 - [x] All 22 tests still passing after fix
+
+## AI Chat Settings & History (June 2026)
+- [x] Add view state (chat/settings/manage-history) to AIChat.tsx
+- [x] Add getMyHistory and clearMyHistory tRPC procedures
+- [x] Add getConversationBySessionId and clearConversationHistory DB helpers
+- [x] Settings Panel: "Gérer la discussion" + "Pour commencer" with ChevronRight arrows
+- [x] History Panel: "Effacer l'historique" button with confirm dialog + message list
+- [x] "..." button opens Settings Panel (slide-in from right)
+- [x] Back button in each panel to navigate back
+- [x] Input area only visible in chat view
+- [x] TypeScript errors: 0, Tests: 22/22
