@@ -1,6 +1,6 @@
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Transition } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Mic, StopCircle, Upload, File } from 'lucide-react';
+import { X, Send, Mic, StopCircle, Upload, File, MoreHorizontal } from 'lucide-react';
 import { Streamdown } from 'streamdown';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
@@ -18,7 +18,6 @@ interface AIChatProps {
   onClose: () => void;
 }
 
-// Session ID persistence
 function getSessionId(): string {
   const key = 'bysis_chat_session';
   let id = localStorage.getItem(key);
@@ -29,7 +28,6 @@ function getSessionId(): string {
   return id;
 }
 
-// Quick action questions
 const SUGGESTED_QUESTIONS = [
   { label: 'نحب نعدي كومند', text: 'نحب نعدي كومند', emoji: '🛒' },
   { label: 'احسبلي سعر', text: 'احسبلي سعر منتوج', emoji: '🧮' },
@@ -38,6 +36,23 @@ const SUGGESTED_QUESTIONS = [
   { label: 'كيفاش نخلص؟', text: 'كيفاش نخلص؟', emoji: '💳' },
   { label: 'شنوة bysis؟', text: 'شنوة bysis وكيفاش تخدم؟', emoji: 'ℹ️' },
 ];
+
+// Slide up/down spring animation — same feel as Amazon Rufus
+const springIn: Transition = { type: 'spring', stiffness: 380, damping: 38, mass: 0.8 };
+const springOut: Transition = { type: 'spring', stiffness: 400, damping: 40, mass: 0.6 };
+
+const SLIDE_VARIANTS = {
+  hidden: { y: '100%', opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: springIn },
+  exit: { y: '100%', opacity: 0, transition: springOut },
+};
+
+// Backdrop fade
+const BACKDROP_VARIANTS = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.18 } },
+  exit: { opacity: 0, transition: { duration: 0.22 } },
+};
 
 export default function AIChat({ isOpen, onClose }: AIChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -56,8 +71,8 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  // tRPC mutation for chat
   const chatMutation = trpc.chatbot.sendMessage.useMutation({
     onSuccess: (response) => {
       setMessages((prev) => {
@@ -70,10 +85,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
             isTyping: false,
           };
         } else {
-          updated.push({
-            role: 'assistant',
-            content: response.message,
-          });
+          updated.push({ role: 'assistant', content: response.message });
         }
         return updated;
       });
@@ -94,13 +106,19 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
     }
   }, [messages]);
 
+  // Focus input when chat opens
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => inputRef.current?.focus(), 300);
+    }
+  }, [isOpen]);
+
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64 = event.target?.result as string;
+    reader.onload = (ev) => {
+      const base64 = ev.target?.result as string;
       setImageBase64(base64);
       setImagePreview(base64);
     };
@@ -110,10 +128,9 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const base64 = event.target?.result as string;
+    reader.onload = (ev) => {
+      const base64 = ev.target?.result as string;
       setPendingFile({ name: file.name, base64 });
       toast.success(`ملف "${file.name}" جاهز للإرسال`);
     };
@@ -126,29 +143,21 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        audioChunksRef.current.push(event.data);
-      };
-
+      mediaRecorder.ondataavailable = (ev) => audioChunksRef.current.push(ev.data);
       mediaRecorder.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         const reader = new FileReader();
-        reader.onload = (event) => {
-          const base64 = event.target?.result as string;
+        reader.onload = (ev) => {
+          const base64 = ev.target?.result as string;
           handleSendMessage(input, base64, null, null);
         };
         reader.readAsDataURL(audioBlob);
       };
-
       mediaRecorder.start();
       setIsRecording(true);
       setRecordingSeconds(0);
-
-      recordingTimerRef.current = setInterval(() => {
-        setRecordingSeconds((s) => s + 1);
-      }, 1000);
-    } catch (error) {
+      recordingTimerRef.current = setInterval(() => setRecordingSeconds((s) => s + 1), 1000);
+    } catch {
       toast.error('لا يمكن الوصول للميكروفون');
     }
   };
@@ -156,11 +165,9 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
   const stopRecording = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
-      mediaRecorderRef.current.stream.getTracks().forEach((track) => track.stop());
+      mediaRecorderRef.current.stream.getTracks().forEach((t) => t.stop());
     }
-    if (recordingTimerRef.current) {
-      clearInterval(recordingTimerRef.current);
-    }
+    if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
     setIsRecording(false);
     setRecordingSeconds(0);
   };
@@ -186,27 +193,12 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
     setImagePreview(null);
     setIsLoading(true);
 
-    // Add typing indicator
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: 'assistant',
-        content: '',
-        isTyping: true,
-      },
-    ]);
+    setMessages((prev) => [...prev, { role: 'assistant', content: '', isTyping: true }]);
 
-    const msgArray = [
-      ...messages,
-      userMessage,
-    ];
-
+    const msgArray = [...messages, userMessage];
     chatMutation.mutate({
       sessionId,
-      messages: msgArray.map((m) => ({
-        role: m.role,
-        content: m.content,
-      })),
+      messages: msgArray.map((m) => ({ role: m.role, content: m.content })),
       imageBase64: imageBase64Param || imageBase64 || undefined,
       audioBase64: audioBase64 || undefined,
       fileBase64: fileBase64Param || pendingFile?.base64 || undefined,
@@ -215,227 +207,261 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
     });
   };
 
-  const handleSuggestedQuestion = (question: string) => {
-    handleSendMessage(question);
-  };
-
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: 100 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 100 }}
-          transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[9999] bg-white flex flex-col"
-          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X size={24} className="text-black" />
-            </motion.button>
+        <>
+          {/* Backdrop */}
+          <motion.div
+            key="backdrop"
+            variants={BACKDROP_VARIANTS}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-[9998] bg-black/30"
+            onClick={onClose}
+          />
 
-            <div className="flex items-center gap-2">
-              <img
-                src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_7e8b089f.png"
-                alt="Bysis AI"
-                className="w-5 h-5 object-contain"
-              />
-              <h2 className="text-lg font-semibold text-black">Bysis AI</h2>
+          {/* Chat Panel — slides up from bottom, leaves bottom nav visible */}
+          <motion.div
+            key="chat-panel"
+            variants={SLIDE_VARIANTS}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed left-0 right-0 bottom-0 z-[9999] bg-white flex flex-col"
+            style={{
+              height: 'calc(100dvh - 64px)', // leave room for bottom nav
+              borderTopLeftRadius: '20px',
+              borderTopRightRadius: '20px',
+              boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
+            }}
+          >
+            {/* Drag handle */}
+            <div className="flex justify-center pt-3 pb-1">
+              <div className="w-10 h-1 bg-gray-300 rounded-full" />
             </div>
 
-            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-              <span className="text-xl text-black">⋯</span>
-            </button>
-          </div>
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+              <motion.button
+                whileTap={{ scale: 0.88 }}
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+              >
+                <X size={22} className="text-black" />
+              </motion.button>
 
-          {/* Chat Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4" ref={scrollRef}>
-            {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full gap-6 py-8">
-                <div className="text-center">
-                  <h3 className="text-xl font-bold text-black mb-2">
-                    في أي مجال تحتاج مساعدة؟
-                  </h3>
-                  <p className="text-sm text-gray-600">
-                    اختر من الخيارات أسفله أو اسأل سؤالك
-                  </p>
+              <div className="flex flex-col items-center">
+                <div className="flex items-center gap-1.5">
+                  <img
+                    src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_7e8b089f.png"
+                    alt="Bysis AI"
+                    className="w-5 h-5 object-contain"
+                  />
+                  <span className="text-base font-bold text-black tracking-tight">Bysis</span>
+                  <span className="text-base font-bold text-gray-400">ai</span>
                 </div>
-
-                <div className="w-full space-y-3">
-                  <div className="grid grid-cols-2 gap-2">
-                    {SUGGESTED_QUESTIONS.map((q, i) => (
-                      <motion.button
-                        key={i}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => handleSuggestedQuestion(q.text)}
-                        className="p-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-left text-sm text-gray-700 transition-colors"
-                      >
-                        <div className="font-semibold">{q.emoji} {q.label}</div>
-                      </motion.button>
-                    ))}
-                  </div>
-                </div>
+                <span className="text-[10px] text-gray-400 -mt-0.5">beta</span>
               </div>
-            ) : (
-              messages.map((msg, i) => (
+
+              <button className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                <MoreHorizontal size={22} className="text-black" />
+              </button>
+            </div>
+
+            {/* Chat Area */}
+            <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4" ref={scrollRef}>
+              {messages.length === 0 ? (
                 <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 10 }}
+                  initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  transition={{ delay: 0.15, duration: 0.3 }}
+                  className="flex flex-col gap-5 pt-2"
                 >
-                  <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                      msg.role === 'user'
-                        ? 'bg-black text-white rounded-br-none'
-                        : 'bg-gray-100 text-black rounded-bl-none'
-                    }`}
-                  >
-                    {msg.isTyping ? (
-                      <div className="flex gap-2">
-                        <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" />
-                        <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0.1s' }} />
-                        <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0.2s' }} />
-                      </div>
-                    ) : (
-                      <>
-                        {msg.imageUrl && (
-                          <img src={msg.imageUrl} alt="uploaded" className="w-full rounded mb-2 max-h-48 object-cover" />
-                        )}
-                        <Streamdown>{msg.content}</Streamdown>
-                      </>
-                    )}
+                  <p className="text-[15px] font-semibold text-black">
+                    في أي مجال تحتاج مساعدة اليوم؟
+                  </p>
+
+                  {/* Suggestion chips — horizontal scroll rows */}
+                  <div className="space-y-3">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      استكشف الخيارات
+                    </p>
+                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                      {SUGGESTED_QUESTIONS.slice(0, 3).map((q, i) => (
+                        <motion.button
+                          key={i}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleSendMessage(q.text)}
+                          className="flex-shrink-0 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-800 font-medium transition-colors border border-gray-200"
+                        >
+                          {q.emoji} {q.label}
+                        </motion.button>
+                      ))}
+                    </div>
+
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      طلبات شائعة
+                    </p>
+                    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                      {SUGGESTED_QUESTIONS.slice(3).map((q, i) => (
+                        <motion.button
+                          key={i}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleSendMessage(q.text)}
+                          className="flex-shrink-0 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm text-gray-800 font-medium transition-colors border border-gray-200"
+                        >
+                          {q.emoji} {q.label}
+                        </motion.button>
+                      ))}
+                    </div>
                   </div>
                 </motion.div>
-              ))
+              ) : (
+                messages.map((msg, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div
+                      className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                        msg.role === 'user'
+                          ? 'bg-black text-white rounded-br-sm'
+                          : 'bg-gray-100 text-black rounded-bl-sm'
+                      }`}
+                    >
+                      {msg.isTyping ? (
+                        <div className="flex gap-1.5 py-1">
+                          {[0, 0.15, 0.3].map((delay, j) => (
+                            <motion.div
+                              key={j}
+                              className="w-2 h-2 rounded-full bg-gray-400"
+                              animate={{ y: [0, -5, 0] }}
+                              transition={{ repeat: Infinity, duration: 0.7, delay }}
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <>
+                          {msg.imageUrl && (
+                            <img
+                              src={msg.imageUrl}
+                              alt="uploaded"
+                              className="w-full rounded-xl mb-2 max-h-48 object-cover"
+                            />
+                          )}
+                          <Streamdown>{msg.content}</Streamdown>
+                        </>
+                      )}
+                    </div>
+                  </motion.div>
+                ))
+              )}
+            </div>
+
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="px-4 py-2 border-t border-gray-100">
+                <div className="relative inline-block">
+                  <img src={imagePreview} alt="preview" className="w-16 h-16 rounded-xl object-cover" />
+                  <button
+                    onClick={() => { setImagePreview(null); setImageBase64(null); }}
+                    className="absolute -top-1.5 -right-1.5 bg-black text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+                  >
+                    ×
+                  </button>
+                </div>
+              </div>
             )}
-          </div>
 
-          {/* Image Preview */}
-          {imagePreview && (
-            <div className="px-4 py-2 border-t border-gray-200">
-              <div className="relative inline-block">
-                <img src={imagePreview} alt="preview" className="w-20 h-20 rounded object-cover" />
-                <button
-                  onClick={() => {
-                    setImagePreview(null);
-                    setImageBase64(null);
+            {/* File Preview */}
+            {pendingFile && (
+              <div className="px-4 py-2 border-t border-gray-100">
+                <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-xl">
+                  <File size={14} className="text-gray-600" />
+                  <span className="text-xs text-gray-700 flex-1 truncate">{pendingFile.name}</span>
+                  <button onClick={() => setPendingFile(null)} className="text-gray-400 hover:text-black">×</button>
+                </div>
+              </div>
+            )}
+
+            {/* Input Area */}
+            <div className="px-4 py-3 border-t border-gray-100 bg-white">
+              <div className="flex items-center gap-2 bg-gray-100 rounded-2xl px-3 py-2">
+                {/* Media buttons */}
+                <motion.button
+                  whileTap={{ scale: 0.88 }}
+                  onClick={() => imageInputRef.current?.click()}
+                  className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  <Upload size={18} className="text-gray-500" />
+                </motion.button>
+
+                <motion.button
+                  whileTap={{ scale: 0.88 }}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
+                >
+                  <File size={18} className="text-gray-500" />
+                </motion.button>
+
+                {/* Text input */}
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage(input);
+                    }
                   }}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-          )}
+                  placeholder="اسأل Bysis AI..."
+                  className="flex-1 bg-transparent text-sm text-black placeholder-gray-400 outline-none"
+                  disabled={isLoading}
+                />
 
-          {/* File Preview */}
-          {pendingFile && (
-            <div className="px-4 py-2 border-t border-gray-200">
-              <div className="flex items-center gap-2 bg-gray-100 p-2 rounded">
-                <File size={16} />
-                <span className="text-sm text-gray-700 flex-1 truncate">{pendingFile.name}</span>
-                <button
-                  onClick={() => setPendingFile(null)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Input Area */}
-          <div className="p-4 border-t border-gray-200 bg-white space-y-2">
-            {/* Media buttons */}
-            <div className="flex gap-2 justify-start">
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => imageInputRef.current?.click()}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="صورة"
-              >
-                <Upload size={20} className="text-gray-600" />
-              </motion.button>
-
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => fileInputRef.current?.click()}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                title="ملف"
-              >
-                <File size={20} className="text-gray-600" />
-              </motion.button>
-
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={isRecording ? stopRecording : startRecording}
-                className={`p-2 rounded-lg transition-colors ${
-                  isRecording ? 'bg-red-100' : 'hover:bg-gray-100'
-                }`}
-                title="صوت"
-              >
-                {isRecording ? (
-                  <div className="flex items-center gap-1">
-                    <StopCircle size={20} className="text-red-600" />
-                    <span className="text-xs text-red-600">{recordingSeconds}s</span>
-                  </div>
+                {/* Mic / Send */}
+                {input.trim() || imageBase64 || pendingFile ? (
+                  <motion.button
+                    whileTap={{ scale: 0.88 }}
+                    onClick={() => handleSendMessage(input)}
+                    disabled={isLoading}
+                    className="p-1.5 bg-black rounded-lg transition-colors disabled:opacity-50"
+                  >
+                    <Send size={18} className="text-white" />
+                  </motion.button>
                 ) : (
-                  <Mic size={20} className="text-gray-600" />
+                  <motion.button
+                    whileTap={{ scale: 0.88 }}
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className={`p-1.5 rounded-lg transition-colors ${
+                      isRecording ? 'bg-red-100' : 'hover:bg-gray-200'
+                    }`}
+                  >
+                    {isRecording ? (
+                      <div className="flex items-center gap-1">
+                        <StopCircle size={18} className="text-red-600" />
+                        <span className="text-xs text-red-600 font-mono">{recordingSeconds}s</span>
+                      </div>
+                    ) : (
+                      <Mic size={18} className="text-gray-500" />
+                    )}
+                  </motion.button>
                 )}
-              </motion.button>
+              </div>
             </div>
 
-            {/* Input field */}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage(input);
-                  }
-                }}
-                placeholder="اكتب رسالتك..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-black placeholder-gray-500"
-              />
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => handleSendMessage(input)}
-                disabled={isLoading || (!input.trim() && !imageBase64 && !pendingFile)}
-                className="p-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors"
-              >
-                <Send size={20} />
-              </motion.button>
-            </div>
-          </div>
-
-          {/* Hidden file inputs */}
-          <input
-            ref={imageInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageSelect}
-            className="hidden"
-          />
-          <input
-            ref={fileInputRef}
-            type="file"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
-
-          {/* Safe area bottom */}
-          <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
-        </motion.div>
+            {/* Hidden file inputs */}
+            <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />
+            <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelect} />
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
