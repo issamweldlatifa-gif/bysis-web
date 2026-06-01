@@ -6,6 +6,11 @@ import path from "node:path";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
+// Increase Node memory for build
+if (process.env.NODE_ENV === 'production') {
+  process.env.NODE_OPTIONS = '--max-old-space-size=4096';
+}
+
 // =============================================================================
 // Manus Debug Collector - Vite Plugin
 // Writes browser logs directly to files, trimmed when exceeding size limit
@@ -160,6 +165,7 @@ export default defineConfig({
       "@shared": path.resolve(import.meta.dirname, "shared"),
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
+    dedupe: ['react', 'react-dom'],
   },
   envDir: path.resolve(import.meta.dirname),
   root: path.resolve(import.meta.dirname, "client"),
@@ -173,22 +179,23 @@ export default defineConfig({
       compress: {
         drop_console: true,
         drop_debugger: true,
+        passes: 2,
+      },
+      mangle: true,
+      format: {
+        comments: false,
       },
     },
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // Vendor chunks
-          if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'vendor-react';
-            if (id.includes('@radix-ui')) return 'vendor-ui';
-            if (id.includes('framer-motion')) return 'vendor-animation';
-            if (id.includes('@trpc')) return 'vendor-trpc';
-            if (id.includes('zod') || id.includes('superjson')) return 'vendor-utils';
-            return 'vendor';
-          }
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-select', '@radix-ui/react-dropdown-menu'],
+          'vendor-animation': ['framer-motion'],
+          'vendor-trpc': ['@trpc/client', '@trpc/react-query'],
+          'vendor-utils': ['date-fns', 'clsx', 'tailwind-merge'],
         },
-            // Optimize chunk names
+        // Optimize chunk names
         chunkFileNames: 'assets/[name]-[hash].js',
         entryFileNames: 'assets/[name]-[hash].js',
         // Optimize asset names
@@ -228,6 +235,9 @@ export default defineConfig({
       host: 'localhost',
       port: 5173,
     },
+    watch: {
+      usePolling: false,
+    },
   },
   // Optimize dependencies
   optimizeDeps: {
@@ -238,8 +248,13 @@ export default defineConfig({
       '@trpc/client',
       '@trpc/react-query',
     ],
+    exclude: ['@aws-sdk/client-s3', 'mysql2'],
   },
   define: {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
   },
+  esbuild: {
+    legalComments: 'none',
+  },
+  logLevel: 'error',
 });
