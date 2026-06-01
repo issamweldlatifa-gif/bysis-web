@@ -331,3 +331,19 @@
 - [x] Color Extractor utility (k-means clustering + React hook useDominantColor)
 - [x] BgColorContext: إضافة carouselColor منفصل عن bgColor
 - [x] DynamicColorCarousel: onColorChange callback لتمرير اللون للـ header
+
+## 🔧 Amazon Diff Fixes (June 2026)
+- [ ] شريط البحث أبيض ثابت دائماً (لا يتلون مع الـ carousel)
+- [ ] زر الـ chatbot داخل شريط البحث (ليس FAB منفصل)
+- [ ] زر الـ chatbot يختفي عند السكرول للأسفل
+- [ ] Bottom Nav يختفي عند السكرول للأسفل ويرجع للأعلى
+- [ ] Carousel peek effect (90% عرض مع ظهور حافة الـ card التالي)
+
+## 🔧 Amazon Diff Fixes (June 2026)
+- [x] شريط بحث أبيض ثابت دائماً (لا يتغير لونه)
+- [x] Chatbot button (dots icon) داخل شريط البحث يختفي عند السكرول للأسفل
+- [x] Bottom Nav يختفي عند السكرول للأسفل ويرجع للأعلى
+- [x] Carousel peek effect 88% + snap-to-center
+- [x] لون Hero فقط (ليس الصفحة كلها)
+- [x] Color Extractor utility (k-means clustering + useDominantColor hook)
+- [x] BgColorContext: carouselColor منفصل عن bgColor
