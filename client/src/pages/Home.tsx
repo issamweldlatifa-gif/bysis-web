@@ -1,9 +1,36 @@
-import { useState } from 'react';
 import AppLayout from '@/components/AppLayout';
-import CenterSnapCarousel, { CarouselCard } from '@/components/CenterSnapCarousel';
+import { useBgColor } from '@/contexts/BgColorContext';
 import { useLocation } from 'wouter';
 import { useChatContext } from '@/App';
+import DynamicColorCarousel, { CarouselSlide } from '@/components/DynamicColorCarousel';
 import { trpc } from '@/lib/trpc';
+
+/* ── Carousel Slides ─────────────────────────────────────────────────────── */
+const CAROUSEL_SLIDES: CarouselSlide[] = [
+  {
+    color: '#f5c518',
+    title: 'Organisez-vous',
+    subtitle: 'Découvrez les meilleures ventes',
+    cards: [{ label: 'Commander' }, { label: 'Arrivages' }, { label: 'Suivre' }, { label: 'Calculer' }],
+  },
+  {
+    color: '#006a2e',
+    title: 'Nos meilleures\nventes à\npetits prix',
+    cards: [{ label: 'Mode' }, { label: 'Électronique' }, { label: 'Maison' }, { label: 'Beauté' }],
+  },
+  {
+    color: '#1a3a5c',
+    title: 'Meilleures\nventes de livres',
+    subtitle: 'Découvrez maintenant',
+    cards: [{ label: 'Romans' }, { label: 'Sciences' }, { label: 'Enfants' }, { label: 'Cuisine' }],
+  },
+  {
+    color: '#ff3131',
+    title: 'Ventes Flash',
+    subtitle: "Offres limitées — jusqu'à -70%",
+    cards: [{ label: 'Chaussures' }, { label: 'Sacs' }, { label: 'Vêtements' }, { label: 'Accessoires' }],
+  },
+];
 
 /* ── Icon constants ──────────────────────────────────────────────────────── */
 const SW = '1.8';
@@ -12,7 +39,9 @@ const SW = '1.8';
 function IcoOrder({ color }: { color: string }) {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
+      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <path d="M16 10a4 4 0 01-8 0"/>
     </svg>
   );
 }
@@ -20,7 +49,8 @@ function IcoOrder({ color }: { color: string }) {
 function IcoTrack({ color }: { color: string }) {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      <circle cx="12" cy="12" r="10"/>
+      <polyline points="12 6 12 12 16 14"/>
     </svg>
   );
 }
@@ -28,7 +58,9 @@ function IcoTrack({ color }: { color: string }) {
 function IcoBox({ color }: { color: string }) {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+      <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+      <line x1="12" y1="22.08" x2="12" y2="12"/>
     </svg>
   );
 }
@@ -36,7 +68,16 @@ function IcoBox({ color }: { color: string }) {
 function IcoCalc({ color }: { color: string }) {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="8" y2="10"/><line x1="12" y1="10" x2="12" y2="10"/><line x1="16" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/>
+      <rect x="4" y="2" width="16" height="20" rx="2"/>
+      <line x1="8" y1="6" x2="16" y2="6"/>
+      <line x1="8" y1="10" x2="8" y2="10"/>
+      <line x1="12" y1="10" x2="12" y2="10"/>
+      <line x1="16" y1="10" x2="16" y2="10"/>
+      <line x1="8" y1="14" x2="8" y2="14"/>
+      <line x1="12" y1="14" x2="12" y2="14"/>
+      <line x1="16" y1="14" x2="16" y2="14"/>
+      <line x1="8" y1="18" x2="12" y2="18"/>
+      <line x1="16" y1="18" x2="16" y2="18"/>
     </svg>
   );
 }
@@ -45,7 +86,10 @@ function IcoCalc({ color }: { color: string }) {
 function IcoRocket({ color }: { color: string }) {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
+      <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 00-2.91-.09z"/>
+      <path d="M12 15l-3-3a22 22 0 012-3.95A12.88 12.88 0 0122 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 01-4 2z"/>
+      <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/>
+      <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/>
     </svg>
   );
 }
@@ -53,7 +97,10 @@ function IcoRocket({ color }: { color: string }) {
 function IcoAIFeature({ color }: { color: string }) {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+      <path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/>
+      <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+      <line x1="9" y1="9" x2="9.01" y2="9"/>
+      <line x1="15" y1="9" x2="15.01" y2="9"/>
     </svg>
   );
 }
@@ -61,7 +108,8 @@ function IcoAIFeature({ color }: { color: string }) {
 function IcoShield({ color }: { color: string }) {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      <polyline points="9 12 11 14 15 10"/>
     </svg>
   );
 }
@@ -69,7 +117,10 @@ function IcoShield({ color }: { color: string }) {
 function IcoPackage({ color }: { color: string }) {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round">
-      <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+      <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/>
+      <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+      <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+      <line x1="12" y1="22.08" x2="12" y2="12"/>
     </svg>
   );
 }
@@ -115,7 +166,9 @@ function ArrivageCard({ item, onAdd }: { item: any; onAdd: () => void }) {
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
             </svg>
           </div>
         )}
@@ -139,83 +192,17 @@ function ArrivageCard({ item, onAdd }: { item: any; onAdd: () => void }) {
 
 /* ── Home Component ──────────────────────────────────────────────────────── */
 function HomeContent() {
+  const { setCarouselColor } = useBgColor();
   const [, navigate] = useLocation();
   const { openChat } = useChatContext();
-  const [headerBgColor, setHeaderBgColor] = useState('#FFFFFF');
 
   const { data: arrivageData } = trpc.arrivage.list.useQuery();
   const availableItems = arrivageData?.filter((i: any) => i.available)?.slice(0, 6) ?? [];
 
-  // Carousel slides with proper card structure
-  const carouselCards: CarouselCard[] = [
-    {
-      id: 'flash-sales',
-      color: '#FF3131',
-      title: 'Ventes Flash',
-      subtitle: 'Offres limitées — jusqu\'à -70%',
-      content: (
-        <div className="grid grid-cols-2 gap-3 w-full">
-          {['Chaussures', 'Sacs', 'Vêtements', 'Accessoires'].map((cat) => (
-            <div key={cat} className="rounded-2xl border-2 border-white/30 p-4 text-center">
-              <p className="text-sm font-bold">{cat}</p>
-            </div>
-          ))}
-        </div>
-      ),
-    },
-    {
-      id: 'organize',
-      color: '#F5C518',
-      title: 'Organisez-vous',
-      subtitle: 'Découvrez les meilleures ventes',
-      content: (
-        <div className="grid grid-cols-2 gap-3 w-full">
-          {['Commander', 'Arrivages', 'Suivre', 'Calculer'].map((cat) => (
-            <div key={cat} className="rounded-2xl border-2 border-white/30 p-4 text-center">
-              <p className="text-sm font-bold">{cat}</p>
-            </div>
-          ))}
-        </div>
-      ),
-    },
-    {
-      id: 'best-sales',
-      color: '#006A2E',
-      title: 'Nos meilleures\nventes à\npetits prix',
-      content: (
-        <div className="grid grid-cols-2 gap-3 w-full">
-          {['Mode', 'Électronique', 'Maison', 'Beauté'].map((cat) => (
-            <div key={cat} className="rounded-2xl border-2 border-white/30 p-4 text-center">
-              <p className="text-sm font-bold">{cat}</p>
-            </div>
-          ))}
-        </div>
-      ),
-    },
-    {
-      id: 'books',
-      color: '#1A3A5C',
-      title: 'Meilleures\nventes de livres',
-      subtitle: 'Découvrez maintenant',
-      content: (
-        <div className="grid grid-cols-2 gap-3 w-full">
-          {['Romans', 'Sciences', 'Enfants', 'Cuisine'].map((cat) => (
-            <div key={cat} className="rounded-2xl border-2 border-white/30 p-4 text-center">
-              <p className="text-sm font-bold">{cat}</p>
-            </div>
-          ))}
-        </div>
-      ),
-    },
-  ];
-
   return (
     <div className="w-full bg-white">
-      {/* Hero Carousel with dynamic header color */}
-      <CenterSnapCarousel
-        cards={carouselCards}
-        onActiveCardChange={(color) => setHeaderBgColor(color)}
-      />
+      {/* Hero Carousel */}
+      <DynamicColorCarousel slides={CAROUSEL_SLIDES} onColorChange={setCarouselColor} />
 
       {/* Quick Actions */}
       <section className="w-full px-4 py-4 bg-white">
