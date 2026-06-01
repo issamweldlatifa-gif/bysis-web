@@ -210,17 +210,19 @@ function TopHeader({ chatVisible, onChatClick }: TopHeaderProps) {
 interface BottomNavProps {
   onProfileClick: () => void;
   onMenuClick?: () => void;
+  onChatClick: () => void;
   visible: boolean;
 }
 
 const NAV_TABS = [
   { id: 'home',     path: '/',        label: 'Accueil' },
   { id: 'boutique', path: '/arrivage', label: 'Boutiques' },
+  { id: 'chat',     path: null,       label: 'Bysis AI' },
   { id: 'panier',   path: '/panier',  label: 'Panier' },
   { id: 'moi',      path: null,       label: 'Moi' },
 ] as const;
 
-function BottomNav({ onProfileClick, onMenuClick: _onMenuClick, visible }: BottomNavProps) {
+function BottomNav({ onProfileClick, onMenuClick: _onMenuClick, visible, onChatClick }: BottomNavProps & { onChatClick: () => void }) {
   const [location, navigate] = useLocation();
   const { totalItems } = useCart();
 
@@ -233,6 +235,8 @@ function BottomNav({ onProfileClick, onMenuClick: _onMenuClick, visible }: Botto
   const handleTab = (tab: typeof NAV_TABS[number]) => {
     if (tab.id === 'moi') {
       onProfileClick();
+    } else if (tab.id === 'chat') {
+      onChatClick();
     } else if (tab.path) {
       navigate(tab.path);
     }
@@ -245,9 +249,38 @@ function BottomNav({ onProfileClick, onMenuClick: _onMenuClick, visible }: Botto
       animate={{ y: visible ? 0 : '100%' }}
       transition={{ type: 'spring', stiffness: 400, damping: 38, mass: 0.8 }}
     >
-      <div className="flex items-stretch justify-around px-2 pt-2 pb-1 gap-1">
+      <div className="flex items-end justify-around px-2 pt-2 pb-1 gap-1">
         {NAV_TABS.map((tab) => {
-          const active = tab.id === 'moi' ? false : isActive(tab.path);
+          const active = tab.id === 'moi' || tab.id === 'chat' ? false : isActive(tab.path);
+
+          /* ── Chatbot FAB (raised center button) ── */
+          if (tab.id === 'chat') {
+            return (
+              <div key="chat" className="flex flex-col items-center justify-end flex-1" style={{ minHeight: 52 }}>
+                <motion.button
+                  whileTap={{ scale: 0.85 }}
+                  onClick={() => handleTab(tab)}
+                  className="flex items-center justify-center rounded-full shadow-lg mb-1"
+                  style={{
+                    width: 52,
+                    height: 52,
+                    background: 'linear-gradient(135deg, #0A0A0A 0%, #1A1A2E 100%)',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+                    marginBottom: 6,
+                  }}
+                  aria-label="Bysis AI"
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <circle cx="6"  cy="12" r="3" fill="#FF3131" />
+                    <circle cx="12" cy="12" r="3" fill="#F5C518" />
+                    <circle cx="18" cy="12" r="3" fill="#006A2E" />
+                  </svg>
+                </motion.button>
+                <span className="text-[10px] font-semibold leading-none" style={{ color: '#888888' }}>AI</span>
+              </div>
+            );
+          }
+
           return (
             <motion.button
               key={tab.id}
@@ -345,6 +378,7 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
       {showNav && (
         <BottomNav
           onProfileClick={() => setProfileOpen(true)}
+          onChatClick={handleChatOpen}
           visible={navVisible}
         />
       )}
