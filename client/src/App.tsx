@@ -7,9 +7,9 @@ import { Route, Switch, useLocation } from "wouter";
 import { AnimatePresence } from "framer-motion";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import FloatingChat from "./components/FloatingChat";
+import AIChat from "./components/AIChat";
 
-// Context to allow any page to open FloatingChat
+// Context to allow any page to open AIChat
 export const ChatContext = createContext<{ openChat: () => void }>({ openChat: () => {} });
 export function useChatContext() { return useContext(ChatContext); }
 
@@ -75,13 +75,8 @@ function Router() {
   );
 }
 
-function FloatingChatWrapper({ chatOpen, setChatOpen }: { chatOpen: boolean; setChatOpen: (v: boolean) => void }) {
-  const [location] = useLocation();
-  // Hide floating button on home page and scanner page
-  const hideOnHome = location === "/";
-  const hideOnScanner = location === "/scanner";
-  if ((hideOnHome || hideOnScanner) && !chatOpen) return null;
-  return <FloatingChat externalOpen={chatOpen} onExternalOpenChange={setChatOpen} />;
+function AIChatWrapper({ chatOpen, setChatOpen }: { chatOpen: boolean; setChatOpen: (v: boolean) => void }) {
+  return <AIChat isOpen={chatOpen} onClose={() => setChatOpen(false)} />;
 }
 
 function App() {
@@ -96,7 +91,7 @@ function App() {
           <ChatContext.Provider value={{ openChat: () => setChatOpen(true) }}>
             <Toaster />
             <Router />
-            <FloatingChatWrapper chatOpen={chatOpen} setChatOpen={setChatOpen} />
+            <AIChatWrapper chatOpen={chatOpen} setChatOpen={setChatOpen} />
           </ChatContext.Provider>
         </TooltipProvider>
         </CartProvider>

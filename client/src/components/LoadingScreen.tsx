@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
 
 export default function LoadingScreen() {
+  const colors = ['#FF4444', '#4444FF', '#FF9900']; // أحمر، أزرق، برتقالي
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white">
       {/* Animated background gradient */}
@@ -74,14 +76,16 @@ export default function LoadingScreen() {
           </motion.span>
         </motion.div>
 
-        {/* Animated dots */}
-        <div className="flex gap-2">
-          {[0, 1, 2].map((i) => (
+        {/* Animated colored dots */}
+        <div className="flex gap-3">
+          {colors.map((color, i) => (
             <motion.div
               key={i}
-              className="w-2 h-2 rounded-full bg-black"
+              className="w-3 h-3 rounded-full"
+              style={{ background: color }}
               animate={{
-                y: [0, -8, 0],
+                y: [0, -12, 0],
+                scale: [1, 1.2, 1],
               }}
               transition={{
                 duration: 0.6,
