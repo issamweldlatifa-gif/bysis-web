@@ -359,3 +359,23 @@
 - [x] I18nContext: FR/AR translations (nav, profile, cart, general)
 - [x] Scanner page: Amazon Lens-style with flash + barcode + help page
 - [x] Home.tsx: Quick Actions with colored icons + Boutiques section
+
+## Phase: Catalogue + Admin Slides/Produits/Catégories (Juin 2026)
+- [x] DB: tables carousel_slides, categories, products dans drizzle/schema.ts
+- [x] DB: helpers getCarouselSlides, getActiveCarouselSlides, createCarouselSlide, updateCarouselSlide, deleteCarouselSlide
+- [x] DB: helpers getAllCategories, getActiveCategories, createCategory, updateCategory, deleteCategory
+- [x] DB: helpers getAllProducts, getActiveProducts, getProductsByCategory, getProductById, searchProducts, createProduct, updateProduct, deleteProduct, countProducts
+- [x] Backend: procedures carousel.list, carousel.adminList, carousel.create, carousel.update, carousel.delete
+- [x] Backend: procedures categories.list, categories.adminList, categories.create, categories.update, categories.delete
+- [x] Backend: procedures products.list (retourne {items, total}), products.get, products.adminList, products.create, products.update, products.delete, products.uploadImage
+- [x] Admin: AdminSlides.tsx - gestion des slides du carousel (CRUD + réordonnancement)
+- [x] Admin: AdminProducts.tsx - gestion des produits (CRUD + upload image)
+- [x] Admin: AdminCategories.tsx - gestion des catégories (CRUD)
+- [x] Admin: Intégration dans ShipMasterDashboard (tabs Slides, Produits, Catégories)
+- [x] Home.tsx: Carousel dynamique depuis DB (fallback sur slides hardcodées si DB vide)
+- [x] Catalogue.tsx: Page catalogue public avec liste, filtres par catégorie, recherche, pagination
+- [x] ProduitDetail.tsx: Page détail produit avec ajout au panier et commande directe
+- [x] App.tsx: Routes /catalogue et /produit/:id ajoutées
+- [x] AppLayout.tsx: Navigation bottom nav pointe vers /catalogue
+- [x] Panier.tsx: handleCommander passe tous les articles au checkout via sessionStorage
+- [x] 22/22 tests Vitest passent

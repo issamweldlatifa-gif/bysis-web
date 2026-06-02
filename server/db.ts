@@ -7,7 +7,10 @@ import {
   auditLogs, AuditLog, InsertAuditLog,
   chatConversations, chatMessages, ChatConversation, ChatMessage,
   appSettings, arrivageItems, ArrivageItem, InsertArrivageItem,
-  calculationHistory, CalculationHistory, InsertCalculationHistory
+  calculationHistory, CalculationHistory, InsertCalculationHistory,
+  carouselSlides, CarouselSlide, InsertCarouselSlide,
+  categories, Category, InsertCategory,
+  products, Product, InsertProduct
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -440,4 +443,155 @@ export async function getCalculationHistoryByDevice(deviceId: string, limit: num
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   return await db.select().from(calculationHistory).where(eq(calculationHistory.deviceId, deviceId)).orderBy(desc(calculationHistory.createdAt)).limit(limit);
+}
+
+// ===== Carousel Slides Helpers =====
+
+export async function getCarouselSlides(): Promise<CarouselSlide[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(carouselSlides).orderBy(carouselSlides.displayOrder);
+}
+
+export async function getActiveCarouselSlides(): Promise<CarouselSlide[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(carouselSlides)
+    .where(eq(carouselSlides.active, 1))
+    .orderBy(carouselSlides.displayOrder);
+}
+
+export async function createCarouselSlide(slide: InsertCarouselSlide): Promise<CarouselSlide> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(carouselSlides).values(slide);
+  const insertId = (result as any)[0]?.insertId;
+  const created = await db.select().from(carouselSlides).where(eq(carouselSlides.id, insertId)).limit(1);
+  return created[0];
+}
+
+export async function updateCarouselSlide(id: number, updates: Partial<InsertCarouselSlide>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(carouselSlides).set(updates).where(eq(carouselSlides.id, id));
+}
+
+export async function deleteCarouselSlide(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(carouselSlides).where(eq(carouselSlides.id, id));
+}
+
+// ===== Categories Helpers =====
+
+export async function getAllCategories(): Promise<Category[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(categories).orderBy(categories.displayOrder);
+}
+
+export async function getActiveCategories(): Promise<Category[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(categories)
+    .where(eq(categories.active, 1))
+    .orderBy(categories.displayOrder);
+}
+
+export async function createCategory(cat: InsertCategory): Promise<Category> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(categories).values(cat);
+  const insertId = (result as any)[0]?.insertId;
+  const created = await db.select().from(categories).where(eq(categories.id, insertId)).limit(1);
+  return created[0];
+}
+
+export async function updateCategory(id: number, updates: Partial<InsertCategory>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(categories).set(updates).where(eq(categories.id, id));
+}
+
+export async function deleteCategory(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(categories).where(eq(categories.id, id));
+}
+
+// ===== Products Helpers =====
+
+export async function getAllProducts(limit = 50, offset = 0): Promise<Product[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(products).orderBy(desc(products.createdAt)).limit(limit).offset(offset);
+}
+
+export async function getActiveProducts(limit = 50, offset = 0): Promise<Product[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(products)
+    .where(eq(products.active, 1))
+    .orderBy(desc(products.createdAt))
+    .limit(limit).offset(offset);
+}
+
+export async function getProductsByCategory(categoryId: number, limit = 50): Promise<Product[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(products)
+    .where(and(eq(products.categoryId, categoryId), eq(products.active, 1)))
+    .orderBy(desc(products.createdAt))
+    .limit(limit);
+}
+
+export async function getProductById(id: number): Promise<Product | undefined> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(products).where(eq(products.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getProductBySlug(slug: string): Promise<Product | undefined> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(products).where(eq(products.slug, slug)).limit(1);
+  return result[0];
+}
+
+export async function searchProducts(query: string, limit = 20): Promise<Product[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(products)
+    .where(and(like(products.name, `%${query}%`), eq(products.active, 1)))
+    .orderBy(desc(products.createdAt))
+    .limit(limit);
+}
+
+export async function createProduct(product: InsertProduct): Promise<Product> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(products).values(product);
+  const insertId = (result as any)[0]?.insertId;
+  const created = await db.select().from(products).where(eq(products.id, insertId)).limit(1);
+  return created[0];
+}
+
+export async function updateProduct(id: number, updates: Partial<InsertProduct>): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(products).set(updates).where(eq(products.id, id));
+}
+
+export async function deleteProduct(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(products).where(eq(products.id, id));
+}
+
+export async function countProducts(): Promise<number> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select({ count: sql<number>`count(*)` }).from(products);
+  return result[0]?.count ?? 0;
 }

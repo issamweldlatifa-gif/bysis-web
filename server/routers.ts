@@ -19,6 +19,10 @@ import {
   getOrderStats,
   getUserByOpenId,
   getDb,
+  getCarouselSlides, getActiveCarouselSlides, createCarouselSlide, updateCarouselSlide, deleteCarouselSlide,
+  getAllCategories, getActiveCategories, createCategory, updateCategory, deleteCategory,
+  getAllProducts, getActiveProducts, getProductsByCategory, getProductById, searchProducts,
+  createProduct, updateProduct, deleteProduct, countProducts,
 } from "./db";
 import { invokeLLM } from "./_core/llm";
 import { notifyOwner } from "./_core/notification";
@@ -1020,6 +1024,200 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
       const all = await getAllOrders();
       return { count: all.filter(o => o.status === "new").length };
     }),
+  }),
+
+  // ===== Carousel Slides =====
+  carousel: router({
+    // Public: get active slides for homepage
+    list: publicProcedure.query(async () => {
+      return await getActiveCarouselSlides();
+    }),
+    // Admin: get all slides
+    adminList: customAdminProcedure.query(async () => {
+      return await getCarouselSlides();
+    }),
+    // Admin: create slide
+    create: customAdminProcedure
+      .input(z.object({
+        title: z.string().min(1),
+        subtitle: z.string().optional(),
+        bgColor: z.string().default("#E8192C"),
+        textColor: z.string().default("#ffffff"),
+        imageUrl: z.string().optional(),
+        card1Label: z.string().optional(), card1Image: z.string().optional(), card1Link: z.string().optional(),
+        card2Label: z.string().optional(), card2Image: z.string().optional(), card2Link: z.string().optional(),
+        card3Label: z.string().optional(), card3Image: z.string().optional(), card3Link: z.string().optional(),
+        card4Label: z.string().optional(), card4Image: z.string().optional(), card4Link: z.string().optional(),
+        displayOrder: z.number().default(0),
+        active: z.number().default(1),
+      }))
+      .mutation(async ({ input }) => {
+        return await createCarouselSlide(input);
+      }),
+    // Admin: update slide
+    update: customAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().optional(),
+        subtitle: z.string().optional(),
+        bgColor: z.string().optional(),
+        textColor: z.string().optional(),
+        imageUrl: z.string().optional(),
+        card1Label: z.string().optional(), card1Image: z.string().optional(), card1Link: z.string().optional(),
+        card2Label: z.string().optional(), card2Image: z.string().optional(), card2Link: z.string().optional(),
+        card3Label: z.string().optional(), card3Image: z.string().optional(), card3Link: z.string().optional(),
+        card4Label: z.string().optional(), card4Image: z.string().optional(), card4Link: z.string().optional(),
+        displayOrder: z.number().optional(),
+        active: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...updates } = input;
+        await updateCarouselSlide(id, updates);
+        return { success: true };
+      }),
+    // Admin: delete slide
+    delete: customAdminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteCarouselSlide(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // ===== Categories =====
+  categories: router({
+    list: publicProcedure.query(async () => {
+      return await getActiveCategories();
+    }),
+    adminList: customAdminProcedure.query(async () => {
+      return await getAllCategories();
+    }),
+    create: customAdminProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        slug: z.string().min(1),
+        description: z.string().optional(),
+        imageUrl: z.string().optional(),
+        icon: z.string().optional(),
+        displayOrder: z.number().default(0),
+        active: z.number().default(1),
+      }))
+      .mutation(async ({ input }) => {
+        return await createCategory(input);
+      }),
+    update: customAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        slug: z.string().optional(),
+        description: z.string().optional(),
+        imageUrl: z.string().optional(),
+        icon: z.string().optional(),
+        displayOrder: z.number().optional(),
+        active: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...updates } = input;
+        await updateCategory(id, updates);
+        return { success: true };
+      }),
+    delete: customAdminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteCategory(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // ===== Products =====
+  products: router({
+    list: publicProcedure
+      .input(z.object({ limit: z.number().default(50), offset: z.number().default(0), categoryId: z.number().optional(), search: z.string().optional() }))
+      .query(async ({ input }) => {
+        if (input.search) {
+          const items = await searchProducts(input.search, input.limit);
+          return { items, total: items.length };
+        }
+        if (input.categoryId) {
+          const items = await getProductsByCategory(input.categoryId, input.limit);
+          return { items, total: items.length };
+        }
+        const items = await getActiveProducts(input.limit, input.offset);
+        const total = await countProducts();
+        return { items, total };
+      }),
+    get: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const product = await getProductById(input.id);
+        if (!product) throw new TRPCError({ code: "NOT_FOUND", message: "Produit introuvable" });
+        return product;
+      }),
+    adminList: customAdminProcedure
+      .input(z.object({ limit: z.number().default(50), offset: z.number().default(0) }))
+      .query(async ({ input }) => {
+        const items = await getAllProducts(input.limit, input.offset);
+        const total = await countProducts();
+        return { items, total };
+      }),
+    create: customAdminProcedure
+      .input(z.object({
+        categoryId: z.number(),
+        name: z.string().min(1),
+        slug: z.string().min(1),
+        description: z.string().optional(),
+        priceTnd: z.number(),
+        priceEur: z.number().optional(),
+        originalPrice: z.number().optional(),
+        discount: z.number().default(0),
+        imageUrl: z.string().optional(),
+        images: z.array(z.string()).default([]),
+        platform: z.enum(["shein", "aliexpress", "temu", "local"]).default("local"),
+        platformLink: z.string().optional(),
+        stock: z.number().default(0),
+        active: z.number().default(1),
+      }))
+      .mutation(async ({ input }) => {
+        return await createProduct(input);
+      }),
+    update: customAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        categoryId: z.number().optional(),
+        name: z.string().optional(),
+        slug: z.string().optional(),
+        description: z.string().optional(),
+        priceTnd: z.number().optional(),
+        priceEur: z.number().optional(),
+        originalPrice: z.number().optional(),
+        discount: z.number().optional(),
+        imageUrl: z.string().optional(),
+        images: z.array(z.string()).optional(),
+        platform: z.enum(["shein", "aliexpress", "temu", "local"]).optional(),
+        platformLink: z.string().optional(),
+        stock: z.number().optional(),
+        active: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...updates } = input;
+        await updateProduct(id, updates);
+        return { success: true };
+      }),
+    delete: customAdminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteProduct(input.id);
+        return { success: true };
+      }),
+    // Upload product image
+    uploadImage: customAdminProcedure
+      .input(z.object({ base64: z.string(), filename: z.string(), mimeType: z.string() }))
+      .mutation(async ({ input }) => {
+        const buffer = Buffer.from(input.base64, "base64");
+        const key = `products/${Date.now()}-${input.filename}`;
+        const { url } = await storagePut(key, buffer, input.mimeType);
+        return { url };
+      }),
   }),
 
   // ===== Push Notifications =====

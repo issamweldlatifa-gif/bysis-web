@@ -359,3 +359,34 @@ export const calculationHistory = mysqlTable("calculation_history", {
 
 export type CalculationHistory = typeof calculationHistory.$inferSelect;
 export type InsertCalculationHistory = typeof calculationHistory.$inferInsert;
+
+/**
+ * Carousel Slides - managed by admin, displayed on home page
+ */
+export const carouselSlides = mysqlTable("carousel_slides", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  subtitle: text("subtitle"),
+  bgColor: varchar("bgColor", { length: 32 }).default("#E8192C").notNull(),
+  textColor: varchar("textColor", { length: 32 }).default("#ffffff"),
+  imageUrl: text("imageUrl"),
+  card1Label: varchar("card1Label", { length: 128 }),
+  card1Image: text("card1Image"),
+  card1Link: text("card1Link"),
+  card2Label: varchar("card2Label", { length: 128 }),
+  card2Image: text("card2Image"),
+  card2Link: text("card2Link"),
+  card3Label: varchar("card3Label", { length: 128 }),
+  card3Image: text("card3Image"),
+  card3Link: text("card3Link"),
+  card4Label: varchar("card4Label", { length: 128 }),
+  card4Image: text("card4Image"),
+  card4Link: text("card4Link"),
+  displayOrder: int("displayOrder").default(0).notNull(),
+  active: tinyint("active").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CarouselSlide = typeof carouselSlides.$inferSelect;
+export type InsertCarouselSlide = typeof carouselSlides.$inferInsert;

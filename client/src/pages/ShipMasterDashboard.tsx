@@ -18,9 +18,17 @@ import {
   LayoutDashboard, Users, ShoppingBag, Truck, Bell, Search, RefreshCw,
   LogOut, Settings, Shield, BarChart2, Eye, Ban, CheckCircle, AlertTriangle,
   ChevronRight, X, Package, DollarSign, TrendingUp, MessageSquare,
-  Clock, CreditCard, Warehouse, XCircle, Filter, Download, Menu,
+  Clock, CreditCard, Warehouse, XCircle, Filter, Download, Menu, Tag,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import AdminSlides from "./AdminSlides";
+import AdminProducts from "./AdminProducts";
+import AdminCategories from "./AdminCategories";
+
+// Wrapper components for lazy rendering
+function SlidesTabWrapper() { return <AdminSlides />; }
+function ProductsTabWrapper() { return <AdminProducts />; }
+function CategoriesTabWrapper() { return <AdminCategories />; }
 
 // ─── Color constants (light theme matching mockup) ────────────────────────────
 const BG = "#F4F6F9";
@@ -57,7 +65,7 @@ const CLIENT_STATUS_CONFIG: Record<string, { label: string; color: string; bg: s
 
 const PIE_COLORS = ["#3B82F6", "#F59E0B", "#F97316", "#8B5CF6", "#10B981", "#00A651", "#EF4444"];
 
-type AdminTab = "dashboard" | "crm" | "orders" | "audit" | "settings";
+type AdminTab = "dashboard" | "crm" | "orders" | "audit" | "settings" | "slides" | "products" | "categories";
 
 // ─── Notification sound ───────────────────────────────────────────────────────
 function playNotificationSound() {
@@ -182,8 +190,11 @@ export default function ShipMasterDashboard() {
     { id: "dashboard", icon: LayoutDashboard, label: "Tableau de Bord" },
     { id: "crm",       icon: Users,           label: "CRM / Clients" },
     { id: "orders",    icon: ShoppingBag,     label: "Commandes", badge: newOrdersCount > 0 ? newOrdersCount : undefined },
-    { id: "audit",     icon: Shield,          label: "Journal d'Audit" },
-    { id: "settings",  icon: Settings,        label: "Paramètres" },
+    { id: "audit",      icon: Shield,          label: "Journal d'Audit" },
+    { id: "slides",     icon: LayoutDashboard, label: "Slides Carousel" },
+    { id: "products",   icon: Package,         label: "Produits" },
+    { id: "categories", icon: Tag,             label: "Catégories" },
+    { id: "settings",   icon: Settings,        label: "Paramètres" },
   ];
 
   const handleTabChange = (t: AdminTab) => { setTab(t); setSidebarOpen(false); };
@@ -340,18 +351,24 @@ export default function ShipMasterDashboard() {
             {/* Page title */}
             <div className="mb-6">
               <h1 className="text-xl font-bold" style={{ color: TEXT }}>
-                {tab === "dashboard" && "Tableau de Bord"}
-                {tab === "crm"       && "CRM / Clients"}
-                {tab === "orders"    && "Gestion des Commandes"}
-                {tab === "audit"     && "Journal d'Audit"}
-                {tab === "settings"  && "Paramètres"}
+                {tab === "dashboard"  && "Tableau de Bord"}
+                {tab === "crm"        && "CRM / Clients"}
+                {tab === "orders"     && "Gestion des Commandes"}
+                {tab === "audit"      && "Journal d'Audit"}
+                {tab === "slides"     && "Slides Carousel"}
+                {tab === "products"   && "Catalogue Produits"}
+                {tab === "categories" && "Catégories"}
+                {tab === "settings"   && "Paramètres"}
               </h1>
               <p className="text-sm mt-0.5" style={{ color: MUTED }}>
-                {tab === "dashboard" && "Vue d'ensemble de votre activité"}
-                {tab === "crm"       && "Gérez vos clients et leur historique"}
-                {tab === "orders"    && "Suivez et mettez à jour les commandes"}
-                {tab === "audit"     && "Historique de toutes les actions admin"}
-                {tab === "settings"  && "Configuration de la plateforme"}
+                {tab === "dashboard"  && "Vue d'ensemble de votre activité"}
+                {tab === "crm"        && "Gérez vos clients et leur historique"}
+                {tab === "orders"     && "Suivez et mettez à jour les commandes"}
+                {tab === "audit"      && "Historique de toutes les actions admin"}
+                {tab === "slides"     && "Gérez les slides de la page d'accueil"}
+                {tab === "products"   && "Gérez votre catalogue de produits"}
+                {tab === "categories" && "Organisez vos catégories de produits"}
+                {tab === "settings"   && "Configuration de la plateforme"}
               </p>
             </div>
 
@@ -388,6 +405,15 @@ export default function ShipMasterDashboard() {
 
             {/* ═══════════════ AUDIT ═══════════════ */}
             {tab === "audit" && <AuditTab logs={auditLogs} />}
+
+            {/* ═══════════════ SLIDES ═══════════════ */}
+            {tab === "slides" && <SlidesTabWrapper />}
+
+            {/* ═══════════════ PRODUCTS ═══════════════ */}
+            {tab === "products" && <ProductsTabWrapper />}
+
+            {/* ═══════════════ CATEGORIES ═══════════════ */}
+            {tab === "categories" && <CategoriesTabWrapper />}
 
             {/* ═══════════════ SETTINGS ═══════════════ */}
             {tab === "settings" && <SettingsTab />}

@@ -35,6 +35,8 @@ const ShipMasterDashboard = lazy(() => import("./pages/ShipMasterDashboard"));
 const Parametres = lazy(() => import("./pages/Parametres"));
 const Panier = lazy(() => import("./pages/Panier"));
 const Scanner = lazy(() => import("./pages/Scanner"));
+const Catalogue = lazy(() => import("./pages/Catalogue"));
+const ProduitDetail = lazy(() => import("./pages/ProduitDetail"));
 
 // Lazy load AIChat (only loaded when needed)
 const AIChatLazy = lazy(() => import("./components/AIChat"));
@@ -70,6 +72,8 @@ function Router() {
           <Route path={"/parametres"} component={Parametres} />
           <Route path={"/panier"} component={Panier} />
           <Route path={"/scanner"} component={Scanner} />
+          <Route path={"/catalogue"} component={Catalogue} />
+          <Route path={"/produit/:id"} component={ProduitDetail} />
           <Route path={"/404"} component={NotFound} />
           <Route component={NotFound} />
         </Switch>

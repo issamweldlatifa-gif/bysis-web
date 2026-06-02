@@ -31,7 +31,7 @@ function EmptyCart({ t, isDark }: { t: (k: any) => string; isDark: boolean }) {
       </p>
       <motion.button
         whileTap={{ scale: 0.96 }}
-        onClick={() => navigate('/arrivage')}
+        onClick={() => navigate('/catalogue')}
         className="px-8 py-3.5 rounded-2xl text-sm font-bold text-white"
         style={{ background: `linear-gradient(135deg, ${BLUE}, #1A1A1A)` }}
       >
@@ -56,11 +56,14 @@ export default function Panier() {
 
   const handleCommander = () => {
     if (items.length === 0) return;
+    // Store all cart items in sessionStorage for OrderForm
+    sessionStorage.setItem('bysis_cart_order', JSON.stringify(items));
     const first = items[0];
     const params = new URLSearchParams({
       productLink: first.productLink || '',
       quantity: String(first.quantity),
-      productName: first.name,
+      productName: items.length > 1 ? `${items.length} articles (${totalPrice.toFixed(2)} DT)` : first.name,
+      fromCart: '1',
     });
     navigate(`/order?${params.toString()}`);
   };

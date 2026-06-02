@@ -2,9 +2,11 @@ import AppLayout from '@/components/AppLayout';
 import { useBgColor } from '@/contexts/BgColorContext';
 import { useLocation } from 'wouter';
 import DynamicColorCarousel, { CarouselSlide } from '@/components/DynamicColorCarousel';
+import { trpc } from '@/lib/trpc';
+import { useMemo } from 'react';
 
-/* ── Carousel Slides ─────────────────────────────────────────────────────── */
-const CAROUSEL_SLIDES: CarouselSlide[] = [
+/* ── Fallback Slides (si DB vide) ────────────────────────────────────────────────────────────────── */
+const FALLBACK_SLIDES: CarouselSlide[] = [
   {
     color: '#f5c518',
     title: 'Organisez-vous',
@@ -192,11 +194,28 @@ function ArrivageCard({ item, onAdd }: { item: any; onAdd: () => void }) {
 function HomeContent() {
   const { setCarouselColor } = useBgColor();
   const [, navigate] = useLocation();
+  const { data: dbSlides } = trpc.carousel.list.useQuery();
+
+  const carouselSlides = useMemo((): CarouselSlide[] => {
+    if (!dbSlides || dbSlides.length === 0) return FALLBACK_SLIDES;
+    return dbSlides.map(s => ({
+      color: s.bgColor,
+      textColor: s.textColor ?? undefined,
+      title: s.title,
+      subtitle: s.subtitle ?? undefined,
+      cards: [
+        s.card1Label || s.card1Image ? { label: s.card1Label ?? undefined, image: s.card1Image ?? undefined } : null,
+        s.card2Label || s.card2Image ? { label: s.card2Label ?? undefined, image: s.card2Image ?? undefined } : null,
+        s.card3Label || s.card3Image ? { label: s.card3Label ?? undefined, image: s.card3Image ?? undefined } : null,
+        s.card4Label || s.card4Image ? { label: s.card4Label ?? undefined, image: s.card4Image ?? undefined } : null,
+      ].filter(Boolean) as any[],
+    }));
+  }, [dbSlides]);
 
   return (
     <div className="w-full bg-white">
       {/* Hero Carousel */}
-      <DynamicColorCarousel slides={CAROUSEL_SLIDES} onColorChange={setCarouselColor} />
+      <DynamicColorCarousel slides={carouselSlides} onColorChange={setCarouselColor} />
 
       {/* Quick Actions */}
       <section className="w-full px-4 py-4 bg-white">

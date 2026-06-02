@@ -213,7 +213,7 @@ interface BottomNavProps {
 
 const NAV_TABS = [
   { id: 'home',     path: '/',         label: 'Accueil'   },
-  { id: 'boutique', path: '/arrivage', label: 'Boutiques' },
+  { id: 'boutique', path: '/catalogue', label: 'Catalogue' },
   { id: 'chat',     path: null,        label: 'AI'        },
   { id: 'panier',   path: '/panier',   label: 'Panier'    },
   { id: 'moi',      path: null,        label: 'Moi'       },
