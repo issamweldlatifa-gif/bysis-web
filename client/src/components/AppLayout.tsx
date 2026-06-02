@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import AuthGateModal from '@/components/AuthGateModal';
 import ProfileSheet from '@/components/ProfileSheet';
 import { useCart } from '@/contexts/CartContext';
-import { BgColorProvider } from '@/contexts/BgColorContext';
+import { BgColorProvider, useBgColor } from '@/contexts/BgColorContext';
 import { useChatContext } from '@/App';
 
 interface AppLayoutProps {
@@ -124,23 +124,42 @@ function IcoAI({ size = 22 }: { size?: number }) {
 interface TopHeaderProps {
   chatVisible: boolean;
   onChatClick: () => void;
+  headerBgColor?: string;
 }
 
-function TopHeader({ chatVisible, onChatClick }: TopHeaderProps) {
+function TopHeader({ chatVisible, onChatClick, headerBgColor = '#FFFFFF' }: TopHeaderProps) {
   const [, navigate] = useLocation();
+  const isDarkBg = headerBgColor !== '#FFFFFF';
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white" style={{ borderBottom: '1px solid #F0F0F0' }}>
-      <div style={{ height: 'env(safe-area-inset-top, 0px)', background: '#FFFFFF' }} />
+    <header
+      className="sticky top-0 z-40 w-full transition-colors duration-500"
+      style={{
+        background: headerBgColor,
+        borderBottom: isDarkBg ? 'none' : '1px solid #F0F0F0',
+      }}
+    >
+      <div style={{ height: 'env(safe-area-inset-top, 0px)', background: headerBgColor }} />
       <div className="w-full px-3 py-2.5 flex items-center gap-2">
         {/* Search bar */}
         <button
           onClick={() => navigate('/search')}
-          className="flex-1 flex items-center gap-2 px-3 py-2 rounded-full bg-gray-100 active:bg-gray-200 transition-colors"
-          style={{ minHeight: 40 }}
+          className="flex-1 flex items-center gap-2 px-3 py-2 rounded-full transition-colors"
+          style={{
+            minHeight: 40,
+            background: isDarkBg ? 'rgba(255,255,255,0.18)' : '#F3F3F3',
+            backdropFilter: isDarkBg ? 'blur(10px)' : 'none',
+          }}
         >
-          <IcoSearch />
-          <span className="flex-1 text-sm text-gray-400 text-left select-none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke={isDarkBg ? 'rgba(255,255,255,0.7)' : '#9CA3AF'}
+            strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+          <span
+            className="flex-1 text-sm text-left select-none"
+            style={{ color: isDarkBg ? 'rgba(255,255,255,0.6)' : '#9CA3AF' }}
+          >
             Rechercher ou poser une question
           </span>
           <AnimatePresence mode="popLayout">
@@ -163,10 +182,19 @@ function TopHeader({ chatVisible, onChatClick }: TopHeaderProps) {
         {/* Camera / Scanner button */}
         <button
           onClick={() => navigate('/scanner')}
-          className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 active:bg-gray-200 transition-colors"
+          className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full transition-colors"
+          style={{
+            background: isDarkBg ? 'rgba(255,255,255,0.18)' : '#F3F3F3',
+            backdropFilter: isDarkBg ? 'blur(10px)' : 'none',
+          }}
           aria-label="Scanner"
         >
-          <IcoCamera />
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke={isDarkBg ? 'white' : '#111111'}
+            strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
         </button>
       </div>
     </header>
@@ -273,9 +301,11 @@ function BottomNav({ onProfileClick, onChatClick, visible }: BottomNavProps) {
    INNER LAYOUT
 ───────────────────────────────────────────────────────────────────────────── */
 function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps) {
-  const [profileOpen, setProfileOpen] = useState(false);
-  const [authOpen,    setAuthOpen]    = useState(false);
-  const [navVisible,  setNavVisible]  = useState(true);
+  const [profileOpen,  setProfileOpen]  = useState(false);
+  const [authOpen,     setAuthOpen]     = useState(false);
+  const [navVisible,   setNavVisible]   = useState(true);
+
+  const { carouselColor } = useBgColor();
 
   const { openChat }   = useChatContext();
   const handleChatOpen = onChatOpen ?? openChat;
@@ -312,7 +342,7 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
       <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
       <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
 
-      <TopHeader chatVisible={navVisible} onChatClick={handleChatOpen} />
+      <TopHeader chatVisible={navVisible} onChatClick={handleChatOpen} headerBgColor={carouselColor} />
 
       <main
         ref={mainRef}

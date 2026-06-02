@@ -1,18 +1,17 @@
 /**
  * DynamicColorCarousel — Amazon-style hero carousel
  *
- * Key behaviors (matching Amazon exactly):
- *  - Cards at ~88% width with peek of next card on the right
- *  - Snap-to-center with momentum
- *  - Colored background ONLY in the hero section (not the whole page)
+ * Key behaviors:
+ *  - Cards at 80% width, PERFECTLY CENTERED
+ *  - Equal peek: ~10% visible on BOTH left AND right sides
+ *  - scroll-snap-type: x mandatory + scroll-snap-align: center
  *  - Smooth color interpolation tied to scroll progress
  *  - Bold title top-left + 2×2 grid of product cards
  *  - Dot indicators at the bottom
+ *  - onColorChange fires on every scroll for header sync
  */
 
 import { useEffect, useRef, useCallback, useState } from 'react';
-import useEmblaCarousel from 'embla-carousel-react';
-import Autoplay from 'embla-carousel-autoplay';
 
 /* ── Types ─────────────────────────────────────────────────────────────────── */
 export interface CarouselSlide {
@@ -37,7 +36,6 @@ interface DynamicColorCarouselProps {
 
 /* ── Color helpers ─────────────────────────────────────────────────────────── */
 function hexToRgb(hex: string): [number, number, number] {
-  // Handle rgb() strings
   if (hex.startsWith('rgb')) {
     const m = hex.match(/\d+/g);
     if (m) return [+m[0], +m[1], +m[2]];
@@ -63,45 +61,46 @@ function isLight(hex: string): boolean {
 
 /* ── Component ─────────────────────────────────────────────────────────────── */
 export default function DynamicColorCarousel({ slides, onColorChange }: DynamicColorCarouselProps) {
-  const [heroBg, setHeroBg] = useState(slides[0]?.color ?? '#f5c518');
+  const [heroBg, setHeroBg]       = useState(slides[0]?.color ?? '#f5c518');
   const [activeIndex, setActiveIndex] = useState(0);
-  const rafRef = useRef<number | null>(null);
-
-  // Autoplay: 4s delay, stops on user interaction
-  const autoplay = Autoplay({ delay: 4000, stopOnInteraction: true, stopOnMouseEnter: true });
-
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    {
-      loop: true,
-      align: 'center',        // snap-to-center like Amazon
-      skipSnaps: false,
-      dragFree: false,
-      containScroll: false,   // allow peek of adjacent slides
-    },
-    [autoplay]
-  );
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const rafRef    = useRef<number | null>(null);
 
   /* ── Sync hero background color with scroll progress ─────────────────── */
   const syncColor = useCallback(() => {
-    if (!emblaApi || slides.length === 0) return;
+    const el = scrollRef.current;
+    if (!el || slides.length === 0) return;
 
-    const progress = emblaApi.scrollProgress(); // 0 → 1
-    const total = slides.length;
-    const raw = Math.max(0, Math.min(progress * (total - 1), total - 1.001));
-    const from = Math.floor(raw);
-    const to = Math.min(from + 1, total - 1);
-    const t = raw - from;
+    // Card width = 80% of container, gap between cards = 12px
+    const containerWidth = el.clientWidth;
+    const cardWidth      = containerWidth * 0.80;
+    const gap            = 12;
+    const peekWidth      = (containerWidth - cardWidth) / 2;
 
-    const color = lerpColor(slides[from].color, slides[to].color, t);
+    // scrollLeft when card i is centered = i * (cardWidth + gap)
+    const scrollLeft = el.scrollLeft;
+    const cardStep   = cardWidth + gap;
+
+    // Fractional index
+    const rawIndex = scrollLeft / cardStep;
+    const fromIdx  = Math.max(0, Math.floor(rawIndex));
+    const toIdx    = Math.min(fromIdx + 1, slides.length - 1);
+    const t        = rawIndex - fromIdx;
+
+    const color = lerpColor(slides[fromIdx].color, slides[toIdx].color, t);
     setHeroBg(color);
     onColorChange?.(color);
-    setActiveIndex(emblaApi.selectedScrollSnap());
-  }, [emblaApi, slides, onColorChange]);
+
+    // Active index = nearest
+    const nearest = Math.round(rawIndex);
+    setActiveIndex(Math.max(0, Math.min(nearest, slides.length - 1)));
+  }, [slides, onColorChange]);
 
   useEffect(() => {
-    if (!emblaApi) return;
+    const el = scrollRef.current;
+    if (!el) return;
 
-    setHeroBg(slides[0]?.color ?? '#f5c518');
+    // Fire initial color
     onColorChange?.(slides[0]?.color ?? '#f5c518');
 
     const onScroll = () => {
@@ -109,149 +108,139 @@ export default function DynamicColorCarousel({ slides, onColorChange }: DynamicC
       rafRef.current = requestAnimationFrame(syncColor);
     };
 
-    emblaApi.on('scroll', onScroll);
-    emblaApi.on('settle', syncColor);
-    emblaApi.on('select', syncColor);
-
+    el.addEventListener('scroll', onScroll, { passive: true });
     return () => {
-      emblaApi.off('scroll', onScroll);
-      emblaApi.off('settle', syncColor);
-      emblaApi.off('select', syncColor);
+      el.removeEventListener('scroll', onScroll);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [emblaApi, syncColor, slides, onColorChange]);
+  }, [syncColor, slides, onColorChange]);
 
   if (slides.length === 0) return null;
 
   return (
-    /* Hero wrapper — ONLY this section has the colored background */
+    /* Hero wrapper — colored background matches active slide */
     <div
       className="w-full relative"
-      style={{
-        background: heroBg,
-        // No transition here — color is interpolated in JS for smoothness
-      }}
+      style={{ background: heroBg }}
     >
-      {/* Embla viewport — overflow visible to show peek of adjacent slides */}
+      {/* Scroll container: overflow-x scroll, snap mandatory */}
       <div
-        ref={emblaRef}
-        className="overflow-hidden w-full"
-        style={{ paddingLeft: '6%', paddingRight: '6%' }}
+        ref={scrollRef}
+        className="w-full overflow-x-auto"
+        style={{
+          scrollSnapType: 'x mandatory',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          paddingTop: '16px',
+          paddingBottom: '0px',
+          /* scroll-padding-inline ensures snap points align to center */
+          scrollPaddingInline: '10%',
+        } as React.CSSProperties}
       >
-        <div className="flex gap-3">
+        {/* Hide scrollbar webkit */}
+        <style>{`.carousel-scroll::-webkit-scrollbar { display: none; }`}</style>
+
+        <div
+          style={{
+            display: 'flex',
+            gap: '12px',
+            width: 'fit-content',
+            /* Equal padding on both sides so first/last cards can center */
+            paddingLeft: '10%',
+            paddingRight: '10%',
+          }}
+        >
           {slides.map((slide, i) => {
-            const light = isLight(slide.color);
-            const titleColor = slide.textColor ?? (light ? '#0a0a0a' : '#ffffff');
+            const light        = isLight(slide.color);
+            const titleColor   = slide.textColor ?? (light ? '#0a0a0a' : '#ffffff');
             const subtitleColor = light ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.8)';
-            const cardBorder = light ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.75)';
+            const cardBorder   = light ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.75)';
 
             return (
               <div
                 key={i}
                 className="relative flex-none select-none"
                 style={{
-                  // 88% width = peek of ~6% on each side
-                  width: '88%',
-                  borderRadius: '16px',
+                  /* 80% of viewport width — equal peek on both sides */
+                  width: '80vw',
+                  borderRadius: '20px',
                   overflow: 'hidden',
                   backgroundColor: slide.color,
+                  scrollSnapAlign: 'center',
+                  scrollSnapStop: 'always',
                 }}
                 onClick={slide.onClick}
               >
-                {/* ── Slide content ─────────────────────────────────────── */}
-                <div className="px-4 pt-5 pb-4">
-                  {/* Title */}
+                {/* Content */}
+                <div className="p-5 pb-3">
                   <h2
-                    className="font-black leading-tight"
-                    style={{
-                      color: titleColor,
-                      fontSize: 'clamp(1.5rem, 6.5vw, 2rem)',
-                      letterSpacing: '-0.02em',
-                      lineHeight: 1.1,
-                      whiteSpace: 'pre-line',
-                    }}
+                    className="text-2xl font-black leading-tight mb-1 whitespace-pre-wrap"
+                    style={{ color: titleColor }}
                   >
                     {slide.title}
                   </h2>
-
-                  {/* Subtitle */}
                   {slide.subtitle && (
-                    <p
-                      className="mt-1.5 font-medium"
-                      style={{
-                        color: subtitleColor,
-                        fontSize: 'clamp(0.8rem, 3.2vw, 0.95rem)',
-                      }}
-                    >
+                    <p className="text-sm font-medium mb-4" style={{ color: subtitleColor }}>
                       {slide.subtitle}
                     </p>
                   )}
+                </div>
 
-                  {/* ── 2×2 Product Grid ──────────────────────────────── */}
-                  <div className="grid grid-cols-2 gap-2.5 mt-4 mb-3">
-                    {(slide.cards ?? Array(4).fill({})).slice(0, 4).map((card: CarouselCard, j: number) => (
-                      <button
-                        key={j}
-                        onClick={(e) => { e.stopPropagation(); card.onClick?.(); }}
-                        className="relative overflow-hidden active:scale-[0.96] transition-transform duration-150"
+                {/* 2×2 grid */}
+                {slide.cards && slide.cards.length > 0 && (
+                  <div className="px-4 pb-5 grid grid-cols-2 gap-2.5">
+                    {slide.cards.slice(0, 4).map((card, ci) => (
+                      <div
+                        key={ci}
+                        className="aspect-square rounded-2xl flex items-end justify-start p-2.5"
                         style={{
-                          aspectRatio: '1 / 1',
-                          borderRadius: '12px',
-                          border: `2px solid ${cardBorder}`,
-                          backgroundColor: 'transparent',
+                          border: `1.5px solid ${cardBorder}`,
+                          background: 'transparent',
                         }}
+                        onClick={card.onClick}
                       >
-                        {card.image ? (
+                        {card.image && (
                           <img
                             src={card.image}
-                            alt={card.label ?? `Product ${j + 1}`}
-                            className="w-full h-full object-cover"
-                            loading="lazy"
-                            decoding="async"
-                            draggable={false}
+                            alt={card.label}
+                            className="w-full h-full object-cover absolute inset-0 rounded-2xl"
                           />
-                        ) : (
-                          <div className="w-full h-full" />
                         )}
                         {card.label && (
                           <span
-                            className="absolute bottom-1.5 left-1.5 right-1.5 text-xs font-semibold text-center truncate"
+                            className="text-xs font-bold relative z-10"
                             style={{ color: titleColor }}
                           >
                             {card.label}
                           </span>
                         )}
-                      </button>
+                      </div>
                     ))}
                   </div>
-                </div>
+                )}
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* ── Dot indicators ─────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-center gap-1.5 py-3">
-        {slides.map((_, i) => {
-          const activeBg = isLight(slides[activeIndex]?.color ?? '#fff');
-          return (
-            <span
-              key={i}
-              style={{
-                display: 'inline-block',
-                height: '3px',
-                width: i === activeIndex ? '20px' : '6px',
-                borderRadius: '2px',
-                backgroundColor:
-                  i === activeIndex
-                    ? activeBg ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.95)'
-                    : activeBg ? 'rgba(0,0,0,0.22)' : 'rgba(255,255,255,0.38)',
-                transition: 'width 0.25s cubic-bezier(0.23,1,0.32,1)',
-              }}
-            />
-          );
-        })}
+      {/* Dot indicators */}
+      <div className="flex justify-center gap-1.5 py-3">
+        {slides.map((_, i) => (
+          <div
+            key={i}
+            style={{
+              width:  i === activeIndex ? 20 : 6,
+              height: 6,
+              borderRadius: 3,
+              background: i === activeIndex
+                ? (isLight(heroBg) ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.9)')
+                : (isLight(heroBg) ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.35)'),
+              transition: 'width 0.3s ease, background 0.3s ease',
+            }}
+          />
+        ))}
       </div>
     </div>
   );

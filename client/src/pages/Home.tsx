@@ -1,9 +1,7 @@
 import AppLayout from '@/components/AppLayout';
 import { useBgColor } from '@/contexts/BgColorContext';
 import { useLocation } from 'wouter';
-import { useChatContext } from '@/App';
 import DynamicColorCarousel, { CarouselSlide } from '@/components/DynamicColorCarousel';
-import { trpc } from '@/lib/trpc';
 
 /* ── Carousel Slides ─────────────────────────────────────────────────────── */
 const CAROUSEL_SLIDES: CarouselSlide[] = [
@@ -194,10 +192,6 @@ function ArrivageCard({ item, onAdd }: { item: any; onAdd: () => void }) {
 function HomeContent() {
   const { setCarouselColor } = useBgColor();
   const [, navigate] = useLocation();
-  const { openChat } = useChatContext();
-
-  const { data: arrivageData } = trpc.arrivage.list.useQuery();
-  const availableItems = arrivageData?.filter((i: any) => i.available)?.slice(0, 6) ?? [];
 
   return (
     <div className="w-full bg-white">
