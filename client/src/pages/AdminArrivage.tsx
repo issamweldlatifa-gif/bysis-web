@@ -171,7 +171,7 @@ export default function AdminArrivage() {
                 {/* Image */}
                 <div className="relative h-48" style={{ background: "#EEF2F7" }}>
                   {item.imageUrl ? (
-                    <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                    <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <Package className="w-12 h-12 text-slate-600" />

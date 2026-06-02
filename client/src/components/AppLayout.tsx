@@ -10,7 +10,6 @@ import ProfileSheet from '@/components/ProfileSheet';
 import { useCart } from '@/contexts/CartContext';
 import { BgColorProvider, useBgColor } from '@/contexts/BgColorContext';
 import { useChatContext } from '@/App';
-import { prefetchRoute } from '@/hooks/usePrefetch';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -276,8 +275,6 @@ function BottomNav({ onProfileClick, onChatClick, visible }: BottomNavProps) {
               key={tab.id}
               whileTap={{ scale: 0.88 }}
               onClick={() => handleTab(tab)}
-              onMouseEnter={() => tab.path && prefetchRoute(tab.path.replace('/', '') || 'home')}
-              onTouchStart={() => tab.path && prefetchRoute(tab.path.replace('/', '') || 'home')}
               className="flex flex-col items-center justify-center flex-1 py-1.5 gap-1"
               style={{ minHeight: 52 }}
               aria-label={tab.label}

@@ -1,7 +1,6 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Suspense, lazy, useState, createContext, useContext, useEffect } from "react";
-import { prefetchCriticalRoutes } from "@/hooks/usePrefetch";
+import { Suspense, lazy, useState, createContext, useContext } from "react";
 import { CartProvider } from "./contexts/CartContext";
 import { I18nProvider } from "./contexts/I18nContext";
 import { Route, Switch, useLocation } from "wouter";
@@ -93,13 +92,6 @@ function AIChatWrapper({ chatOpen, setChatOpen }: { chatOpen: boolean; setChatOp
 
 function App() {
   const [chatOpen, setChatOpen] = useState(false);
-
-  // Prefetch critical routes after initial render (Amazon-style)
-  useEffect(() => {
-    // Wait 1s after mount so initial render doesn't compete with prefetch
-    const timer = setTimeout(prefetchCriticalRoutes, 1000);
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <ErrorBoundary>

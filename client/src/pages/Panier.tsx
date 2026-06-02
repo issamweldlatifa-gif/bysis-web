@@ -109,7 +109,7 @@ export default function Panier() {
                       style={{ background: isDark ? 'rgba(255,255,255,0.05)' : '#F5F5F7' }}
                     >
                       {item.imageUrl ? (
-                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" loading="lazy" decoding="async" width={64} height={64} />
+                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={textSecondary} strokeWidth="1.5">
