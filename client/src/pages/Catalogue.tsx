@@ -4,7 +4,8 @@ import { useCart } from "@/contexts/CartContext";
 import AppLayout from "@/components/AppLayout";
 import { useLocation } from "wouter";
 import { toast } from "sonner";
-import { Search, ShoppingCart, ChevronRight, Package, Star, Loader2 } from "lucide-react";
+import { Search, ShoppingCart, Package } from "lucide-react";
+import { CatalogueGridSkeleton } from "@/components/SkeletonCatalogue";
 
 const PLATFORM_LABELS: Record<string, string> = {
   shein: "Shein", aliexpress: "AliExpress", temu: "Temu", local: "Local",
@@ -91,9 +92,7 @@ export default function Catalogue() {
         {/* Products grid */}
         <div className="px-3 pt-4">
           {isLoading ? (
-            <div className="flex items-center justify-center h-48">
-              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-            </div>
+            <CatalogueGridSkeleton count={8} />
           ) : products.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 text-center px-8">
               <Package size={40} className="text-gray-300 mb-3" />
@@ -156,7 +155,15 @@ function ProductCard({ product, onNavigate, onAddToCart }: {
       {/* Image */}
       <div className="relative w-full aspect-square bg-gray-50">
         {product.imageUrl ? (
-          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
+            width={200}
+            height={200}
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <Package size={32} className="text-gray-300" />

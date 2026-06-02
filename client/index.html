@@ -1,26 +1,150 @@
 <!doctype html>
 <html lang="fr">
-
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#cadfe2" />
+    <meta name="theme-color" content="#1A1A1A" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>{{project_title}}</title>    
-    <!-- Inter Variable Font — Shein-style typography -->
+    <meta name="description" content="Bysis — Commandez depuis Shein, AliExpress, Temu en Tunisie" />
+    <title>{{project_title}}</title>
+
+    <!-- DNS Prefetch & Preconnect — reduce latency for external resources -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Inter Variable Font — display=swap prevents FOIT (Flash of Invisible Text) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:wght@700;900&display=swap" rel="stylesheet" />
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         CRITICAL CSS — above-the-fold styles inlined to prevent FOUC
+         These styles are applied before any JS/CSS bundle loads.
+         ═══════════════════════════════════════════════════════════════════════ -->
+    <style>
+      /* ── Reset & base ── */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html {
+        -webkit-text-size-adjust: 100%;
+        font-size: 16px;
+        scroll-behavior: smooth;
+        /* Prevent horizontal scroll */
+        overflow-x: hidden;
+      }
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #ffffff;
+        color: #1A1A1A;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+        /* iOS momentum scrolling */
+        -webkit-overflow-scrolling: touch;
+      }
+      /* ── Root container ── */
+      #root {
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
+      /* ── Prevent layout shift from images ── */
+      img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+      }
+      /* ── Skeleton pulse animation ── */
+      @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.45; }
+      }
+      .animate-pulse { animation: pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+      /* ── Initial loader — shown before React mounts ── */
+      #initial-loader {
+        position: fixed;
+        inset: 0;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.25s ease-out;
+      }
+      #initial-loader.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      /* ── Loader dots (Amazon/Shein style) ── */
+      .loader-dots { display: flex; gap: 8px; align-items: center; }
+      .loader-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        animation: loaderBounce 1.1s ease-in-out infinite;
+      }
+      .loader-dot:nth-child(1) { background: #E8192C; animation-delay: 0s; }
+      .loader-dot:nth-child(2) { background: #FF6A00; animation-delay: 0.18s; }
+      .loader-dot:nth-child(3) { background: #1A1A1A; animation-delay: 0.36s; }
+      @keyframes loaderBounce {
+        0%, 80%, 100% { transform: scale(0.75); opacity: 0.5; }
+        40% { transform: scale(1.25); opacity: 1; }
+      }
+      /* ── Bottom nav safe area (iOS) ── */
+      .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+      /* ── Scrollbar hide utility ── */
+      .scrollbar-hide::-webkit-scrollbar { display: none; }
+      .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+      /* ── Button active feedback ── */
+      button:active { transform: scale(0.97); }
+      /* ── Focus ring (accessibility) ── */
+      :focus-visible {
+        outline: 2px solid #1A1A1A;
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+    </style>
   </head>
 
   <body>
+    <!-- Initial loader — hidden by React after mount -->
+    <div id="initial-loader" aria-hidden="true">
+      <div class="loader-dots">
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+      </div>
+    </div>
+
     <div id="root"></div>
+
+    <!-- Hide initial loader once React is ready -->
+    <script>
+      (function() {
+        // Hide loader after React mounts (max 3s fallback)
+        var loader = document.getElementById('initial-loader');
+        if (!loader) return;
+        var observer = new MutationObserver(function() {
+          if (document.getElementById('root').children.length > 0) {
+            loader.classList.add('hidden');
+            setTimeout(function() { loader.remove(); }, 300);
+            observer.disconnect();
+          }
+        });
+        observer.observe(document.getElementById('root'), { childList: true });
+        // Fallback: remove after 3s
+        setTimeout(function() {
+          loader.classList.add('hidden');
+          setTimeout(function() { loader.remove(); }, 300);
+        }, 3000);
+      })();
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
     <script
       defer
       src="%VITE_ANALYTICS_ENDPOINT%/umami"
       data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
   </body>
-
 </html>

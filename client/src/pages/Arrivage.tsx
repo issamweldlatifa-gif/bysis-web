@@ -88,11 +88,19 @@ export default function Arrivage() {
           ))}
         </div>
 
-        {/* Loading */}
+        {/* Loading — Skeleton Screens */}
         {isLoading && (
           <div className="grid grid-cols-2 gap-3">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-52 bg-white rounded-2xl animate-pulse" />
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="bg-white rounded-2xl overflow-hidden border border-gray-100">
+                <div className="h-36 bg-gray-100 animate-pulse" />
+                <div className="p-3 space-y-2">
+                  <div className="h-3 bg-gray-100 rounded animate-pulse" />
+                  <div className="h-3 bg-gray-100 rounded animate-pulse w-3/4" />
+                  <div className="h-5 bg-gray-100 rounded animate-pulse w-1/2" />
+                  <div className="h-8 bg-gray-100 rounded-xl animate-pulse" />
+                </div>
+              </div>
             ))}
           </div>
         )}
@@ -132,6 +140,10 @@ export default function Arrivage() {
                           src={item.imageUrl}
                           alt={item.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          decoding="async"
+                          width={200}
+                          height={144}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gray-50">

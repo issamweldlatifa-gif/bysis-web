@@ -5,6 +5,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
+import { VitePWA } from "vite-plugin-pwa";
 
 // Increase Node memory for build
 if (process.env.NODE_ENV === 'production') {
@@ -155,7 +156,71 @@ function vitePluginManusDebugCollector(): Plugin {
   };
 }
 
-const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector()];
+const pwaPlugin = VitePWA({
+  registerType: 'autoUpdate',
+  injectRegister: 'auto',
+  workbox: {
+    globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff2}'],
+    runtimeCaching: [
+      {
+        urlPattern: /^\/api\/trpc\/.*/i,
+        handler: 'StaleWhileRevalidate',
+        options: {
+          cacheName: 'trpc-api-cache',
+          expiration: { maxEntries: 50, maxAgeSeconds: 300 },
+          cacheableResponse: { statuses: [0, 200] },
+        },
+      },
+      {
+        urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
+        handler: 'CacheFirst',
+        options: {
+          cacheName: 'images-cache',
+          expiration: { maxEntries: 200, maxAgeSeconds: 7 * 24 * 60 * 60 },
+          cacheableResponse: { statuses: [0, 200] },
+        },
+      },
+      {
+        urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
+        handler: 'CacheFirst',
+        options: {
+          cacheName: 'google-fonts-cache',
+          expiration: { maxEntries: 10, maxAgeSeconds: 365 * 24 * 60 * 60 },
+          cacheableResponse: { statuses: [0, 200] },
+        },
+      },
+      {
+        urlPattern: /^\/manus-storage\/.*/i,
+        handler: 'CacheFirst',
+        options: {
+          cacheName: 'storage-cache',
+          expiration: { maxEntries: 100, maxAgeSeconds: 7 * 24 * 60 * 60 },
+          cacheableResponse: { statuses: [0, 200] },
+        },
+      },
+    ],
+    skipWaiting: true,
+    clientsClaim: true,
+    navigateFallback: '/index.html',
+    navigateFallbackDenylist: [/^\/api\//],
+  },
+  manifest: {
+    name: 'Bysis',
+    short_name: 'Bysis',
+    description: 'Bysis — Commandez depuis Shein, AliExpress, Temu en Tunisie',
+    theme_color: '#1A1A1A',
+    background_color: '#ffffff',
+    display: 'standalone',
+    orientation: 'portrait',
+    start_url: '/',
+    icons: [
+      { src: '/favicon.ico', sizes: '64x64', type: 'image/x-icon' },
+    ],
+  },
+  devOptions: { enabled: false },
+});
+
+const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime(), vitePluginManusDebugCollector(), pwaPlugin];
 
 export default defineConfig({
   plugins,

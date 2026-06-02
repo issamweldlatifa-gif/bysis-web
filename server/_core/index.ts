@@ -53,14 +53,34 @@ async function startServer() {
   registerOAuthRoutes(app);
   registerGoogleAuthRoutes(app);
   
-  // Cache control for static assets
+  // Cache control for static assets (HTTP/2 compatible)
   app.use((req, res, next) => {
-    if (req.path.startsWith('/assets/') || req.path.startsWith('/manus-storage/')) {
+    if (req.path.startsWith('/assets/')) {
+      // Hashed assets — cache forever (1 year)
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      res.setHeader('Vary', 'Accept-Encoding');
+    } else if (req.path.startsWith('/manus-storage/')) {
+      // Storage assets — cache 1 week
+      res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
+      res.setHeader('Vary', 'Accept-Encoding');
     } else if (req.path.endsWith('.js') || req.path.endsWith('.css')) {
+      // Bundled files — cache 1 year
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      res.setHeader('Vary', 'Accept-Encoding');
+    } else if (req.path.endsWith('.woff2') || req.path.endsWith('.woff')) {
+      // Fonts — cache 1 year
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    } else if (req.path.endsWith('.png') || req.path.endsWith('.jpg') || req.path.endsWith('.webp') || req.path.endsWith('.svg') || req.path.endsWith('.ico')) {
+      // Images — cache 1 week
+      res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
     } else if (req.path === '/' || req.path.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'public, max-age=3600, must-revalidate');
+      // HTML — no cache (always fresh, SW handles offline)
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+    } else if (req.path.startsWith('/api/trpc/')) {
+      // API — no cache by default (tRPC handles its own caching)
+      res.setHeader('Cache-Control', 'no-store');
     }
     next();
   });

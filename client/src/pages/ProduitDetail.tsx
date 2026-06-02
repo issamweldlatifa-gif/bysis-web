@@ -3,7 +3,8 @@ import { trpc } from "@/lib/trpc";
 import { useCart } from "@/contexts/CartContext";
 import AppLayout from "@/components/AppLayout";
 import { toast } from "sonner";
-import { ShoppingCart, ArrowLeft, Package, ExternalLink, Loader2, Tag } from "lucide-react";
+import { ShoppingCart, ArrowLeft, Package, ExternalLink, Tag } from "lucide-react";
+import { ProduitDetailSkeleton } from "@/components/SkeletonCatalogue";
 
 const PLATFORM_LABELS: Record<string, string> = {
   shein: "Shein", aliexpress: "AliExpress", temu: "Temu", local: "Local",
@@ -25,9 +26,7 @@ export default function ProduitDetail() {
 
   if (isLoading) return (
     <AppLayout>
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-      </div>
+      <ProduitDetailSkeleton />
     </AppLayout>
   );
 
@@ -84,7 +83,16 @@ export default function ProduitDetail() {
         {/* Product image */}
         <div className="w-full aspect-square bg-gray-50 relative">
           {product.imageUrl ? (
-            <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className="w-full h-full object-cover"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+              width={400}
+              height={400}
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Package size={64} className="text-gray-300" />

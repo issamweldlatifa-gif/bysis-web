@@ -162,7 +162,15 @@ function ArrivageCard({ item, onAdd }: { item: any; onAdd: () => void }) {
     <div className="flex-shrink-0 w-36 rounded-2xl overflow-hidden" style={{ background: '#FAFAFA', border: '1px solid #F0F0F0' }}>
       <div className="w-full h-32 bg-gray-100 overflow-hidden">
         {item.imageUrl ? (
-          <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+          <img
+            src={item.imageUrl}
+            alt={item.name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
+            width={144}
+            height={128}
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round">

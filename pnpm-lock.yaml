@@ -221,15 +221,9 @@ importers:
       vaul:
         specifier: ^1.1.2
         version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      vite-plugin-pwa:
-        specifier: ^1.3.0
-        version: 1.3.0(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4))(workbox-build@7.4.1(@types/babel__core@7.20.5))(workbox-window@7.4.1)
       web-push:
         specifier: ^3.6.7
         version: 3.6.7
-      workbox-window:
-        specifier: ^7.4.1
-        version: 7.4.1
       wouter:
         specifier: ^3.3.5
         version: 3.10.0(react@19.2.6)
@@ -312,9 +306,15 @@ importers:
       vite-plugin-manus-runtime:
         specifier: ^0.0.57
         version: 0.0.57
+      vite-plugin-pwa:
+        specifier: ^1.3.0
+        version: 1.3.0(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4))(workbox-build@7.4.1(@types/babel__core@7.20.5))(workbox-window@7.4.1)
       vitest:
         specifier: ^2.1.4
         version: 2.1.9(@types/node@24.12.4)(lightningcss@1.32.0)(terser@5.48.0)
+      workbox-window:
+        specifier: ^7.4.1
+        version: 7.4.1
 
 packages:
 

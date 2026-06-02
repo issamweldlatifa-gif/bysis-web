@@ -379,3 +379,19 @@
 - [x] AppLayout.tsx: Navigation bottom nav pointe vers /catalogue
 - [x] Panier.tsx: handleCommander passe tous les articles au checkout via sessionStorage
 - [x] 22/22 tests Vitest passent
+
+## ⚡ Performance Amazon-Style (Juin 2026)
+- [x] Skeleton Screens pour Catalogue, ProduitDetail, History, Arrivage
+- [x] Image Optimization: loading="lazy" + decoding="async" + width/height sur toutes les images
+- [x] Code Splitting: React.lazy + Suspense pour toutes les pages dans App.tsx
+- [x] Prefetching: preload page au hover/touch des liens de navigation (usePrefetch hook)
+- [x] Vite Build: manualChunks pour vendor/ui/animation/trpc, terser minification, cssCodeSplit
+- [x] Service Worker (PWA): vite-plugin-pwa + workbox (CacheFirst images, StaleWhileRevalidate API)
+- [x] Critical CSS inline dans index.html (above-the-fold styles, reset, skeleton, loader)
+- [x] DNS Prefetch + Preconnect pour Google Fonts
+- [x] Initial Loader (dots animation) avant mount React
+- [x] HTTP headers: Cache-Control optimisés sur Express (immutable assets, stale-while-revalidate)
+- [x] Compression gzip (level 6) sur Express
+- [x] prefetchCriticalRoutes() au mount (catalogue, arrivage, panier, calculator)
+- [ ] Optimistic UI: panier + commandes avec onMutate/onError/onSettled (optional enhancement)
+- [ ] Web Vitals monitoring: LCP, FID, CLS tracking (optional enhancement)

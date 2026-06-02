@@ -148,10 +148,21 @@ export default function History() {
           </div>
         </motion.div>
 
-        {/* Loading */}
+        {/* Loading — Skeleton Screens */}
         {getHistory.isLoading && (
-          <div className="flex justify-center py-12">
-            <div style={{ width: 32, height: 32, border: '3px solid #1A1A1A', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
+          <div className="space-y-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} style={{ background: '#FFFFFF', borderRadius: '16px', padding: '14px', border: '1px solid #E8ECF0' }}>
+                <div className="flex gap-3">
+                  <div style={{ width: 72, height: 72, borderRadius: '12px', background: '#F0F0F0' }} className="animate-pulse flex-shrink-0" />
+                  <div className="flex-1 space-y-2 pt-1">
+                    <div className="h-3 bg-gray-100 rounded animate-pulse w-1/3" />
+                    <div className="h-5 bg-gray-100 rounded animate-pulse w-1/2" />
+                    <div className="h-3 bg-gray-100 rounded animate-pulse w-2/3" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -199,7 +210,7 @@ export default function History() {
                       border: '1px solid #D0D7DE',
                     }}>
                       {item.imageUrl ? (
-                        <img src={item.imageUrl} alt="Product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={item.imageUrl} alt="Product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" decoding="async" />
                       ) : (
                         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9DA3A6', fontSize: '0.75rem' }}>
                           لا صورة
