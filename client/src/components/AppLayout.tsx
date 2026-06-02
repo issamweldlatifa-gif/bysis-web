@@ -129,36 +129,37 @@ interface TopHeaderProps {
 
 function TopHeader({ chatVisible, onChatClick, headerBgColor = '#FFFFFF' }: TopHeaderProps) {
   const [, navigate] = useLocation();
-  const isDarkBg = headerBgColor !== '#FFFFFF';
+  const isColored = headerBgColor !== '#FFFFFF' && headerBgColor !== '#ffffff';
 
   return (
     <header
-      className="sticky top-0 z-40 w-full transition-colors duration-500"
+      className="sticky top-0 z-40 w-full"
       style={{
         background: headerBgColor,
-        borderBottom: isDarkBg ? 'none' : '1px solid #F0F0F0',
+        transition: 'background-color 0.5s ease',
+        borderBottom: isColored ? 'none' : '1px solid #F0F0F0',
       }}
     >
-      <div style={{ height: 'env(safe-area-inset-top, 0px)', background: headerBgColor }} />
+      <div style={{ height: 'env(safe-area-inset-top, 0px)', background: 'inherit' }} />
       <div className="w-full px-3 py-2.5 flex items-center gap-2">
-        {/* Search bar */}
+        {/* Search bar — ALWAYS white background, ALWAYS dark text/icon */}
         <button
           onClick={() => navigate('/search')}
-          className="flex-1 flex items-center gap-2 px-3 py-2 rounded-full transition-colors"
+          className="flex-1 flex items-center gap-2 px-3 py-2 rounded-full"
           style={{
             minHeight: 40,
-            background: isDarkBg ? 'rgba(255,255,255,0.18)' : '#F3F3F3',
-            backdropFilter: isDarkBg ? 'blur(10px)' : 'none',
+            background: '#FFFFFF',
+            boxShadow: isColored ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke={isDarkBg ? 'rgba(255,255,255,0.7)' : '#9CA3AF'}
+            stroke="#9CA3AF"
             strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
           </svg>
           <span
             className="flex-1 text-sm text-left select-none"
-            style={{ color: isDarkBg ? 'rgba(255,255,255,0.6)' : '#9CA3AF' }}
+            style={{ color: '#9CA3AF' }}
           >
             Rechercher ou poser une question
           </span>
@@ -179,18 +180,18 @@ function TopHeader({ chatVisible, onChatClick, headerBgColor = '#FFFFFF' }: TopH
           </AnimatePresence>
         </button>
 
-        {/* Camera / Scanner button */}
+        {/* Camera / Scanner button — ALWAYS white background, ALWAYS dark icon */}
         <button
           onClick={() => navigate('/scanner')}
-          className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full transition-colors"
+          className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full"
           style={{
-            background: isDarkBg ? 'rgba(255,255,255,0.18)' : '#F3F3F3',
-            backdropFilter: isDarkBg ? 'blur(10px)' : 'none',
+            background: '#FFFFFF',
+            boxShadow: isColored ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
           }}
           aria-label="Scanner"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-            stroke={isDarkBg ? 'white' : '#111111'}
+            stroke="#111111"
             strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
             <circle cx="12" cy="13" r="4"/>
