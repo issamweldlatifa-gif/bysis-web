@@ -10,7 +10,8 @@ import {
   calculationHistory, CalculationHistory, InsertCalculationHistory,
   carouselSlides, CarouselSlide, InsertCarouselSlide,
   categories, Category, InsertCategory,
-  products, Product, InsertProduct
+  products, Product, InsertProduct,
+  aiOrders, AiOrder, InsertAiOrder
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -594,4 +595,70 @@ export async function countProducts(): Promise<number> {
   if (!db) throw new Error("Database not available");
   const result = await db.select({ count: sql<number>`count(*)` }).from(products);
   return result[0]?.count ?? 0;
+}
+
+// ===== AI Orders Helpers =====
+
+function generateTrackingCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = 'BY';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+export async function createAiOrder(data: Omit<InsertAiOrder, 'trackingCode'>): Promise<AiOrder> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  let trackingCode = generateTrackingCode();
+  // Ensure uniqueness
+  for (let i = 0; i < 5; i++) {
+    const existing = await db.select().from(aiOrders).where(eq(aiOrders.trackingCode, trackingCode)).limit(1);
+    if (existing.length === 0) break;
+    trackingCode = generateTrackingCode();
+  }
+  const result = await db.insert(aiOrders).values({ ...data, trackingCode });
+  const insertId = (result as any)[0]?.insertId;
+  const created = await db.select().from(aiOrders).where(eq(aiOrders.id, insertId)).limit(1);
+  return created[0];
+}
+
+export async function getAiOrderByTracking(trackingCode: string): Promise<AiOrder | undefined> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(aiOrders).where(eq(aiOrders.trackingCode, trackingCode.toUpperCase())).limit(1);
+  return result[0];
+}
+
+export async function getAiOrdersByUserId(userId: number): Promise<AiOrder[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(aiOrders).where(eq(aiOrders.userId, userId)).orderBy(desc(aiOrders.createdAt));
+}
+
+export async function getAllAiOrders(): Promise<AiOrder[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(aiOrders).orderBy(desc(aiOrders.createdAt));
+}
+
+export async function updateAiOrderStatus(id: number, status: string, adminNotes?: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const updates: Partial<InsertAiOrder> = { status };
+  if (adminNotes !== undefined) updates.adminNotes = adminNotes;
+  await db.update(aiOrders).set(updates).where(eq(aiOrders.id, id));
+}
+
+export async function updateAiOrderPaymentProof(id: number, paymentProofUrl: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(aiOrders).set({ paymentProofUrl, status: 'deposit_received' }).where(eq(aiOrders.id, id));
+}
+
+export async function searchAiOrdersByName(name: string): Promise<AiOrder[]> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return await db.select().from(aiOrders).where(
+    like(aiOrders.customerName, `%${name}%`)
+  ).orderBy(desc(aiOrders.createdAt)).limit(20);
 }

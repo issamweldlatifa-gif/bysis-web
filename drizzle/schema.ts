@@ -390,3 +390,31 @@ export const carouselSlides = mysqlTable("carousel_slides", {
 
 export type CarouselSlide = typeof carouselSlides.$inferSelect;
 export type InsertCarouselSlide = typeof carouselSlides.$inferInsert;
+
+/**
+ * AI Orders - commandes créées via le chatbot AI Bysis
+ * Status: pending_deposit → deposit_received → confirmed → processing → shipped → delivered | cancelled
+ */
+export const aiOrders = mysqlTable("ai_orders", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId"),
+  trackingCode: varchar("trackingCode", { length: 32 }).notNull().unique(),
+  productName: varchar("productName", { length: 500 }),
+  productUrl: text("productUrl"),
+  productImageUrl: text("productImageUrl"),
+  totalPrice: int("totalPrice").default(0).notNull(),
+  depositAmount: int("depositAmount").default(0).notNull(),
+  status: varchar("status", { length: 32 }).default("pending_deposit"),
+  customerName: varchar("customerName", { length: 255 }),
+  customerLastName: varchar("customerLastName", { length: 255 }),
+  gouvernorat: varchar("gouvernorat", { length: 128 }),
+  moatamadia: varchar("moatamadia", { length: 128 }),
+  phone: varchar("phone", { length: 32 }),
+  email: varchar("email", { length: 320 }),
+  paymentProofUrl: text("paymentProofUrl"),
+  adminNotes: text("adminNotes"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type AiOrder = typeof aiOrders.$inferSelect;
+export type InsertAiOrder = typeof aiOrders.$inferInsert;

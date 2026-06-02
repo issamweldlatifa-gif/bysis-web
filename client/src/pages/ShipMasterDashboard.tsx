@@ -18,12 +18,13 @@ import {
   LayoutDashboard, Users, ShoppingBag, Truck, Bell, Search, RefreshCw,
   LogOut, Settings, Shield, BarChart2, Eye, Ban, CheckCircle, AlertTriangle,
   ChevronRight, X, Package, DollarSign, TrendingUp, MessageSquare,
-  Clock, CreditCard, Warehouse, XCircle, Filter, Download, Menu, Tag,
+  Clock, CreditCard, Warehouse, XCircle, Filter, Download, Menu, Tag, Bot,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import AdminSlides from "./AdminSlides";
 import AdminProducts from "./AdminProducts";
 import AdminCategories from "./AdminCategories";
+import AdminAiOrders from "./AdminAiOrders";
 
 // Wrapper components for lazy rendering
 function SlidesTabWrapper() { return <AdminSlides />; }
@@ -65,7 +66,7 @@ const CLIENT_STATUS_CONFIG: Record<string, { label: string; color: string; bg: s
 
 const PIE_COLORS = ["#3B82F6", "#F59E0B", "#F97316", "#8B5CF6", "#10B981", "#00A651", "#EF4444"];
 
-type AdminTab = "dashboard" | "crm" | "orders" | "audit" | "settings" | "slides" | "products" | "categories";
+type AdminTab = "dashboard" | "crm" | "orders" | "audit" | "settings" | "slides" | "products" | "categories" | "ai_orders";
 
 // ─── Notification sound ───────────────────────────────────────────────────────
 function playNotificationSound() {
@@ -194,6 +195,7 @@ export default function ShipMasterDashboard() {
     { id: "slides",     icon: LayoutDashboard, label: "Slides Carousel" },
     { id: "products",   icon: Package,         label: "Produits" },
     { id: "categories", icon: Tag,             label: "Catégories" },
+    { id: "ai_orders",  icon: Bot,             label: "Commandes AI" },
     { id: "settings",   icon: Settings,        label: "Paramètres" },
   ];
 
@@ -358,6 +360,7 @@ export default function ShipMasterDashboard() {
                 {tab === "slides"     && "Slides Carousel"}
                 {tab === "products"   && "Catalogue Produits"}
                 {tab === "categories" && "Catégories"}
+                {tab === "ai_orders"  && "Commandes AI Chat"}
                 {tab === "settings"   && "Paramètres"}
               </h1>
               <p className="text-sm mt-0.5" style={{ color: MUTED }}>
@@ -368,6 +371,7 @@ export default function ShipMasterDashboard() {
                 {tab === "slides"     && "Gérez les slides de la page d'accueil"}
                 {tab === "products"   && "Gérez votre catalogue de produits"}
                 {tab === "categories" && "Organisez vos catégories de produits"}
+                {tab === "ai_orders"  && "Commandes passées via le chat AI"}
                 {tab === "settings"   && "Configuration de la plateforme"}
               </p>
             </div>
@@ -414,6 +418,9 @@ export default function ShipMasterDashboard() {
 
             {/* ═══════════════ CATEGORIES ═══════════════ */}
             {tab === "categories" && <CategoriesTabWrapper />}
+
+            {/* ═══════════════ AI ORDERS ═══════════════ */}
+            {tab === "ai_orders" && <AdminAiOrders />}
 
             {/* ═══════════════ SETTINGS ═══════════════ */}
             {tab === "settings" && <SettingsTab />}

@@ -379,3 +379,35 @@
 - [x] AppLayout.tsx: Navigation bottom nav pointe vers /catalogue
 - [x] Panier.tsx: handleCommander passe tous les articles au checkout via sessionStorage
 - [x] 22/22 tests Vitest passent
+
+## 🤖 AI Chat — Refonte Complète (Juin 2026)
+- [ ] DB: table ai_orders (id, userId, trackingCode, productName, productUrl, productImageUrl, totalPrice, depositAmount, status, customerName, customerLastName, gouvernorat, moatamadia, phone, paymentProofUrl, adminNotes, createdAt, updatedAt)
+- [ ] Backend: procedure ai.createOrder + sendEmail client + notifier admin CRM
+- [ ] Backend: procedure ai.trackOrder (par trackingCode ou nom)
+- [ ] Backend: procedure ai.confirmOrder / rejectOrder (admin + email client)
+- [ ] Backend: procedure ai.uploadPaymentProof
+- [ ] AI System Prompt: format prix fixe (💰 prix, 📦 produit, ✅ inclus, 💳 paiement, ⚠️ note, infos commande)
+- [ ] AI System Prompt: 3 boutons après calcul (عدّل كومند / عاود احسبلي / القائمة الرئيسية)
+- [ ] AI System Prompt: flow commande (collecte infos → login gate → création CRM + trackingCode)
+- [ ] AI System Prompt: premier message = demande nom ou numéro de suivi
+- [ ] AI System Prompt: ne pas révéler méthode de calcul ni commission
+- [ ] UI: dots d'attente multicolores (rouge #E8192C / orange #FF6B00 / noir #0A0A0A)
+- [ ] UI: bottom sheet animation (slide up/down depuis le bas)
+- [ ] UI: bottom nav reste visible sous le chat
+- [ ] UI: fermeture chat au 2ème clic sur bouton AI
+- [ ] UI: typographie élégante (Inter, taille lisible, espacement généreux)
+- [ ] UI: boutons d'action après calcul prix
+- [ ] UI: login gate avant confirmation commande (redirect → retour AI)
+- [ ] CRM: AI orders apparaissent dans ShipMaster avec section dédiée
+- [ ] CRM: admin peut confirmer/rejeter + envoyer email depuis CRM
+- [ ] Email: confirmation commande → client (sur email Manus/Google enregistré)
+- [ ] Email: changement statut → client
+- [ ] Paiement: UIB RIB 12067000013314111448 (Nermin mejrissi) + Mandat La Poste (Nermine mejressi, Monastir)
+- [ ] Dépôt: 50% du total de la commande
+
+## 🤖 AI Chat Orders — Admin Integration (Juin 2026)
+- [x] Fix TypeScript errors in AdminAiOrders.tsx (trpc.aiOrders.reject, .confirm, .updateStatus)
+- [x] Add confirm/reject/updateStatus procedures to routers.ts (aliases for adminUpdateStatus)
+- [x] Add "ai_orders" tab to ShipMasterDashboard.tsx (type, navItems, title/subtitle, render)
+- [x] Bot icon imported from lucide-react for ai_orders nav item
+- [x] 22/22 tests Vitest passent, 0 erreurs TypeScript

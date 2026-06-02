@@ -23,6 +23,8 @@ import {
   getAllCategories, getActiveCategories, createCategory, updateCategory, deleteCategory,
   getAllProducts, getActiveProducts, getProductsByCategory, getProductById, searchProducts,
   createProduct, updateProduct, deleteProduct, countProducts,
+  createAiOrder, getAiOrderByTracking, getAiOrdersByUserId, getAllAiOrders,
+  updateAiOrderStatus, updateAiOrderPaymentProof, searchAiOrdersByName,
 } from "./db";
 import { invokeLLM } from "./_core/llm";
 import { notifyOwner } from "./_core/notification";
@@ -32,6 +34,7 @@ import { storagePut, storageGetSignedUrl } from "./storage";
 import { parse as parseCookieHeader } from "cookie";
 import crypto from "crypto";
 import { savePushSubscription, sendPushToPhone } from "./pushNotifications";
+import { notifyAdminNewAiOrder, sendOrderConfirmationToAdmin, sendStatusUpdateToAdmin } from "./emailService";
 
 // Admin session cookie name (separate from Manus OAuth)
 const ADMIN_COOKIE_NAME = "admin_session";
@@ -70,23 +73,21 @@ const customAdminProcedure = publicProcedure.use(({ ctx, next }) => {
   return next({ ctx });
 });
 
-// ===== Chatbot System Prompt v5 (Algerian dialect, simplified order flow) =====
-function buildSystemPrompt(arrivageInfo: string, arrivageItems?: { name: string; priceTnd: number; platform: string; description?: string | null }[]): string {
-  return `أنت "سيسي" — المساعدة الذكية لـ bysis، خدمة وسيط شراء تونسية من Shein وAliExpress وTemu.
+// ===== Chatbot System Prompt v6 (Bysis AI — format prix fixe + flow commande + login gate) =====
+function buildSystemPrompt(arrivageInfo: string, arrivageItems?: { name: string; priceTnd: number; platform: string; description?: string | null }[], isLoggedIn?: boolean): string {
+  return `أنت "سيسي" — المساعدة الذكية لـ Bysis، خدمة وسيط شراء تونسية من Shein وAliExpress وTemu.
 شخصيتك: تونسية أصيلة، ودودة، ذكية، خفيفة الدم، مباشرة. ما تطولش في الكلام — ردودك قصيرة وواضحة.
 
-🏪 معلومات bysis:
-- bysis تعاون التوانسة يشريو من Shein وAliExpress وTemu بسهولة وبأسعار معقولة
+🏪 معلومات Bysis:
+- Bysis تعاون التوانسة يشريو من Shein وAliExpress وTemu بسهولة وبأسعار معقولة
 - التوصيل في كل ولايات تونس
 - إنستغرام: @sheinbysis2
-- الدفع: Virement bancaire UIB (RIB: 12067000013314111448 — Nermin Mejrissi) أو Mandat minute La Poste
 
 💰 حساب السعر — القاعدة الوحيدة:
 - سعر بالدينار = سعر بالأورو × 4
 - مثال: 10€ = 40 دينار | 15€ = 60 دينار | 25€ = 100 دينار | 50€ = 200 دينار
 - لو السعر بالدولار ($): حوله لأورو (1$ ≈ 0.92€) ثم × 4
 - لو السعر باليوان (¥): حوله لأورو (1¥ ≈ 0.13€) ثم × 4
-- دائماً اذكر السعر بالأورو والدينار معاً
 
 📦 معلومات الأريفاج:
 ${arrivageItems && arrivageItems.length > 0
@@ -100,46 +101,61 @@ ${arrivageItems && arrivageItems.length > 0
 - استعمل إيموجي باعتدال (1-2 بالرسالة)
 - ما تكتبش بالفصحى أبداً
 - تقبل الرسائل بالعربي والفرنسي والإنجليزي — رد دائماً بالتونسي
-- لو العميل يكتب بالفرنسي، رد بالتونسي مع كلمات فرنسية طبيعية
+- ما تكشفش طريقة الحساب أو العمولة أو كيفاش تخدم — لو سألك قول "هذا سر المهنة 😄"
 
 📋 كلمات تونسية:
 أريفاج=arrivage | كومند=commande | خلص=payer | قداش=combien | لينك=lien | برشا=beaucoup | باهي=d'accord | يزي=ça suffit | واش=est-ce que | نجم=je peux | بالصح=exactement | يعيشك=merci | حاجة=chose | مليحة=bien/belle
 
-🛒 لو العميل يحب يعدي كومند — اجمع هذي المعلومات بالترتيب (سؤال سؤال):
-1. الاسم الكامل (الاسم + اللقب)
-2. رقم التلفون (+216...)
-3. الولاية (من: أريانة، باجة، بن عروس، بنزرت، قابس، قفصة، جندوبة، القيروان، القصرين، قبلي، الكاف، المهدية، منوبة، مدنين، المنستير، نابل، صفاقس، سيدي بوزيد، سليانة، سوسة، تطاوين، توزر، تونس، زغوان)
-4. العنوان الكامل للتوصيل
-5. لينك المنتوج (رابط من Shein أو AliExpress أو Temu)
+📸 لو العميل يرفع صورة منتوج — قواعد قراءة السعر:
+1. السعر المشطوب (الأصلي): خذه
+2. Retail Price / Prix original / السعر الأسود الكبير: خذه
+3. لو في سعرين: خذ الأكبر دائماً
+4. لو السعر بعد تخفيض فقط (-30%): احسب الأصلي = سعر التخفيض ÷ (1 - نسبة التخفيض)
+5. لو ما شفتش سعر واضح: قول "ما نجمتش نقرأ السعر، ارسلي صورة أوضح"
 
-⚠️ مهم:
-- ما تسألش على اللون، الحجم، الكمية في مرحلة جمع البيانات
-- لما تجمع الاسم + التلفون + الولاية + العنوان + اللينك، رد بهذا الفورمات في آخر الرسالة:
-[ORDER_DATA]{"name":"الاسم الكامل","phone":"الرقم","address":"الولاية — العنوان","link":"اللينك"}[/ORDER_DATA]
-- بعد [ORDER_DATA] أكد للعميل وقوله كود التتبع متاعه سيجيه في رسالة تأكيد
+🎯 بعد حساب السعر — الفورمات الإلزامي:
+لازم ترد بهذا الفورمات بالضبط (لا تغير شيء):
+[PRICE_RESULT]
+💰 السعر النهائي: {السعر} د.ت
 
-💳 لو العميل يسأل على طريقة الدفع:
-- عندنا طريقتين:
-  1. **Virement bancaire UIB**: RIB 12067000013314111448 — Nermin Mejrissi (اذكر اسمك ورقم كومندتك في الوصف)
-  2. **Mandat minute La Poste**: في أي مكتب بريد تونسي، باسم Nermin Mejrissi
-- بعد الدفع ارفع صورة الوصل في صفحة الكومند
+📦 المنتج: {اسم المنتج أو "منتج مخصص"}
 
-📸 لو العميل يرفع صورة منتوج — قواعد قراءة السعر بالترتيب:
-1. **السعر المشطوب** (مشطوب عليه بخط): هذا هو السعر الأصلي — خذه
-2. **Retail Price / Prix original / السعر الأسود الكبير**: خذه
-3. **لو في سعرين**: خذ الأكبر دائماً (مثال: 5,13€ و7,86€ → خذ 7,86€)
-4. **لو السعر بعد تخفيض فقط** (مثال: -30%): احسب السعر الأصلي = سعر التخفيض ÷ (1 - نسبة التخفيض)
-5. **لو ما شفتش سعر واضح**: قول "ما نجمتش نقرأ السعر، ارسلي صورة أوضح"
+✅ يشمل:
+• ثمن المنتج
+• الشحن
+• العمولة
 
-بعد ما تحدد السعر الصح:
-- حوله لأورو لو بدولار أو يوان
-- احسب: سعر بالدينار = سعر بالأورو × 4
-- رد قصير: "هذا المنتوج بـ X€ (السعر الأصلي)، يعني ~Y دينار 👌 تحب تعدي كومند؟"
+💳 طرق الدفع:
+• دفع مسبق 50% من إجمالي الطلب
+• تحويل بنكي UIB: RIB 12067000013314111448 — Nermin Mejrissi
+  (اذكر اسمك وكود التتبع في الوصف)
+• Mandat minute La Poste: باسم Nermine Mejressi — Monastir
+
+⚠️ ملاحظة:
+السعر قابل للتغيير في حالة تغيير سعر المورد أو الشحن.
+
+لإتمام الطلب أرسل:
+📱 الاسم واللقب
+📍 الولاية والمعتمدية
+📞 رقم الهاتف
+[/PRICE_RESULT]
+[PRICE_DATA]{"price_tnd": السعر_بالأرقام, "product_name": "اسم المنتج", "price_eur": السعر_بالأورو}[/PRICE_DATA]
+
+🛒 بعد ما يرسل العميل معلوماته لإتمام الطلب:
+${isLoggedIn
+  ? `- العميل مسجل دخول ✅ — اجمع: الاسم + اللقب + الولاية + المعتمدية + رقم الهاتف
+- لما تجمع كل المعلومات، رد بهذا الفورمات:
+[ORDER_DATA]{"name":"الاسم","lastName":"اللقب","phone":"الرقم","gouvernorat":"الولاية","moatamadia":"المعتمدية","productUrl":"الرابط لو موجود"}[/ORDER_DATA]`
+  : `- العميل غير مسجل دخول ⚠️ — قوله:
+"باش تعدي كومند، لازم تسجل دخول أول. اضغط على زر 'تسجيل الدخول' وبعدها ارجع نكملو 😊"
+[REQUIRE_LOGIN]true[/REQUIRE_LOGIN]`
+}
 
 🔍 لو العميل يسأل على كومندته:
-- قوله يعطيك اسمه الكامل أو رقم تلفونه
+- قوله يعطيك اسمه الكامل أو رقم تلفونه أو كود التتبع
 - لو أعطاك الاسم: [TRACK_NAME]الاسم[/TRACK_NAME]
 - لو أعطاك التلفون: [TRACK_PHONE]الرقم[/TRACK_PHONE]
+- لو أعطاك كود التتبع (يبدأ بـ BY): [TRACK_CODE]الكود[/TRACK_CODE]
 
 🕐 لو يسأل على الأريفاج:
 - رد بالمعلومات الموجودة أعلاه
@@ -494,6 +510,9 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         fileBase64: z.string().optional(),
         fileName: z.string().optional(),
         isNewConversation: z.boolean().optional(),
+        isLoggedIn: z.boolean().optional(),
+        userId: z.string().optional(),
+        userEmail: z.string().optional(),
       }))
       .mutation(async ({ input }) => {
         const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -607,7 +626,7 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
             body: JSON.stringify({
               model: "claude-sonnet-4-5",
               max_tokens: 1500,
-              system: buildSystemPrompt(arrivageInfo, arrivageItemsList),
+              system: buildSystemPrompt(arrivageInfo, arrivageItemsList, input.isLoggedIn),
               messages: claudeMessages,
             }),
           });
@@ -621,34 +640,112 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
           const data = await response.json() as any;
           let assistantMessage = data.content?.[0]?.text || "معذرة، ما نجمتش نجاوبك. جرب مرة أخرى 🙏";
 
+          // Parse PRICE_DATA (store for later order creation)
+          let priceData: { price_tnd?: number; product_name?: string; price_eur?: number } | null = null;
+          const priceDataMatch = assistantMessage.match(/\[PRICE_DATA\]([\s\S]*?)\[\/PRICE_DATA\]/);
+          if (priceDataMatch) {
+            try { priceData = JSON.parse(priceDataMatch[1]); } catch (e) { /* ignore */ }
+            assistantMessage = assistantMessage.replace(/\[PRICE_DATA\][\s\S]*?\[\/PRICE_DATA\]/, "").trim();
+          }
+
+          // Parse PRICE_RESULT block — keep content, remove tags
+          assistantMessage = assistantMessage.replace(/\[PRICE_RESULT\]([\s\S]*?)\[\/PRICE_RESULT\]/, "$1").trim();
+
+          // Parse REQUIRE_LOGIN
+          let requireLogin = false;
+          if (assistantMessage.includes("[REQUIRE_LOGIN]true[/REQUIRE_LOGIN]")) {
+            requireLogin = true;
+            assistantMessage = assistantMessage.replace(/\[REQUIRE_LOGIN\]true\[\/REQUIRE_LOGIN\]/, "").trim();
+          }
+
           // Handle order creation
           let orderCreated = false;
+          let orderTrackingCode: string | null = null;
           const orderMatch = assistantMessage.match(/\[ORDER_DATA\]([\s\S]*?)\[\/ORDER_DATA\]/);
           if (orderMatch) {
             try {
               const orderData = JSON.parse(orderMatch[1]);
+              // Generate tracking code BY + timestamp
+              orderTrackingCode = `BY${Date.now().toString(36).toUpperCase()}`;
+              const fullName = `${orderData.name || ""} ${orderData.lastName || ""}`.trim();
+              const address = [orderData.gouvernorat, orderData.moatamadia].filter(Boolean).join(" — ");
+              const priceTnd = priceData?.price_tnd || null;
+              const depositAmount = priceTnd ? Math.ceil(priceTnd * 0.5) : null;
+
+              // Create in ai_orders table
+              try {
+                const nameParts = fullName.split(" ");
+                const firstName = nameParts[0] || fullName;
+                const lastName = nameParts.slice(1).join(" ") || "";
+                await createAiOrder({
+                  customerName: firstName,
+                  customerLastName: lastName,
+                  phone: orderData.phone || null,
+                  email: input.userEmail || null,
+                  gouvernorat: orderData.gouvernorat || null,
+                  moatamadia: orderData.moatamadia || null,
+                  productUrl: orderData.productUrl || null,
+                  productName: priceData?.product_name || null,
+                  totalPrice: priceTnd || 0,
+                  depositAmount: depositAmount || 0,
+                  productImageUrl: imageUrl || null,
+                  userId: input.userId ? parseInt(input.userId) : null,
+                  status: "pending_deposit",
+                });
+              } catch (e) { console.error("[Chatbot] ai_orders insert error:", e); }
+
+              // Also create in main orders table for CRM
               await createOrder({
-                customerName: orderData.name,
+                customerName: fullName,
                 customerPhone: orderData.phone || null,
-                customerAddress: orderData.address || null,
-                productLink: orderData.link,
+                customerAddress: address || null,
+                productLink: orderData.productUrl || null,
                 quantity: 1,
                 size: null, color: null,
-                notes: "كومند من الشات",
+                notes: `كومند من الشات AI | كود: ${orderTrackingCode}${priceTnd ? ` | السعر: ${priceTnd} د.ت` : ""}`,
                 screenshotUrl: imageUrl,
                 userId: null,
               });
+
               orderCreated = true;
               if (conversation) {
                 await markConversationHasOrder(conversation.id);
-                await updateConversationCustomer(conversation.id, orderData.name, orderData.phone);
+                await updateConversationCustomer(conversation.id, fullName, orderData.phone);
               }
+
+              // Notify admin
               notifyOwner({
-                title: "🛒 كومند جديدة من الشات",
-                content: `Client: ${orderData.name}\nTel: ${orderData.phone || "—"}\nAdresse: ${orderData.address || "—"}\nLien: ${orderData.link}`,
+                title: "🛒 كومند جديدة من الشات AI",
+                content: `Client: ${fullName}\nTel: ${orderData.phone || "—"}\nAdresse: ${address || "—"}\nPrix: ${priceTnd ? priceTnd + " د.ت" : "—"}\nAcompte: ${depositAmount ? depositAmount + " د.ت" : "—"}\nCode: ${orderTrackingCode}`,
               }).catch(() => {});
-            } catch (e) { console.error("[Chatbot] Order parse error:", e); }
+
+              // Send email to admin
+              const nameParts2 = fullName.split(" ");
+              notifyAdminNewAiOrder({
+                trackingCode: orderTrackingCode,
+                customerName: nameParts2[0] || fullName,
+                customerLastName: nameParts2.slice(1).join(" ") || "",
+                productName: priceData?.product_name || null,
+                totalPrice: priceTnd || 0,
+                depositAmount: depositAmount || 0,
+                status: "pending_deposit",
+                customerEmail: input.userEmail || null,
+              }).catch(() => {});
+
+              // Replace ORDER_DATA with confirmation message
+              const confirmMsg = `\n\n✅ تسجلت كومندتك!\n🔑 كود التتبع: **${orderTrackingCode}**\n💰 التسبقة: **${depositAmount || "—"} د.ت**\n\nارفع صورة وصل الدفع هنا بعد ما تخلص 📸`;
+              assistantMessage = assistantMessage.replace(/\[ORDER_DATA\][\s\S]*?\[\/ORDER_DATA\]/, confirmMsg).trim();
+            } catch (e) {
+              console.error("[Chatbot] Order creation error:", e);
+              assistantMessage = assistantMessage.replace(/\[ORDER_DATA\][\s\S]*?\[\/ORDER_DATA\]/, "").trim();
+            }
+          } else {
             assistantMessage = assistantMessage.replace(/\[ORDER_DATA\][\s\S]*?\[\/ORDER_DATA\]/, "").trim();
+          }
+
+          // Return requireLogin flag
+          if (requireLogin) {
+            return { message: assistantMessage, orderCreated: false, isBusy: false, requireLogin: true, orderTrackingCode: null };
           }
 
           // Handle order tracking by name
@@ -1030,7 +1127,40 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
   carousel: router({
     // Public: get active slides for homepage
     list: publicProcedure.query(async () => {
-      return await getActiveCarouselSlides();
+      const slides = await getActiveCarouselSlides();
+      if (!slides || slides.length === 0) {
+        // Default fallback slides when DB is empty
+        return [
+          {
+            id: 1, title: 'Organisez-vous', subtitle: 'Découvrez les meilleures ventes',
+            bgColor: '#F5C518', textColor: '#1A1A1A', imageUrl: null,
+            card1Label: 'Commander', card1Image: null, card1Link: '/order',
+            card2Label: 'Arrivages', card2Image: null, card2Link: '/arrivage',
+            card3Label: 'Suivre', card3Image: null, card3Link: '/track',
+            card4Label: 'Calculer', card4Image: null, card4Link: '/calculator',
+            displayOrder: 1, isActive: true, createdAt: new Date(), updatedAt: new Date(),
+          },
+          {
+            id: 2, title: 'Nos meilleurs arrivages', subtitle: 'Vêtements, chaussures, accessoires',
+            bgColor: '#1A6B3C', textColor: '#FFFFFF', imageUrl: null,
+            card1Label: 'Mode', card1Image: null, card1Link: '/arrivage',
+            card2Label: 'Maison', card2Image: null, card2Link: '/arrivage',
+            card3Label: 'Accessoires', card3Image: null, card3Link: '/arrivage',
+            card4Label: 'Tout voir', card4Image: null, card4Link: '/arrivage',
+            displayOrder: 2, isActive: true, createdAt: new Date(), updatedAt: new Date(),
+          },
+          {
+            id: 3, title: 'Mode & Style', subtitle: 'Les tendances à petits prix',
+            bgColor: '#E53E3E', textColor: '#FFFFFF', imageUrl: null,
+            card1Label: 'Femme', card1Image: null, card1Link: '/catalogue',
+            card2Label: 'Homme', card2Image: null, card2Link: '/catalogue',
+            card3Label: 'Enfant', card3Image: null, card3Link: '/catalogue',
+            card4Label: 'Catalogue', card4Image: null, card4Link: '/catalogue',
+            displayOrder: 3, isActive: true, createdAt: new Date(), updatedAt: new Date(),
+          },
+        ];
+      }
+      return slides;
     }),
     // Admin: get all slides
     adminList: customAdminProcedure.query(async () => {
@@ -1217,6 +1347,200 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         const key = `products/${Date.now()}-${input.filename}`;
         const { url } = await storagePut(key, buffer, input.mimeType);
         return { url };
+      }),
+  }),
+
+  // ===== AI Orders =====
+  aiOrders: router({
+    // Create a new AI order (after collecting all customer info)
+    create: publicProcedure
+      .input(z.object({
+        productName: z.string().optional(),
+        productUrl: z.string().optional(),
+        productImageUrl: z.string().optional(),
+        totalPrice: z.number().int(), // in millimes (TND * 100)
+        customerName: z.string().min(1),
+        customerLastName: z.string().min(1),
+        gouvernorat: z.string().min(1),
+        moatamadia: z.string().optional(),
+        phone: z.string().min(8),
+        email: z.string().email().optional(),
+        userId: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const depositAmount = Math.round(input.totalPrice * 0.5);
+        const order = await createAiOrder({
+          ...input,
+          depositAmount,
+          status: 'pending_deposit',
+        });
+        // Notify admin
+        await notifyAdminNewAiOrder({
+          customerName: order.customerName || '',
+          customerLastName: order.customerLastName || '',
+          trackingCode: order.trackingCode,
+          productName: order.productName,
+          totalPrice: order.totalPrice,
+          depositAmount: order.depositAmount,
+          status: order.status || 'pending_deposit',
+          customerEmail: order.email,
+        });
+        return { trackingCode: order.trackingCode, depositAmount: order.depositAmount, id: order.id };
+      }),
+
+    // Track an order by tracking code
+    track: publicProcedure
+      .input(z.object({ trackingCode: z.string().min(1) }))
+      .query(async ({ input }) => {
+        const order = await getAiOrderByTracking(input.trackingCode);
+        if (!order) throw new TRPCError({ code: 'NOT_FOUND', message: 'كود التتبع غير صحيح' });
+        return order;
+      }),
+
+    // Get orders for logged-in user
+    myOrders: protectedProcedure
+      .query(async ({ ctx }) => {
+        const user = await getUserByOpenId(ctx.user.openId);
+        if (!user) return [];
+        return await getAiOrdersByUserId(user.id);
+      }),
+
+    // Upload payment proof
+    uploadPaymentProof: publicProcedure
+      .input(z.object({
+        trackingCode: z.string(),
+        base64: z.string(),
+        mimeType: z.string(),
+        filename: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const order = await getAiOrderByTracking(input.trackingCode);
+        if (!order) throw new TRPCError({ code: 'NOT_FOUND', message: 'كود التتبع غير صحيح' });
+        const buffer = Buffer.from(input.base64, 'base64');
+        const key = `ai-orders/payment-proofs/${input.trackingCode}-${Date.now()}.${input.filename.split('.').pop()}`;
+        const { url } = await storagePut(key, buffer, input.mimeType);
+        await updateAiOrderPaymentProof(order.id, url);
+        await notifyAdminNewAiOrder({
+          customerName: order.customerName || '',
+          customerLastName: order.customerLastName || '',
+          trackingCode: order.trackingCode,
+          productName: order.productName,
+          totalPrice: order.totalPrice,
+          depositAmount: order.depositAmount,
+          status: 'deposit_received',
+          customerEmail: order.email,
+        });
+        return { success: true, url };
+      }),
+
+    // Admin: get all AI orders
+    adminList: customAdminProcedure
+      .query(async () => {
+        return await getAllAiOrders();
+      }),
+
+    // Admin: confirm an order (alias for adminUpdateStatus with status 'confirmed')
+    confirm: customAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        adminNote: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await updateAiOrderStatus(input.id, 'confirmed', input.adminNote);
+        const orders = await getAllAiOrders();
+        const order = orders.find(o => o.id === input.id);
+        if (order) {
+          await sendOrderConfirmationToAdmin({
+            customerName: order.customerName || '',
+            customerLastName: order.customerLastName || '',
+            trackingCode: order.trackingCode,
+            productName: order.productName,
+            totalPrice: order.totalPrice,
+            depositAmount: order.depositAmount,
+            status: 'confirmed',
+            customerEmail: order.email,
+            adminNotes: input.adminNote,
+          });
+        }
+        return { success: true };
+      }),
+
+    // Admin: reject an order (alias for adminUpdateStatus with status 'cancelled')
+    reject: customAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        reason: z.string().min(1),
+      }))
+      .mutation(async ({ input }) => {
+        await updateAiOrderStatus(input.id, 'cancelled', input.reason);
+        const orders = await getAllAiOrders();
+        const order = orders.find(o => o.id === input.id);
+        if (order) {
+          await sendStatusUpdateToAdmin({
+            customerName: order.customerName || '',
+            customerLastName: order.customerLastName || '',
+            trackingCode: order.trackingCode,
+            productName: order.productName,
+            totalPrice: order.totalPrice,
+            depositAmount: order.depositAmount,
+            status: 'cancelled',
+            customerEmail: order.email,
+            adminNotes: input.reason,
+          });
+        }
+        return { success: true };
+      }),
+
+    // Admin: update order status (simplified alias)
+    updateStatus: customAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.string().min(1),
+      }))
+      .mutation(async ({ input }) => {
+        await updateAiOrderStatus(input.id, input.status as any);
+        const orders = await getAllAiOrders();
+        const order = orders.find(o => o.id === input.id);
+        if (order) {
+          await sendStatusUpdateToAdmin({
+            customerName: order.customerName || '',
+            customerLastName: order.customerLastName || '',
+            trackingCode: order.trackingCode,
+            productName: order.productName,
+            totalPrice: order.totalPrice,
+            depositAmount: order.depositAmount,
+            status: input.status,
+            customerEmail: order.email,
+          });
+        }
+        return { success: true };
+      }),
+
+    // Admin: update order status
+    adminUpdateStatus: customAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(['pending_deposit', 'deposit_received', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']),
+        adminNotes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await updateAiOrderStatus(input.id, input.status, input.adminNotes);
+        // Notify admin (and optionally customer)
+        const order = await getAllAiOrders().then(orders => orders.find(o => o.id === input.id));
+        if (order) {
+          await sendStatusUpdateToAdmin({
+            customerName: order.customerName || '',
+            customerLastName: order.customerLastName || '',
+            trackingCode: order.trackingCode,
+            productName: order.productName,
+            totalPrice: order.totalPrice,
+            depositAmount: order.depositAmount,
+            status: input.status,
+            customerEmail: order.email,
+            adminNotes: input.adminNotes,
+          });
+        }
+        return { success: true };
       }),
   }),
 
