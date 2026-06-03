@@ -237,7 +237,7 @@ function BottomNav({ onProfileClick, onChatClick, visible }: BottomNavProps) {
 
   return (
     <motion.div
-      className="fixed bottom-0 left-0 right-0 z-40 bg-white"
+      className="fixed bottom-0 left-0 right-0 z-[9999] bg-white"
       style={{ borderTop: '1px solid #E5E5E5' }}
       animate={{ y: visible ? 0 : '100%' }}
       transition={{ type: 'spring', stiffness: 400, damping: 38, mass: 0.8 }}
@@ -308,7 +308,7 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
 
   const { carouselColor } = useBgColor();
 
-  const { openChat }   = useChatContext();
+  const { openChat, chatOpen: isChatOpen }   = useChatContext();
   const handleChatOpen = onChatOpen ?? openChat;
 
   const mainRef     = useRef<HTMLDivElement>(null);
@@ -357,7 +357,7 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
         <BottomNav
           onProfileClick={() => setProfileOpen(true)}
           onChatClick={handleChatOpen}
-          visible={navVisible}
+          visible={navVisible || isChatOpen}
         />
       )}
     </div>

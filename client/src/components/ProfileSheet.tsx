@@ -64,6 +64,11 @@ const IconLogin = () => (
     <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
   </svg>
 );
+const IconWhatsApp = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={SW} strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/>
+  </svg>
+);
 
 interface ProfileSheetProps {
   open: boolean;
@@ -349,6 +354,13 @@ export default function ProfileSheet({ open, onClose }: ProfileSheetProps) {
                     icon={<IconMail />}
                     label={t('profile_contact')}
                     onClick={() => window.open('mailto:Iscof840@gmail.com', '_blank')}
+                  />
+                  <div style={{ height: 1, background: divider, margin: '0 16px' }} />
+                  <MenuItem
+                    icon={<IconWhatsApp />}
+                    label="WhatsApp"
+                    onClick={() => window.open('https://wa.me/21623868982', '_blank')}
+                    accent
                   />
                 </div>
 

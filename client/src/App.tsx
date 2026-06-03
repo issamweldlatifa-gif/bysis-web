@@ -10,7 +10,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 // AIChat is lazy loaded below
 
 // Context to allow any page to open AIChat
-export const ChatContext = createContext<{ openChat: () => void }>({ openChat: () => {} });
+export const ChatContext = createContext<{ openChat: () => void; closeChat: () => void; chatOpen: boolean }>({ openChat: () => {}, closeChat: () => {}, chatOpen: false });
 export function useChatContext() { return useContext(ChatContext); }
 
 // Eagerly loaded (critical path)
@@ -99,7 +99,7 @@ function App() {
         <I18nProvider>
         <CartProvider>
         <TooltipProvider>
-          <ChatContext.Provider value={{ openChat: () => setChatOpen(true) }}>
+          <ChatContext.Provider value={{ openChat: () => setChatOpen(v => !v), closeChat: () => setChatOpen(false), chatOpen }}>
             <Toaster />
             <Router />
             <AIChatWrapper chatOpen={chatOpen} setChatOpen={setChatOpen} />

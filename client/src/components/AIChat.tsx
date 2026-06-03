@@ -80,7 +80,7 @@ function PriceActionButtons({
         className="w-full py-3 bg-black text-white rounded-2xl text-[14px] font-semibold tracking-tight flex items-center justify-center gap-2"
         style={{ fontFamily: "'Inter', 'SF Pro Display', sans-serif" }}
       >
-        🛒 عدّل كومند
+        🛒 عدي كومند
       </motion.button>
       <div className="flex gap-2">
         <motion.button
@@ -396,9 +396,10 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed left-0 right-0 bottom-0 z-[9999] bg-white flex flex-col"
+            className="fixed left-0 right-0 z-[9998] bg-white flex flex-col"
             style={{
-              height: 'calc(100dvh - 64px)',
+              bottom: 'calc(env(safe-area-inset-bottom, 0px) + 64px)',
+              height: 'calc(100dvh - 64px - env(safe-area-inset-bottom, 0px) - 64px)',
               borderTopLeftRadius: '24px',
               borderTopRightRadius: '24px',
               boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',

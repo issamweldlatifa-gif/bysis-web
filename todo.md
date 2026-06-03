@@ -411,3 +411,11 @@
 - [x] Add "ai_orders" tab to ShipMasterDashboard.tsx (type, navItems, title/subtitle, render)
 - [x] Bot icon imported from lucide-react for ai_orders nav item
 - [x] 22/22 tests Vitest passent, 0 erreurs TypeScript
+
+## 🔧 Corrections UI Chat + Contact (Juin 2026)
+- [x] Chat toggle: 2ème clic sur bouton AI ferme le chat (actuellement il ne fait rien)
+- [x] Bottom nav: reste visible SOUS le chat (chat s'arrête au-dessus du bottom nav, pas dessus)
+- [x] Texte bouton: 'عدل كومند' → 'عدي كومند' dans AIChat.tsx
+- [x] Texte bouton: 'عدل كومند' → 'عدي كومند' dans system prompt (routers.ts)
+- [x] Ajouter WhatsApp (+216 23 868 982) dans ProfileSheet.tsx (section contact)
+- [x] Ajouter WhatsApp dans footer/contact de l'app (system prompt + ProfileSheet)
