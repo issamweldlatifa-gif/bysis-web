@@ -53,7 +53,7 @@ export default function AdminDashboard() {
       <div className="min-h-screen flex flex-col bg-background">
         <Navbar />
         <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary" strokeWidth={1.5} />
         </main>
       </div>
     );
@@ -310,15 +310,15 @@ function AdminContent() {
                 </Label>
               </div>
               <Button variant="outline" size="sm" onClick={() => navigate("/admin/conversations")} className="gap-2">
-                <MessageSquare className="h-4 w-4" />
+                <MessageSquare className="h-4 w-4" strokeWidth={1.5} />
                 Conversations
               </Button>
               <Button variant="outline" size="sm" onClick={() => navigate("/admin/arrivage")} className="gap-2">
-                <Package className="h-4 w-4" />
+                <Package className="h-4 w-4" strokeWidth={1.5} />
                 Arrivage
               </Button>
               <Button variant="outline" size="sm" onClick={exportCSV} className="gap-2">
-                <Download className="h-4 w-4" />
+                <Download className="h-4 w-4" strokeWidth={1.5} />
                 Export CSV
               </Button>
               <Button
@@ -328,7 +328,7 @@ function AdminContent() {
                 disabled={logoutMutation.isPending}
                 className="gap-2 text-muted-foreground"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-4 w-4" strokeWidth={1.5} />
                 Déconnexion
               </Button>
             </div>
@@ -411,7 +411,7 @@ function AdminContent() {
           <Card className="mb-6 border-cyan-200/50">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <Package className="h-4 w-4 text-cyan-600" />
+                <Package className="h-4 w-4 text-cyan-600" strokeWidth={1.5} />
                 معلومات الأريفاج (يستخدمها الشات بوت)
               </CardTitle>
               <CardDescription className="text-xs">
@@ -434,7 +434,7 @@ function AdminContent() {
                   disabled={saveArrivageInfo.isPending}
                   className="self-end gap-1.5"
                 >
-                  <Save className="h-3.5 w-3.5" />
+                  <Save className="h-3.5 w-3.5" strokeWidth={1.5} />
                   حفظ
                 </Button>
               </div>
@@ -444,7 +444,7 @@ function AdminContent() {
           {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
               <Input
                 placeholder="Rechercher par nom, téléphone ou lien..."
                 value={searchQuery}
@@ -454,7 +454,7 @@ function AdminContent() {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-48">
-                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+                <Filter className="h-4 w-4 mr-2 text-muted-foreground" strokeWidth={1.5} />
                 <SelectValue placeholder="Filtrer par statut" />
               </SelectTrigger>
               <SelectContent>
@@ -485,11 +485,11 @@ function AdminContent() {
             <CardContent>
               {isLoading ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" strokeWidth={1.5} />
                 </div>
               ) : error ? (
                 <div className="flex flex-col items-center justify-center py-12 text-destructive">
-                  <XCircle className="h-12 w-12 mb-4 opacity-50" />
+                  <XCircle className="h-12 w-12 mb-4 opacity-50" strokeWidth={1.5} />
                   <p className="font-medium">Erreur de chargement</p>
                   <p className="text-sm text-muted-foreground mt-1">{error.message}</p>
                   <Button variant="outline" size="sm" className="mt-4" onClick={() => refetch()}>
@@ -498,7 +498,7 @@ function AdminContent() {
                 </div>
               ) : filteredOrders.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                  <Package className="h-12 w-12 mb-4 opacity-30" />
+                  <Package className="h-12 w-12 mb-4 opacity-30" strokeWidth={1.5} />
                   <p>Aucune commande trouvée</p>
                 </div>
               ) : (
@@ -532,12 +532,12 @@ function AdminContent() {
                                 {order.customerPhone && <p>Tel: {order.customerPhone}</p>}
                                 {order.customerAddress && (
                                   <p className="flex items-center gap-1">
-                                    <MapPin className="h-3 w-3" />
+                                    <MapPin className="h-3 w-3" strokeWidth={1.5} />
                                     {order.customerAddress}
                                   </p>
                                 )}
                                 <p className="flex items-center gap-1">
-                                  <ExternalLink className="h-3 w-3" />
+                                  <ExternalLink className="h-3 w-3" strokeWidth={1.5} />
                                   <a
                                     href={order.productLink}
                                     target="_blank"
@@ -632,7 +632,7 @@ function AdminContent() {
                                   onClick={() => handleSaveNotes(order.id)}
                                   disabled={updateNotes.isPending}
                                 >
-                                  <Save className="h-3.5 w-3.5" />
+                                  <Save className="h-3.5 w-3.5" strokeWidth={1.5} />
                                   Sauver
                                 </Button>
                               )}

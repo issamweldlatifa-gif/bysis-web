@@ -82,7 +82,7 @@ function StatCard({ icon: Icon, label, value, sub, color }: { icon: any; label: 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-3">
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
-        <Icon className="w-5 h-5" />
+        <Icon className="w-5 h-5" strokeWidth={1.5} />
       </div>
       <div>
         <p className="text-xs text-gray-500">{label}</p>
@@ -184,10 +184,10 @@ export default function AdminAiOrders() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => exportCSV(orders)} className="gap-2">
-            <Download className="w-4 h-4" /> Export CSV
+            <Download className="w-4 h-4" strokeWidth={1.5} /> Export CSV
           </Button>
           <Button variant="outline" size="sm" onClick={() => refetch()} className="gap-2">
-            <RefreshCw className="w-4 h-4" /> Actualiser
+            <RefreshCw className="w-4 h-4" strokeWidth={1.5} /> Actualiser
           </Button>
         </div>
       </div>
@@ -203,7 +203,7 @@ export default function AdminAiOrders() {
       {/* ── Filters ── */}
       <div className="flex gap-2 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" strokeWidth={1.5} />
           <Input
             placeholder="Nom, téléphone, code suivi, gouvernorat..."
             value={search}
@@ -213,7 +213,7 @@ export default function AdminAiOrders() {
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-[180px]">
-            <Filter className="w-4 h-4 mr-2 text-gray-400" />
+            <Filter className="w-4 h-4 mr-2 text-gray-400" strokeWidth={1.5} />
             <SelectValue placeholder="Tous les statuts" />
           </SelectTrigger>
           <SelectContent>
@@ -232,7 +232,7 @@ export default function AdminAiOrders() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
-          <Package className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <Package className="w-12 h-12 mx-auto mb-3 opacity-30" strokeWidth={1.5} />
           <p className="font-medium">Aucune commande</p>
           <p className="text-sm">Modifiez les filtres ou attendez de nouvelles commandes</p>
         </div>
@@ -253,7 +253,7 @@ export default function AdminAiOrders() {
                     <img src={order.productImageUrl} alt="Produit" className="w-14 h-14 rounded-lg object-cover shrink-0 border border-gray-100" loading="lazy" />
                   ) : (
                     <div className="w-14 h-14 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
-                      <Package className="w-6 h-6 text-gray-300" />
+                      <Package className="w-6 h-6 text-gray-300" strokeWidth={1.5} />
                     </div>
                   )}
 
@@ -265,8 +265,8 @@ export default function AdminAiOrders() {
                       </Badge>
                     </div>
                     <div className="flex items-center gap-3 mt-1 text-sm text-gray-500 flex-wrap">
-                      <span className="flex items-center gap-1"><Phone className="w-3 h-3" />{phone}</span>
-                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{order.gouvernorat}</span>
+                      <span className="flex items-center gap-1"><Phone className="w-3 h-3" strokeWidth={1.5} />{phone}</span>
+                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" strokeWidth={1.5} />{order.gouvernorat}</span>
                       {order.trackingCode && (
                         <span className="font-mono text-xs bg-gray-100 px-2 py-0.5 rounded">{order.trackingCode}</span>
                       )}
@@ -298,7 +298,7 @@ export default function AdminAiOrders() {
                         className="flex-1 bg-green-600 hover:bg-green-700 text-white gap-1"
                         onClick={() => { setSelectedOrder(order); setShowConfirmDialog(true); }}
                       >
-                        <CheckCircle className="w-4 h-4" /> Confirmer
+                        <CheckCircle className="w-4 h-4" strokeWidth={1.5} /> Confirmer
                       </Button>
                       <Button
                         size="sm"
@@ -306,7 +306,7 @@ export default function AdminAiOrders() {
                         className="flex-1 border-red-200 text-red-600 hover:bg-red-50 gap-1"
                         onClick={() => { setSelectedOrder(order); setShowRejectDialog(true); }}
                       >
-                        <XCircle className="w-4 h-4" /> Rejeter
+                        <XCircle className="w-4 h-4" strokeWidth={1.5} /> Rejeter
                       </Button>
                     </>
                   ) : null}
@@ -318,7 +318,7 @@ export default function AdminAiOrders() {
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-50 text-green-700 text-sm font-medium hover:bg-green-100 transition-colors border border-green-200"
                       onClick={e => e.stopPropagation()}
                     >
-                      <MessageCircle className="w-4 h-4" /> WhatsApp
+                      <MessageCircle className="w-4 h-4" strokeWidth={1.5} /> WhatsApp
                     </a>
                   )}
                 </div>
@@ -334,7 +334,7 @@ export default function AdminAiOrders() {
           <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <Package className="w-5 h-5" />
+                <Package className="w-5 h-5" strokeWidth={1.5} />
                 Commande {selectedOrder.trackingCode}
               </DialogTitle>
             </DialogHeader>
@@ -353,7 +353,7 @@ export default function AdminAiOrders() {
                     {selectedOrder.productUrl && (
                       <a href={selectedOrder.productUrl} target="_blank" rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline">
-                        <ExternalLink className="w-3 h-3" /> Voir le produit
+                        <ExternalLink className="w-3 h-3" strokeWidth={1.5} /> Voir le produit
                       </a>
                     )}
                   </div>
@@ -362,11 +362,11 @@ export default function AdminAiOrders() {
 
               {/* Customer info */}
               <div className="bg-gray-50 rounded-xl p-4 space-y-2">
-                <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2"><User className="w-4 h-4" /> Client</h4>
+                <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2"><User className="w-4 h-4" strokeWidth={1.5} /> Client</h4>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div><span className="text-gray-500">Nom:</span> <span className="font-medium">{selectedOrder.customerName} {selectedOrder.customerLastName}</span></div>
                   <div className="flex items-center gap-1">
-                    <Phone className="w-3 h-3 text-gray-400" />
+                    <Phone className="w-3 h-3 text-gray-400" strokeWidth={1.5} />
                     <span className="font-medium">{selectedOrder.phone || selectedOrder.customerPhone}</span>
                   </div>
                   <div><span className="text-gray-500">Gouvernorat:</span> <span className="font-medium">{selectedOrder.gouvernorat}</span></div>
@@ -385,7 +385,7 @@ export default function AdminAiOrders() {
                     target="_blank" rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition-colors"
                   >
-                    <MessageCircle className="w-4 h-4" /> Contacter via WhatsApp
+                    <MessageCircle className="w-4 h-4" strokeWidth={1.5} /> Contacter via WhatsApp
                   </a>
                 )}
               </div>
@@ -432,21 +432,21 @@ export default function AdminAiOrders() {
               {/* Admin notes — editable */}
               <div className="bg-gray-50 rounded-xl p-3 space-y-2">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs text-gray-500 font-medium flex items-center gap-1"><Edit3 className="w-3 h-3" /> Notes admin</p>
+                  <p className="text-xs text-gray-500 font-medium flex items-center gap-1"><Edit3 className="w-3 h-3" strokeWidth={1.5} /> Notes admin</p>
                   {!editingNotes ? (
                     <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => setEditingNotes(true)}>
-                      <Edit3 className="w-3 h-3 mr-1" /> Modifier
+                      <Edit3 className="w-3 h-3 mr-1" strokeWidth={1.5} /> Modifier
                     </Button>
                   ) : (
                     <div className="flex gap-1">
                       <Button size="sm" variant="ghost" className="h-6 px-2 text-xs text-green-600"
                         onClick={() => updateNotesMutation.mutate({ id: selectedOrder.id, adminNotes: notesValue })}
                         disabled={updateNotesMutation.isPending}>
-                        <Save className="w-3 h-3 mr-1" /> Sauvegarder
+                        <Save className="w-3 h-3 mr-1" strokeWidth={1.5} /> Sauvegarder
                       </Button>
                       <Button size="sm" variant="ghost" className="h-6 px-2 text-xs text-red-500"
                         onClick={() => { setEditingNotes(false); setNotesValue(selectedOrder.adminNotes || ""); }}>
-                        <X className="w-3 h-3" />
+                        <X className="w-3 h-3" strokeWidth={1.5} />
                       </Button>
                     </div>
                   )}
@@ -469,7 +469,7 @@ export default function AdminAiOrders() {
                 if (history.length === 0) return null;
                 return (
                   <div className="bg-gray-50 rounded-xl p-3 space-y-2">
-                    <p className="text-xs text-gray-500 font-medium flex items-center gap-1"><History className="w-3 h-3" /> Historique des statuts</p>
+                    <p className="text-xs text-gray-500 font-medium flex items-center gap-1"><History className="w-3 h-3" strokeWidth={1.5} /> Historique des statuts</p>
                     <div className="space-y-1.5">
                       {history.map((h, i) => (
                         <div key={i} className="flex items-start gap-2 text-xs">
@@ -490,10 +490,10 @@ export default function AdminAiOrders() {
               {(selectedOrder.status === "pending_deposit" || selectedOrder.status === "pending") && (
                 <>
                   <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => setShowConfirmDialog(true)}>
-                    <CheckCircle className="w-4 h-4 mr-2" /> Confirmer
+                    <CheckCircle className="w-4 h-4 mr-2" strokeWidth={1.5} /> Confirmer
                   </Button>
                   <Button variant="outline" className="border-red-200 text-red-600 hover:bg-red-50" onClick={() => setShowRejectDialog(true)}>
-                    <XCircle className="w-4 h-4 mr-2" /> Rejeter
+                    <XCircle className="w-4 h-4 mr-2" strokeWidth={1.5} /> Rejeter
                   </Button>
                 </>
               )}

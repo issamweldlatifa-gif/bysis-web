@@ -135,7 +135,7 @@ export default function AdminArrivage() {
           <div className="flex items-center gap-3">
             <Link href="/admin">
               <Button variant="ghost" size="icon" className="text-[#6C7378] hover:text-[#1D1D1D]">
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-5 h-5" strokeWidth={1.5} />
               </Button>
             </Link>
             <div>
@@ -147,7 +147,7 @@ export default function AdminArrivage() {
             onClick={openCreate}
             className="text-white border-0 gap-2" style={{ background: "#0070BA" }}
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4" strokeWidth={1.5} />
             إضافة منتوج
           </Button>
         </div>
@@ -174,7 +174,7 @@ export default function AdminArrivage() {
                     <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Package className="w-12 h-12 text-slate-600" />
+                      <Package className="w-12 h-12 text-slate-600" strokeWidth={1.5} />
                     </div>
                   )}
                   <div className="absolute top-2 right-2">
@@ -215,7 +215,7 @@ export default function AdminArrivage() {
                       onClick={() => toggleMutation.mutate({ id: item.id, available: item.available ? 0 : 1 })}
                       title={item.available ? "إخفاء" : "إظهار"}
                     >
-                      {item.available ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {item.available ? <EyeOff className="w-4 h-4" strokeWidth={1.5} /> : <Eye className="w-4 h-4" strokeWidth={1.5} />}
                     </Button>
                     <Button
                       variant="outline"
@@ -223,7 +223,7 @@ export default function AdminArrivage() {
                       className="border-blue-500/20 bg-blue-500/5 text-blue-400 hover:bg-blue-500/20"
                       onClick={() => { if (confirm("تأكيد الحذف؟")) deleteMutation.mutate({ id: item.id }); }}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" strokeWidth={1.5} />
                     </Button>
                   </div>
                 </div>
@@ -233,12 +233,12 @@ export default function AdminArrivage() {
         ) : (
           <div className="text-center py-24">
             <div className="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
-              <Package className="w-10 h-10 text-[#9DA3A6]" />
+              <Package className="w-10 h-10 text-[#9DA3A6]" strokeWidth={1.5} />
             </div>
             <h3 className="text-lg font-semibold mb-2" style={{ color: "#1D1D1D" }}>ما فيه منتجات بعد</h3>
             <p className="text-[#6C7378] mb-6">ابدأ بإضافة أول منتوج للأريفاج</p>
             <Button onClick={openCreate} className="bg-gradient-to-r from-cyan-500 to-violet-500 text-white border-0 gap-2">
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4" strokeWidth={1.5} />
               إضافة منتوج
             </Button>
           </div>

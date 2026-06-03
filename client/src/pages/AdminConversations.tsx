@@ -27,7 +27,7 @@ export default function AdminConversations() {
       <div className="min-h-screen flex flex-col mesh-bg">
         <Navbar />
         <main className="flex-1 flex items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-cyan-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-cyan-400" strokeWidth={1.5} />
         </main>
       </div>
     );
@@ -83,7 +83,7 @@ function ConversationsContent() {
                 </div>
                 {isLoading ? (
                   <div className="flex items-center justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin text-cyan-400" />
+                    <Loader2 className="h-6 w-6 animate-spin text-cyan-400" strokeWidth={1.5} />
                   </div>
                 ) : !conversations?.length ? (
                   <div className="flex flex-col items-center justify-center py-10 text-[#9DA3A6]">
@@ -161,7 +161,7 @@ function ConversationsContent() {
                     </div>
                   ) : messagesLoading ? (
                     <div className="flex items-center justify-center h-full">
-                      <Loader2 className="h-6 w-6 animate-spin text-cyan-400" />
+                      <Loader2 className="h-6 w-6 animate-spin text-cyan-400" strokeWidth={1.5} />
                     </div>
                   ) : !messages?.length ? (
                     <div className="flex flex-col items-center justify-center h-full text-[#9DA3A6]">
