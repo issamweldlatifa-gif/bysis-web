@@ -641,12 +641,23 @@ export async function getAllAiOrders(): Promise<AiOrder[]> {
   return await db.select().from(aiOrders).orderBy(desc(aiOrders.createdAt));
 }
 
-export async function updateAiOrderStatus(id: number, status: string, adminNotes?: string): Promise<void> {
+export async function updateAiOrderStatus(id: number, status: string, adminNotes?: string, note?: string): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const updates: Partial<InsertAiOrder> = { status };
+  // Append to statusHistory
+  const [current] = await db.select({ statusHistory: aiOrders.statusHistory }).from(aiOrders).where(eq(aiOrders.id, id));
+  let history: { status: string; note?: string; at: string }[] = [];
+  try { history = JSON.parse(current?.statusHistory || "[]"); } catch { history = []; }
+  history.push({ status, note: note || undefined, at: new Date().toISOString() });
+  const updates: Partial<InsertAiOrder> = { status, statusHistory: JSON.stringify(history) };
   if (adminNotes !== undefined) updates.adminNotes = adminNotes;
   await db.update(aiOrders).set(updates).where(eq(aiOrders.id, id));
+}
+
+export async function updateAiOrderAdminNotes(id: number, adminNotes: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(aiOrders).set({ adminNotes }).where(eq(aiOrders.id, id));
 }
 
 export async function updateAiOrderPaymentProof(id: number, paymentProofUrl: string): Promise<void> {

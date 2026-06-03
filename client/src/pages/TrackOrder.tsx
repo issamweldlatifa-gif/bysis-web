@@ -52,10 +52,21 @@ export default function TrackOrder() {
     }
   }, []);
 
-  const { data: order, isLoading } = trpc.orders.getByTrackingCode.useQuery(
+  // Detect if it's an AI order (BY...) or a regular order (BSS-...)
+  const isAiCode = searchCode.startsWith('BY');
+
+  const { data: regularOrder, isLoading: regularLoading } = trpc.orders.getByTrackingCode.useQuery(
     { trackingCode: searchCode },
-    { enabled: searchCode.length >= 8 }
+    { enabled: searchCode.length >= 4 && !isAiCode }
   );
+
+  const { data: aiOrder, isLoading: aiLoading } = trpc.aiOrders.track.useQuery(
+    { trackingCode: searchCode },
+    { enabled: searchCode.length >= 4 && isAiCode, retry: false }
+  );
+
+  const order = isAiCode ? aiOrder : regularOrder;
+  const isLoading = isAiCode ? aiLoading : regularLoading;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +74,30 @@ export default function TrackOrder() {
     if (trimmed.length >= 4) setSearchCode(trimmed);
   };
 
-  const currentConfig = order?.status ? STATUS_CONFIG[order.status] : null;
+  // Normalize aiOrder fields to match regular order shape
+  const normalizedOrder = order && isAiCode ? {
+    ...order,
+    customerName: `${(order as any).customerName || ''} ${(order as any).customerLastName || ''}`.trim(),
+    customerPhone: (order as any).phone || (order as any).customerPhone || '',
+    customerAddress: (order as any).gouvernorat || '',
+    gouvernorat: (order as any).gouvernorat || '',
+    productUrl: (order as any).productUrl || '',
+    screenshotUrl: (order as any).productImageUrl || null,
+    updatedAt: (order as any).updatedAt || (order as any).createdAt,
+    // Map AI statuses to existing STATUS_CONFIG keys
+    status: (() => {
+      const s = (order as any).status || '';
+      if (s === 'pending_deposit' || s === 'pending') return 'new';
+      if (s === 'deposit_received' || s === 'confirmed') return 'processing';
+      if (s === 'processing') return 'processing';
+      if (s === 'shipped') return 'shipped';
+      if (s === 'delivered') return 'completed';
+      if (s === 'cancelled') return 'cancelled';
+      return s;
+    })(),
+  } : order;
+
+  const currentConfig = normalizedOrder?.status ? STATUS_CONFIG[normalizedOrder.status] : null;
   const currentStep = currentConfig?.step ?? -1;
 
   const formatDate = (d: Date | string) =>
@@ -159,7 +193,7 @@ export default function TrackOrder() {
             </motion.div>
           )}
 
-          {!isLoading && searchCode && order === null && (
+          {!isLoading && searchCode && !normalizedOrder && (
             <motion.div key="notfound" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
               style={{ background: WHITE, borderRadius: 20, padding: '28px 20px', boxShadow: SHADOW, border: `1px solid ${BORDER}`, textAlign: 'center' }}
               dir="rtl"
@@ -173,17 +207,17 @@ export default function TrackOrder() {
             </motion.div>
           )}
 
-          {!isLoading && order && currentConfig && (
+          {!isLoading && normalizedOrder && currentConfig && (
             <motion.div key="result" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
               {/* Status card */}
               <div style={{ background: WHITE, borderRadius: 20, padding: '20px', boxShadow: SHADOW, border: `1px solid ${BORDER}` }} dir="rtl">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1A1A1A', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 4 }}>
-                      {order.trackingCode}
-                    </p>
-                    <p style={{ fontSize: '1.1rem', fontWeight: 800, color: TEXT }}>{order.customerName}</p>
-                    {order.gouvernorat && <p style={{ fontSize: '0.8125rem', color: '#666666' }}>{order.gouvernorat}</p>}
+                        {normalizedOrder.trackingCode}
+                      </p>
+                      <p style={{ fontSize: '1.1rem', fontWeight: 800, color: TEXT }}>{normalizedOrder.customerName}</p>
+                      {normalizedOrder.gouvernorat && <p style={{ fontSize: '0.8125rem', color: '#666666' }}>{normalizedOrder.gouvernorat}</p>}
                   </div>
                   <div style={{
                     padding: '8px 14px', borderRadius: 999,
@@ -196,7 +230,7 @@ export default function TrackOrder() {
                 </div>
 
                 {/* Timeline */}
-                {order.status !== 'cancelled' && (
+                  {normalizedOrder.status !== 'cancelled' && (
                   <div className="flex items-center justify-between" style={{ marginTop: 8 }}>
                     {TIMELINE_STEPS.map(({ key, label, Icon }, i) => {
                       const done = currentStep >= i;
@@ -236,22 +270,22 @@ export default function TrackOrder() {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span style={{ fontSize: '0.875rem', color: '#666666', fontWeight: 500 }}>تاريخ الطلب</span>
-                    <span style={{ fontSize: '0.875rem', color: TEXT, fontWeight: 700 }}>{formatDate(order.createdAt)}</span>
+                    <span style={{ fontSize: '0.875rem', color: TEXT, fontWeight: 700 }}>{formatDate(normalizedOrder.createdAt)}</span>
                   </div>
                   <div style={{ height: 1, background: '#F0F4F8' }} />
                   <div className="flex justify-between items-center">
                     <span style={{ fontSize: '0.875rem', color: '#666666', fontWeight: 500 }}>آخر تحديث</span>
-                    <span style={{ fontSize: '0.875rem', color: TEXT, fontWeight: 700 }}>{formatDate(order.updatedAt)}</span>
+                    <span style={{ fontSize: '0.875rem', color: TEXT, fontWeight: 700 }}>{formatDate(normalizedOrder.updatedAt)}</span>
                   </div>
-                  {order.gouvernorat && (
-                    <>
-                      <div style={{ height: 1, background: '#F0F4F8' }} />
-                      <div className="flex justify-between items-center">
-                        <span style={{ fontSize: '0.875rem', color: '#666666', fontWeight: 500 }}>الولاية</span>
-                        <span style={{ fontSize: '0.875rem', color: TEXT, fontWeight: 700 }}>{order.gouvernorat}</span>
-                      </div>
-                    </>
-                  )}
+                      {normalizedOrder.gouvernorat && (
+                        <>
+                          <div style={{ height: 1, background: '#F0F4F8' }} />
+                          <div className="flex justify-between items-center">
+                            <span style={{ fontSize: '0.875rem', color: '#666666', fontWeight: 500 }}>الولاية</span>
+                            <span style={{ fontSize: '0.875rem', color: TEXT, fontWeight: 700 }}>{normalizedOrder.gouvernorat}</span>
+                          </div>
+                        </>
+                      )}
                 </div>
               </div>
             </motion.div>

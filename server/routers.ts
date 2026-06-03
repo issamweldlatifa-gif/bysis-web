@@ -24,7 +24,7 @@ import {
   getAllProducts, getActiveProducts, getProductsByCategory, getProductById, searchProducts,
   createProduct, updateProduct, deleteProduct, countProducts,
   createAiOrder, getAiOrderByTracking, getAiOrdersByUserId, getAllAiOrders,
-  updateAiOrderStatus, updateAiOrderPaymentProof, searchAiOrdersByName,
+  updateAiOrderStatus, updateAiOrderAdminNotes, updateAiOrderPaymentProof, searchAiOrdersByName,
 } from "./db";
 import { invokeLLM } from "./_core/llm";
 import { notifyOwner } from "./_core/notification";
@@ -1468,7 +1468,13 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
             adminNotes: input.adminNote,
           });
         }
-        return { success: true };
+        // Return WhatsApp link for admin to send to customer
+        const phone = order?.phone || '';
+        const waPhone = phone.replace(/\D/g, '');
+        const intlPhone = waPhone.startsWith('216') ? waPhone : `216${waPhone}`;
+        const waMsg = `مرحبا ${order?.customerName || ''}! 🎉 كومندتك مؤكدة ✅\nكود التتبع: ${order?.trackingCode}\nتابع كومندتك: https://bysis.shop/track?code=${order?.trackingCode}\n— Bysis`;
+        const whatsappUrl = phone ? `https://wa.me/${intlPhone}?text=${encodeURIComponent(waMsg)}` : null;
+        return { success: true, whatsappUrl };
       }),
 
     // Admin: reject an order (alias for adminUpdateStatus with status 'cancelled')
@@ -1519,6 +1525,17 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
             customerEmail: order.email,
           });
         }
+        return { success: true };
+      }),
+
+    // Admin: update admin notes only
+    updateAdminNotes: customAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        adminNotes: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        await updateAiOrderAdminNotes(input.id, input.adminNotes);
         return { success: true };
       }),
 

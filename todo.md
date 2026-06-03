@@ -425,3 +425,14 @@
 - [x] Fix: system prompt doit inclure price_tnd dans ORDER_DATA directement (pas séparé)
 - [x] Fix: CRM Commandes AI affiche 0 commandes car ai_orders table vide (bug insert)
 - [x] Fix: AI dit "كود يوصلك عبر SMS" au lieu de donner le code directement dans le chat
+
+## 🚀 CRM + AI Chat — Améliorations complètes (Juin 2026)
+- [x] Fiche commande AI: image produit + lien cliquable + infos client complètes + prix + acompte + bouton WhatsApp direct
+- [x] Stats dashboard dans AdminAiOrders: total commandes, CA total, acomptes reçus, taux confirmation
+- [x] Filtres par statut (pending/confirmed/shipped...) + filtre par date dans AdminAiOrders
+- [x] Page /track pour client: saisir code de suivi → voir statut + infos commande (supporte BY... et BSS-...)
+- [x] Export CSV des commandes AI depuis AdminAiOrders
+- [x] Notes admin sur chaque commande (champ texte libre éditable)
+- [x] Historique des changements de statut avec date/heure
+- [x] WhatsApp notification client lors confirmation: lien wa.me pré-rempli avec code de suivi (ouvre WhatsApp auto)
+- [x] Email de confirmation au client (pas seulement admin)

@@ -413,6 +413,7 @@ export const aiOrders = mysqlTable("ai_orders", {
   email: varchar("email", { length: 320 }),
   paymentProofUrl: text("paymentProofUrl"),
   adminNotes: text("adminNotes"),
+  statusHistory: text("statusHistory"), // JSON array: [{status, note, at}]
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
