@@ -10,11 +10,11 @@ function HelpPage({ onClose }: { onClose: () => void }) {
     >
       <div className="flex items-center justify-between px-4 py-4">
         <button onClick={onClose} className="text-white p-2 -ml-2">
-          <svg width="24" height="24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="24" height="24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 5l-7 7 7 7" />
           </svg>
         </button>
-        <span className="text-white font-semibold text-base">Aide — Recherche photo</span>
+        <span className="text-white font-semibold text-base">Aide — Scanner</span>
         <div className="w-10" />
       </div>
       <div className="px-5 pb-10 space-y-8">

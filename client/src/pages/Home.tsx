@@ -33,7 +33,7 @@ const FALLBACK_SLIDES: CarouselSlide[] = [
 ];
 
 /* ── Icon constants — Nike thin style ───────────────────────────────────── */
-const SW = '1.2';
+const SW = '1.5';
 
 /* ── Quick Action Icons (outline) ────────────────────────────────────────── */
 function IcoOrder({ color }: { color: string }) {
@@ -180,8 +180,8 @@ function ArrivageCard({ item, onAdd }: { item: any; onAdd: () => void }) {
         )}
         <button
           onClick={onAdd}
-          className="mt-2 w-full py-1.5 rounded-xl text-[11px] font-bold text-white"
-          style={{ background: '#111111' }}
+          className="mt-2 w-full text-[11px] font-bold text-white"
+          style={{ background: '#0A0A0A', borderRadius: 36, padding: '8px 12px' }}
         >
           + Panier
         </button>
@@ -255,7 +255,7 @@ function HomeContent() {
       <section className="px-4 pb-6 bg-white">
         <h2
           className="mb-4"
-          style={{ fontSize: 18, fontWeight: 900, color: '#0A0A0A', fontFamily: 'Poppins, sans-serif', letterSpacing: '-0.03em', textTransform: 'uppercase' }}
+          style={{ fontSize: 22, fontWeight: 900, color: '#0A0A0A', fontFamily: '"Barlow Condensed", Poppins, sans-serif', letterSpacing: '-0.01em', textTransform: 'uppercase', lineHeight: 1 }}
         >Pourquoi Bysis ?</h2>
         <div className="grid grid-cols-2 gap-2.5">
           {FEATURES.map((f) => (

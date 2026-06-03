@@ -22,8 +22,8 @@ interface AppLayoutProps {
    Active color: #111111 (near-black)   Inactive color: #9CA3AF (gray-400)
 ───────────────────────────────────────────────────────────────────────────── */
 
-const STROKE = '1.2';
-const STROKE_ACTIVE = '1.6';
+const STROKE = '1.5';
+const STROKE_ACTIVE = '1.8';
 const ACTIVE_COLOR   = '#0A0A0A';
 const INACTIVE_COLOR = '#AAAAAA';
 
@@ -91,7 +91,7 @@ function IcoUser({ active }: { active: boolean }) {
 /* Search */
 function IcoSearch() {
   return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#AAAAAA" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#AAAAAA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="11" cy="11" r="8"/>
       <path d="M21 21l-4.35-4.35"/>
     </svg>
@@ -101,7 +101,7 @@ function IcoSearch() {
 /* Camera / Scanner */
 function IcoCamera() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
       <circle cx="12" cy="13" r="4"/>
     </svg>
@@ -156,7 +156,7 @@ function TopHeader({ chatVisible, onChatClick, headerBgColor = '#FFFFFF' }: TopH
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
             stroke="#AAAAAA"
-            strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+            strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
           </svg>
           <span
@@ -195,7 +195,7 @@ function TopHeader({ chatVisible, onChatClick, headerBgColor = '#FFFFFF' }: TopH
         >
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
             stroke="#0A0A0A"
-            strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+            strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
             <circle cx="12" cy="13" r="4"/>
           </svg>

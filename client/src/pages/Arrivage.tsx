@@ -62,10 +62,8 @@ export default function Arrivage() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-1"
         >
-          <h1 className="text-3xl font-bold" style={{ background: 'linear-gradient(90deg, #1A1A1A, #1A1A1A)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-            Boutique
-          </h1>
-          <p className="text-[#999999] text-sm">Produits disponibles à commander maintenant</p>
+          <h1 style={{ fontSize: 'clamp(2rem, 8vw, 3rem)', fontWeight: 900, color: '#0A0A0A', fontFamily: '"Barlow Condensed", Poppins, sans-serif', textTransform: 'uppercase', letterSpacing: '-0.01em', lineHeight: 1 }}>Boutique</h1>
+          <p className="text-[#888888] text-sm">Produits disponibles à commander maintenant</p>
         </motion.div>
 
         {/* Platform Filter */}
@@ -83,7 +81,7 @@ export default function Arrivage() {
               }`}
               style={platformFilter === p ? { background: 'linear-gradient(90deg, #1A1A1A, #1A1A1A)' } : {}}
             >
-              {p === 'all' ? 'Tous' : PLATFORM_COLORS[p].label}
+              {p === 'all' ? 'Tous' : p === 'shein' ? 'Shein' : p === 'aliexpress' ? 'AliExpress' : 'Temu'}
             </motion.button>
           ))}
         </div>
@@ -104,9 +102,9 @@ export default function Arrivage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-16 space-y-3"
           >
-            <Package size={52} className="mx-auto text-gray-300" />
-            <p className="text-[#999999] text-lg">Aucun produit disponible pour le moment</p>
-            <p className="text-[#9DA3A6] text-sm">Revenez bientôt pour les nouveaux arrivages</p>
+            <Package size={52} className="mx-auto text-gray-300" strokeWidth={1.5} />
+            <p className="text-[#888888] text-lg">Aucun produit disponible pour le moment</p>
+            <p className="text-[#AAAAAA] text-sm">Revenez bientôt pour les nouveaux arrivages</p>
           </motion.div>
         )}
 
@@ -156,7 +154,7 @@ export default function Arrivage() {
 
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-blue-400 font-bold text-base">{item.priceTnd} دينار</p>
+                          <p style={{ fontSize: '1.125rem', fontWeight: 900, color: '#0A0A0A', fontFamily: '"Barlow Condensed", Poppins, sans-serif' }}>{item.priceTnd} DT</p>
                           {item.priceEur && (
                             <p className="text-[#9DA3A6] text-xs">{item.priceEur} EUR</p>
                           )}
@@ -170,7 +168,7 @@ export default function Arrivage() {
                             className="p-1.5 rounded-lg bg-blue-500/15 text-blue-400 hover:bg-blue-500/30 transition-all"
                             title="عرض المنتج"
                           >
-                            <ExternalLink size={16} />
+                            <ExternalLink size={16} strokeWidth={1.5} />
                           </a>
                         ) : null}
                       </div>
@@ -190,11 +188,11 @@ export default function Arrivage() {
                           });
                           toast.success(t('add_to_cart') + ' ✓', { duration: 1800 });
                         }}
-                        className="w-full py-2 rounded-xl text-xs font-bold text-white transition-all flex items-center justify-center gap-1"
-                        style={{ background: 'linear-gradient(90deg, #1A1A1A, #1A1A1A)' }}
+                        className="w-full text-xs font-bold text-white transition-all flex items-center justify-center gap-1"
+                        style={{ background: '#0A0A0A', borderRadius: 36, padding: '10px 16px' }}
                       >
-                        <Sparkle size={12} />
-                        {t('add_to_cart')}
+                        <Sparkle size={12} strokeWidth={1.5} />
+                        Ajouter au panier
                       </motion.button>
                     </div>
                   </motion.div>

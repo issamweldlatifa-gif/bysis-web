@@ -206,8 +206,8 @@ export default function Calculator() {
             >
               <div className="max-w-md mx-auto">
                 <div className="mb-8">
-                  <p className="pp-label mb-2">CALCULATEUR</p>
-                  <h1 className="mb-2" style={{ color: TEXT }}>Calculer le prix</h1>
+                  <p style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#888888', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>Calculateur</p>
+                  <h1 className="mb-2" style={{ color: '#0A0A0A', fontFamily: '"Barlow Condensed", Poppins, sans-serif', fontSize: 'clamp(2rem, 8vw, 3rem)', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-0.01em', lineHeight: 1 }}>Calculer le prix</h1>
                   <p style={{ color: '#666666', fontSize: '0.9375rem' }}>
                     Scannez un produit avec la caméra ou importez une image depuis votre galerie.
                   </p>
@@ -223,13 +223,13 @@ export default function Calculator() {
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = SHADOW; }}
                   >
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: '#F5F5F5' }}>
-                      <Camera size={28} style={{ color: '#1A1A1A' }} />
+                      <Camera size={28} style={{ color: '#1A1A1A' }} strokeWidth={1.5} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-base mb-0.5" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>Prendre une photo</div>
                       <div className="text-sm" style={{ color: '#999999' }}>Utilisez la caméra de votre appareil</div>
                     </div>
-                    <ArrowRight size={20} style={{ color: '#999999', flexShrink: 0 }} />
+                    <ArrowRight size={20} style={{ color: '#999999', flexShrink: 0 }} strokeWidth={1.5} />
                   </motion.button>
 
                   <motion.button
@@ -241,18 +241,18 @@ export default function Calculator() {
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.boxShadow = SHADOW; }}
                   >
                     <div className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: '#F5F5F5' }}>
-                      <Upload size={28} style={{ color: '#1A1A1A' }} />
+                      <Upload size={28} style={{ color: '#1A1A1A' }} strokeWidth={1.5} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-semibold text-base mb-0.5" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>Importer une image</div>
                       <div className="text-sm" style={{ color: '#999999' }}>Choisissez depuis votre galerie</div>
                     </div>
-                    <ArrowRight size={20} style={{ color: '#999999', flexShrink: 0 }} />
+                    <ArrowRight size={20} style={{ color: '#999999', flexShrink: 0 }} strokeWidth={1.5} />
                   </motion.button>
                 </div>
 
                 <div className="mt-6 flex items-start gap-3 p-4 rounded-2xl" style={{ background: '#F5F5F5', border: '1px solid rgba(26,26,26,0.15)' }}>
-                  <Scan size={20} style={{ color: '#1A1A1A', flexShrink: 0, marginTop: 1 }} />
+                  <Scan size={20} style={{ color: '#1A1A1A', flexShrink: 0, marginTop: 1 }} strokeWidth={1.5} />
                   <p className="text-sm leading-relaxed" style={{ color: '#666666' }}>
                     Prenez en photo l'étiquette de prix ou la page produit sur Shein, AliExpress ou Temu.
                     Notre IA extrait le prix et le convertit en <strong style={{ color: TEXT }}>dinars tunisiens (TND)</strong>.
@@ -284,7 +284,7 @@ export default function Calculator() {
                   className="w-10 h-10 rounded-full flex items-center justify-center"
                   style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}
                 >
-                  <ArrowLeft size={20} className="text-white" />
+                  <ArrowLeft size={20} className="text-white" strokeWidth={1.5} />
                 </button>
                 <span className="text-white font-semibold text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>Caméra</span>
                 <div className="w-10" />
@@ -310,7 +310,7 @@ export default function Calculator() {
                   <motion.button whileTap={{ scale: 0.9 }} onClick={() => fileInputRef.current?.click()}
                     className="w-12 h-12 rounded-2xl flex items-center justify-center"
                     style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}>
-                    <Upload size={22} className="text-white" />
+                    <Upload size={22} className="text-white" strokeWidth={1.5} />
                   </motion.button>
                   <motion.button whileTap={{ scale: 0.93 }} onClick={captureFromCamera}
                     className="w-20 h-20 rounded-full flex items-center justify-center"
@@ -339,7 +339,7 @@ export default function Calculator() {
             >
               <div className="max-w-md mx-auto">
                 <button onClick={reset} className="flex items-center gap-2 mb-6 text-sm font-medium" style={{ color: '#1A1A1A' }}>
-                  <ArrowLeft size={18} />
+                  <ArrowLeft size={18} strokeWidth={1.5} />
                   Nouvelle analyse
                 </button>
 
@@ -355,7 +355,7 @@ export default function Calculator() {
                     style={{ background: WHITE, border: `1px solid ${BORDER}`, boxShadow: SHADOW }}>
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: '#F5F5F5' }}>
-                        <Scan size={18} style={{ color: '#1A1A1A' }} />
+                        <Scan size={18} style={{ color: '#1A1A1A' }} strokeWidth={1.5} />
                       </div>
                       <div>
                         <div className="font-semibold text-sm" style={{ color: TEXT, fontFamily: 'Inter, sans-serif' }}>Analyse en cours…</div>
@@ -376,7 +376,7 @@ export default function Calculator() {
                   <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}>
                     <div className="mb-4 p-6 rounded-2xl" style={{ background: WHITE, border: `1px solid ${BORDER}`, boxShadow: SHADOW_MD }}>
                       <div className="flex items-center gap-2 mb-4">
-                        <CheckCircle size={20} style={{ color: GREEN }} />
+                        <CheckCircle size={20} style={{ color: GREEN }} strokeWidth={1.5} />
                         <span className="font-semibold text-sm" style={{ color: GREEN, fontFamily: 'Inter, sans-serif' }}>Prix extrait avec succès</span>
                       </div>
                       <div className="text-center py-4 mb-4 rounded-xl" style={{ background: '#FFFFFF' }}>
@@ -405,14 +405,10 @@ export default function Calculator() {
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <button onClick={() => navigate('/order')}
-                        className="w-full py-3.5 font-semibold text-white rounded-3xl transition-all active:scale-[0.97]"
-                        style={{ background: RED, fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 14px rgba(26,26,26,0.30)' }}>
+                      <button onClick={() => navigate('/order')} className="btn-nike-full">
                         Commander maintenant
                       </button>
-                      <button onClick={reset}
-                        className="w-full py-3.5 font-semibold rounded-3xl transition-all active:scale-[0.97]"
-                        style={{ background: WHITE, color: '#1A1A1A', border: `1.5px solid ${RED}`, fontFamily: 'Inter, sans-serif' }}>
+                      <button onClick={reset} className="btn-nike-white" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         Nouvelle analyse
                       </button>
                     </div>

@@ -191,21 +191,17 @@ export default function OrderForm() {
               <CheckCircle size={44} className="text-[#00A651]" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-[#1D1D1D] mb-2">Commande envoyée !</h2>
+              <h2 style={{ fontSize: 'clamp(1.75rem, 6vw, 2.5rem)', fontWeight: 900, color: '#0A0A0A', fontFamily: '"Barlow Condensed", Poppins, sans-serif', textTransform: 'uppercase', letterSpacing: '-0.01em', lineHeight: 1 }}>Commande envoyée !</h2>
               <p className="text-[#999999] text-sm leading-relaxed">
                 Votre commande a été reçue. Nous vous contacterons bientôt pour confirmer les détails et le prix en TND.
               </p>
             </div>
             <div className="flex flex-col gap-3">
-              <button onClick={handleReset}
-                className="w-full h-12 rounded-xl font-bold text-white flex items-center justify-center gap-2 active:scale-[0.97] transition-all"
-                style={{ background: "#1A1A1A", boxShadow: "0 4px 14px rgba(26,26,26,0.35)" }}>
-                <ShoppingCart size={18} /> Nouvelle commande
+              <button onClick={handleReset} className="btn-nike-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <ShoppingCart size={18} strokeWidth={1.5} /> Nouvelle commande
               </button>
-              <button onClick={() => navigate('/')}
-                className="w-full h-12 rounded-xl font-semibold text-[#999999] flex items-center justify-center gap-2 active:scale-[0.97] transition-all"
-                style={{ background: "#FFFFFF", border: "1.5px solid #E5E5E5" }}>
-                <ArrowLeft size={18} /> Retour à l'accueil
+              <button onClick={() => navigate('/')} className="btn-nike-white" style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <ArrowLeft size={18} strokeWidth={1.5} /> Retour à l'accueil
               </button>
             </div>
           </div>
@@ -224,7 +220,7 @@ export default function OrderForm() {
             <ShoppingCart size={20} className="text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-[#1D1D1D]">Passer une commande</h1>
+            <h1 style={{ fontSize: 'clamp(2rem, 8vw, 3rem)', fontWeight: 900, color: '#0A0A0A', fontFamily: '"Barlow Condensed", Poppins, sans-serif', textTransform: 'uppercase', letterSpacing: '-0.01em', lineHeight: 1 }}>Passer une commande</h1>
             <p className="text-[#999999] text-xs">Remplissez les champs ci-dessous</p>
           </div>
         </div>
@@ -480,13 +476,11 @@ export default function OrderForm() {
             </div>
 
             {/* Submit */}
-            <button type="submit" disabled={createOrder.isPending}
-              className="w-full rounded-xl font-bold text-white flex items-center justify-center gap-2 active:scale-[0.97] transition-all disabled:opacity-50"
-              style={{ height: "52px", background: "#1A1A1A", boxShadow: "0 4px 14px rgba(26,26,26,0.35)" }}>
+            <button type="submit" disabled={createOrder.isPending} className="btn-nike-full" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
               {createOrder.isPending ? (
                 <><Loader2 className="h-5 w-5 animate-spin" /> Envoi...</>
               ) : (
-                <><ShoppingCart size={20} /> Envoyer la commande</>
+                <><ShoppingCart size={20} strokeWidth={1.5} /> Envoyer la commande</>
               )}
             </button>
           </form>

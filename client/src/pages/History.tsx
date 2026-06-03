@@ -1,7 +1,5 @@
 'use client';
 
-'use client';
-
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppLayout from '@/components/AppLayout';
@@ -10,7 +8,6 @@ import { toast } from 'sonner';
 import { Trash, Clock } from 'lucide-react';
 import { useChatContext } from '@/App';
 
-// Stable device ID — one per browser, never shared between users
 function getDeviceId(): string {
   const KEY = 'bysis_device_id';
   let id = localStorage.getItem(KEY);
@@ -31,12 +28,14 @@ interface HistoryItem {
   createdAt: Date;
 }
 
+const FILTER_LABELS = { all: 'Tout', today: "Aujourd'hui", week: 'Cette semaine' };
+const SORT_LABELS = { date: 'Date', price: 'Prix' };
+
 export default function History() {
   const [filter, setFilter] = useState<'all' | 'today' | 'week'>('all');
   const [sortBy, setSortBy] = useState<'date' | 'price'>('date');
   const { openChat } = useChatContext();
 
-  // Stable deviceId reference — never recreated on re-render
   const deviceId = useMemo(() => getDeviceId(), []);
 
   const utils = trpc.useUtils();
@@ -52,10 +51,10 @@ export default function History() {
     },
     onError: (_err, _vars, ctx) => {
       if (ctx?.prev) utils.calculator.getHistory.setData({ deviceId }, ctx.prev);
-      toast.error('فشل الحذف — حاول مرة أخرى');
+      toast.error('Erreur lors de la suppression');
     },
     onSuccess: () => {
-      toast.success('تم حذف من السجل');
+      toast.success('Supprimé de l\'historique');
     },
     onSettled: () => {
       utils.calculator.getHistory.invalidate({ deviceId });
@@ -86,15 +85,23 @@ export default function History() {
 
   return (
     <AppLayout onChatOpen={openChat}>
-      <div className="p-4 space-y-4 pb-24" dir="rtl">
+      <div className="p-4 space-y-4 pb-24">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-4"
         >
-          <h1 style={{ fontFamily: "'Inter', sans-serif", fontWeight: 800, fontSize: '1.75rem', color: '#1A1A1A', letterSpacing: '-0.03em' }}>
-            السجل
+          <h1 style={{
+            fontFamily: '"Barlow Condensed", Poppins, sans-serif',
+            fontWeight: 900,
+            fontSize: 'clamp(2rem, 8vw, 3rem)',
+            color: '#0A0A0A',
+            letterSpacing: '-0.01em',
+            textTransform: 'uppercase',
+            lineHeight: 1,
+          }}>
+            Historique
           </h1>
 
           {/* Time filters */}
@@ -105,20 +112,20 @@ export default function History() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setFilter(f)}
                 style={{
-                  padding: '8px 18px',
-                  borderRadius: '999px',
-                  fontFamily: "'Inter', sans-serif",
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
+                  padding: '10px 20px',
+                  borderRadius: 36,
+                  fontFamily: "'Poppins', sans-serif",
+                  fontWeight: 700,
+                  fontSize: '0.8125rem',
                   whiteSpace: 'nowrap',
                   transition: 'all 0.18s ease',
-                  background: filter === f ? '#1A1A1A' : '#FFFFFF',
-                  color: filter === f ? '#FFFFFF' : '#1A1A1A',
-                  border: filter === f ? 'none' : '1.5px solid #D0D7DE',
-                  boxShadow: filter === f ? '0 2px 8px rgba(26,26,26,0.25)' : 'none',
+                  background: filter === f ? '#0A0A0A' : '#FFFFFF',
+                  color: filter === f ? '#FFFFFF' : '#0A0A0A',
+                  border: filter === f ? 'none' : '1.5px solid #E8E8E8',
+                  boxShadow: filter === f ? '0 2px 8px rgba(0,0,0,0.2)' : 'none',
                 }}
               >
-                {f === 'all' ? 'الكل' : f === 'today' ? 'اليوم' : 'هذا الأسبوع'}
+                {FILTER_LABELS[f]}
               </motion.button>
             ))}
           </div>
@@ -131,18 +138,18 @@ export default function History() {
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSortBy(s)}
                 style={{
-                  padding: '6px 14px',
-                  borderRadius: '8px',
-                  fontFamily: "'Inter', sans-serif",
+                  padding: '8px 16px',
+                  borderRadius: 36,
+                  fontFamily: "'Poppins', sans-serif",
                   fontWeight: 600,
                   fontSize: '0.8125rem',
                   transition: 'all 0.18s ease',
-                  background: sortBy === s ? 'rgba(26,26,26,0.1)' : '#FFFFFF',
-                  color: sortBy === s ? '#1A1A1A' : '#999999',
-                  border: sortBy === s ? '1.5px solid rgba(26,26,26,0.35)' : '1.5px solid #D0D7DE',
+                  background: sortBy === s ? 'rgba(10,10,10,0.08)' : '#FFFFFF',
+                  color: sortBy === s ? '#0A0A0A' : '#AAAAAA',
+                  border: sortBy === s ? '1.5px solid rgba(10,10,10,0.25)' : '1.5px solid #E8E8E8',
                 }}
               >
-                {s === 'date' ? 'التاريخ' : 'السعر'}
+                {SORT_LABELS[s]}
               </motion.button>
             ))}
           </div>
@@ -151,7 +158,7 @@ export default function History() {
         {/* Loading */}
         {getHistory.isLoading && (
           <div className="flex justify-center py-12">
-            <div style={{ width: 32, height: 32, border: '3px solid #1A1A1A', borderTopColor: 'transparent', borderRadius: '50%' }} className="animate-spin" />
+            <div style={{ width: 32, height: 32, border: '3px solid #E8E8E8', borderTopColor: '#0A0A0A', borderRadius: '50%' }} className="animate-spin" />
           </div>
         )}
 
@@ -162,9 +169,9 @@ export default function History() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-16 space-y-3"
           >
-            <Clock size={48} className="mx-auto" style={{ color: '#9DA3A6' }} />
-            <p style={{ color: '#999999', fontSize: '1rem', fontWeight: 600 }}>لا توجد عناصر في السجل</p>
-            <p style={{ color: '#9DA3A6', fontSize: '0.875rem' }}>استخدم الحاسبة لمسح أسعار المنتجات</p>
+            <Clock size={48} className="mx-auto" style={{ color: '#AAAAAA' }} strokeWidth={1.5} />
+            <p style={{ color: '#888888', fontSize: '1rem', fontWeight: 600 }}>Aucun élément dans l'historique</p>
+            <p style={{ color: '#AAAAAA', fontSize: '0.875rem' }}>Utilisez la calculatrice pour scanner des prix</p>
           </motion.div>
         )}
 
@@ -181,10 +188,10 @@ export default function History() {
                   transition={{ delay: index * 0.04, duration: 0.22 }}
                   style={{
                     background: '#FFFFFF',
-                    borderRadius: '16px',
+                    borderRadius: 16,
                     padding: '14px',
-                    border: '1px solid #E8ECF0',
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+                    border: '1px solid #E8E8E8',
+                    boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
                   }}
                 >
                   <div className="flex gap-3">
@@ -192,17 +199,17 @@ export default function History() {
                     <div style={{
                       width: 72,
                       height: 72,
-                      borderRadius: '12px',
+                      borderRadius: 12,
                       overflow: 'hidden',
                       flexShrink: 0,
-                      background: '#FFFFFF',
-                      border: '1px solid #D0D7DE',
+                      background: '#F5F5F5',
+                      border: '1px solid #E8E8E8',
                     }}>
                       {item.imageUrl ? (
-                        <img src={item.imageUrl} alt="Product" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <img src={item.imageUrl} alt="Produit" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       ) : (
-                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9DA3A6', fontSize: '0.75rem' }}>
-                          لا صورة
+                        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#AAAAAA', fontSize: '0.75rem' }}>
+                          Pas d'image
                         </div>
                       )}
                     </div>
@@ -211,13 +218,19 @@ export default function History() {
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p style={{ fontSize: '0.75rem', color: '#9DA3A6', fontWeight: 500, marginBottom: 2 }}>
-                            {new Date(item.createdAt).toLocaleDateString('ar-TN')}
+                          <p style={{ fontSize: '0.75rem', color: '#AAAAAA', fontWeight: 500, marginBottom: 2 }}>
+                            {new Date(item.createdAt).toLocaleDateString('fr-TN')}
                           </p>
-                          <p style={{ fontSize: '1.125rem', fontWeight: 800, color: '#1A1A1A', letterSpacing: '-0.02em', fontFamily: "'Inter', sans-serif" }}>
-                            {parseFloat(item.priceTnd || '0').toFixed(2)} دينار
+                          <p style={{
+                            fontSize: '1.25rem',
+                            fontWeight: 900,
+                            color: '#0A0A0A',
+                            fontFamily: '"Barlow Condensed", Poppins, sans-serif',
+                            letterSpacing: '-0.01em',
+                          }}>
+                            {parseFloat(item.priceTnd || '0').toFixed(2)} DT
                           </p>
-                          <p style={{ fontSize: '0.75rem', color: '#1A1A1A', fontWeight: 600, marginTop: 2 }}>
+                          <p style={{ fontSize: '0.75rem', color: '#888888', fontWeight: 600, marginTop: 2 }}>
                             {item.originalPrice} {item.originalCurrency}
                             {item.priceEur && parseFloat(item.priceEur) > 0 ? ` • ${parseFloat(item.priceEur).toFixed(2)} EUR` : ''}
                           </p>
@@ -231,7 +244,7 @@ export default function History() {
                           disabled={deleteHistoryMutation.isPending}
                           style={{
                             padding: '8px',
-                            borderRadius: '10px',
+                            borderRadius: 12,
                             background: 'rgba(220,38,38,0.08)',
                             color: '#DC2626',
                             border: 'none',
@@ -239,9 +252,9 @@ export default function History() {
                             transition: 'background 0.15s ease',
                             flexShrink: 0,
                           }}
-                          title="حذف"
+                          title="Supprimer"
                         >
-                          <Trash size={18} />
+                          <Trash size={18} strokeWidth={1.5} />
                         </motion.button>
                       </div>
                     </div>

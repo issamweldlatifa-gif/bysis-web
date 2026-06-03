@@ -444,3 +444,24 @@
 - [x] Home.tsx: CTAs pill shape noir (#000) + texte blanc Bold
 - [x] Home.tsx: section "Pourquoi Bysis" avec icônes thin noir (fond noir, icône blanche)
 - [x] Boutons globaux: pill shape, noir/blanc, Bold text
+
+## 🔥 Refonte Nike Radicale — Toutes les pages (Juin 2026)
+- [ ] Ajouter Barlow Condensed Black (700/900) dans client/index.html
+- [ ] Mettre à jour index.css : classe .font-display + variables boutons globales
+- [ ] AppLayout.tsx : strokeWidth 1.2 → 1.5 sur toutes les icônes
+- [ ] Home.tsx : Barlow Condensed pour Hero, boutons épais, labels FR
+- [ ] Calculator.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] OrderForm.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] Arrivage.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] Cart/Panier : boutons épais, strokeWidth 1.5, labels FR
+- [ ] History.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] OrderConfirmation.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] Search.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] Scanner.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] ProfileSheet.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] Catalogue.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] TrackOrder.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] AdminAiOrders.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] ShipMasterDashboard.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] AIChat.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [ ] server/routers.ts : system prompt multilingue (AR/FR/EN/dialecte tunisien)

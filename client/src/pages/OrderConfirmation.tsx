@@ -1,22 +1,10 @@
 'use client';
 
-'use client';
-
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { motion } from 'framer-motion';
 import { CheckCircle, Copy, Search, House, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
-
-const BG    = '#FFFFFF';
-const WHITE = '#FFFFFF';
-const BLUE  = '#1A1A1A';
-const NAVY  = '#1A1A1A';
-const TEXT  = '#1D1D1D';
-const MUTED = '#666666';
-const GREEN = '#00A651';
-const BORDER = '#E5E5E5';
-const SHADOW = '0 2px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05)';
 
 interface ConfirmationData {
   trackingCode: string;
@@ -30,7 +18,6 @@ export default function OrderConfirmation() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    // Read confirmation data from sessionStorage (set by OrderForm on success)
     const raw = sessionStorage.getItem('bysis_order_confirmation');
     if (raw) {
       try {
@@ -56,15 +43,15 @@ export default function OrderConfirmation() {
   if (!data) return null;
 
   const statusSteps = [
-    { key: 'received',  label: 'كومندة وصلت',     done: true  },
-    { key: 'purchase',  label: 'قيد الشراء',       done: false },
-    { key: 'shipping',  label: 'في الشحن',         done: false },
-    { key: 'arrived',   label: 'وصلت تونس',        done: false },
-    { key: 'delivered', label: 'تسلّمت',           done: false },
+    { key: 'received',  label: 'Commande reçue',        done: true  },
+    { key: 'purchase',  label: 'En cours d\'achat',      done: false },
+    { key: 'shipping',  label: 'En livraison',           done: false },
+    { key: 'arrived',   label: 'Arrivée en Tunisie',     done: false },
+    { key: 'delivered', label: 'Livré',                  done: false },
   ];
 
   return (
-    <div className="min-h-screen" style={{ background: '#FFFFFF', fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen" style={{ background: '#FFFFFF', fontFamily: "'Poppins', sans-serif" }}>
       <div className="max-w-md mx-auto px-4 pt-10 pb-24">
 
         {/* Success icon */}
@@ -75,12 +62,12 @@ export default function OrderConfirmation() {
           className="flex justify-center mb-6"
         >
           <div style={{
-            width: 80, height: 80, borderRadius: '50%',
-            background: `${GREEN}18`,
+            width: 88, height: 88, borderRadius: '50%',
+            background: 'rgba(0,166,81,0.1)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            border: `2px solid ${GREEN}40`,
+            border: '2px solid rgba(0,166,81,0.25)',
           }}>
-            <CheckCircle size={44} style={{ color: GREEN }} />
+            <CheckCircle size={48} style={{ color: '#00A651' }} strokeWidth={1.5} />
           </div>
         </motion.div>
 
@@ -90,14 +77,22 @@ export default function OrderConfirmation() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="text-center mb-8"
-          dir="rtl"
         >
-          <h1 style={{ fontSize: '1.625rem', fontWeight: 800, color: TEXT, letterSpacing: '-0.03em', marginBottom: 8 }}>
-            كومندتك وصلت! 🎉
+          <h1 style={{
+            fontSize: 'clamp(2rem, 8vw, 3rem)',
+            fontWeight: 900,
+            color: '#0A0A0A',
+            fontFamily: '"Barlow Condensed", Poppins, sans-serif',
+            textTransform: 'uppercase',
+            letterSpacing: '-0.01em',
+            lineHeight: 1,
+            marginBottom: 12,
+          }}>
+            Commande confirmée !
           </h1>
-          <p style={{ color: '#666666', fontSize: '0.9375rem', lineHeight: 1.6 }}>
-            مرحبا <strong style={{ color: TEXT }}>{data.customerName}</strong>،<br />
-            سنتواصل معك قريباً لتأكيد التفاصيل.
+          <p style={{ color: '#888888', fontSize: '0.9375rem', lineHeight: 1.6 }}>
+            Bonjour <strong style={{ color: '#0A0A0A' }}>{data.customerName}</strong>,<br />
+            nous vous contacterons bientôt pour confirmer les détails.
           </p>
         </motion.div>
 
@@ -107,25 +102,24 @@ export default function OrderConfirmation() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           style={{
-            background: WHITE,
+            background: '#FFFFFF',
             borderRadius: 20,
             padding: '24px 20px',
-            boxShadow: SHADOW,
-            border: `1px solid ${BORDER}`,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+            border: '1px solid #E8E8E8',
             marginBottom: 16,
           }}
-          dir="rtl"
         >
-          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1A1A1A', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
-            TRACKING CODE
+          <p style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#888888', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>
+            Code de suivi
           </p>
           <div className="flex items-center justify-between gap-3">
             <span style={{
               fontSize: '1.75rem',
-              fontWeight: 800,
-              color: '#1A1A1A',
-              letterSpacing: '0.06em',
-              fontVariantNumeric: 'tabular-nums',
+              fontWeight: 900,
+              color: '#0A0A0A',
+              letterSpacing: '0.04em',
+              fontFamily: '"Barlow Condensed", Poppins, sans-serif',
             }}>
               {data.trackingCode}
             </span>
@@ -133,11 +127,11 @@ export default function OrderConfirmation() {
               whileTap={{ scale: 0.9 }}
               onClick={copyCode}
               style={{
-                padding: '10px 16px',
-                borderRadius: 12,
-                background: copied ? `${GREEN}15` : `${BLUE}12`,
-                color: copied ? GREEN : BLUE,
-                border: `1.5px solid ${copied ? GREEN + '40' : BLUE + '30'}`,
+                padding: '10px 18px',
+                borderRadius: 36,
+                background: copied ? 'rgba(0,166,81,0.1)' : '#F5F5F5',
+                color: copied ? '#00A651' : '#0A0A0A',
+                border: `1.5px solid ${copied ? 'rgba(0,166,81,0.3)' : '#E8E8E8'}`,
                 fontWeight: 700,
                 fontSize: '0.875rem',
                 display: 'flex',
@@ -147,12 +141,12 @@ export default function OrderConfirmation() {
                 transition: 'all 0.18s ease',
               }}
             >
-              <Copy size={16} />
-              {copied ? 'تم!' : 'نسخ'}
+              <Copy size={15} strokeWidth={1.5} />
+              {copied ? 'Copié !' : 'Copier'}
             </motion.button>
           </div>
-          <p style={{ fontSize: '0.8125rem', color: '#666666', marginTop: 10, lineHeight: 1.5 }}>
-            احفظ هذا الكود باش تتبع كومندتك في أي وقت.
+          <p style={{ fontSize: '0.8125rem', color: '#888888', marginTop: 10, lineHeight: 1.5 }}>
+            Conservez ce code pour suivre votre commande à tout moment.
           </p>
         </motion.div>
 
@@ -162,27 +156,25 @@ export default function OrderConfirmation() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
           style={{
-            background: WHITE,
+            background: '#FFFFFF',
             borderRadius: 20,
             padding: '20px',
-            boxShadow: SHADOW,
-            border: `1px solid ${BORDER}`,
+            boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+            border: '1px solid #E8E8E8',
             marginBottom: 24,
           }}
-          dir="rtl"
         >
-          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1A1A1A', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
-            حالة الكومندة
+          <p style={{ fontSize: '0.6875rem', fontWeight: 700, color: '#888888', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 16 }}>
+            Statut de la commande
           </p>
           <div className="space-y-0">
             {statusSteps.map((step, i) => (
               <div key={step.key} className="flex items-start gap-3">
-                {/* Dot + line */}
                 <div className="flex flex-col items-center" style={{ width: 20, flexShrink: 0 }}>
                   <div style={{
                     width: 20, height: 20, borderRadius: '50%',
-                    background: step.done ? GREEN : '#E8ECF0',
-                    border: `2px solid ${step.done ? GREEN : '#E5E5E5'}`,
+                    background: step.done ? '#00A651' : '#F0F0F0',
+                    border: `2px solid ${step.done ? '#00A651' : '#E8E8E8'}`,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                   }}>
@@ -193,20 +185,19 @@ export default function OrderConfirmation() {
                     )}
                   </div>
                   {i < statusSteps.length - 1 && (
-                    <div style={{ width: 2, height: 28, background: step.done ? `${GREEN}40` : '#E8ECF0', margin: '2px 0' }} />
+                    <div style={{ width: 2, height: 28, background: step.done ? 'rgba(0,166,81,0.3)' : '#F0F0F0', margin: '2px 0' }} />
                   )}
                 </div>
-                {/* Label */}
                 <p style={{
                   fontSize: '0.9rem',
                   fontWeight: step.done ? 700 : 500,
-                  color: step.done ? TEXT : '#9DA3A6',
+                  color: step.done ? '#0A0A0A' : '#AAAAAA',
                   paddingBottom: i < statusSteps.length - 1 ? 20 : 0,
                   paddingTop: 1,
                 }}>
                   {step.label}
                   {step.done && (
-                    <span style={{ fontSize: '0.75rem', color: GREEN, fontWeight: 600, marginRight: 8 }}>✓ الآن</span>
+                    <span style={{ fontSize: '0.75rem', color: '#00A651', fontWeight: 600, marginLeft: 8 }}>✓ Maintenant</span>
                   )}
                 </p>
               </div>
@@ -220,53 +211,23 @@ export default function OrderConfirmation() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
           className="space-y-3"
-          dir="rtl"
         >
           <button
             onClick={() => navigate(`/track?code=${data.trackingCode}`)}
-            style={{
-              width: '100%',
-              padding: '15px 20px',
-              borderRadius: 999,
-              background: BLUE,
-              color: WHITE,
-              fontWeight: 700,
-              fontSize: '1rem',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              boxShadow: '0 4px 16px rgba(26,26,26,0.3)',
-              transition: 'all 0.18s ease',
-            }}
+            className="btn-nike-full"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
           >
-            <Search size={20} />
-            تتبع كومندتي
+            <Search size={18} strokeWidth={1.5} />
+            Suivre ma commande
           </button>
 
           <button
             onClick={() => navigate('/')}
-            style={{
-              width: '100%',
-              padding: '14px 20px',
-              borderRadius: 999,
-              background: WHITE,
-              color: '#1A1A1A',
-              fontWeight: 700,
-              fontSize: '1rem',
-              border: `1.5px solid ${BLUE}`,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              transition: 'all 0.18s ease',
-            }}
+            className="btn-nike-white"
+            style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
           >
-            <House size={20} />
-            الصفحة الرئيسية
+            <House size={18} strokeWidth={1.5} />
+            Retour à l'accueil
           </button>
         </motion.div>
 
@@ -275,10 +236,9 @@ export default function OrderConfirmation() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7 }}
-          style={{ textAlign: 'center', color: '#9DA3A6', fontSize: '0.8125rem', marginTop: 24, lineHeight: 1.6 }}
-          dir="rtl"
+          style={{ textAlign: 'center', color: '#AAAAAA', fontSize: '0.8125rem', marginTop: 24, lineHeight: 1.6 }}
         >
-          سنتواصل معك على الهاتف خلال 24 ساعة لتأكيد الطلب والسعر النهائي.
+          Nous vous contacterons par téléphone dans les 24h pour confirmer la commande et le prix final.
         </motion.p>
       </div>
     </div>
