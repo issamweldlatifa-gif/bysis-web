@@ -419,3 +419,9 @@
 - [x] Texte bouton: 'عدل كومند' → 'عدي كومند' dans system prompt (routers.ts)
 - [x] Ajouter WhatsApp (+216 23 868 982) dans ProfileSheet.tsx (section contact)
 - [x] Ajouter WhatsApp dans footer/contact de l'app (system prompt + ProfileSheet)
+
+## 🐛 Bug Fix: AI Chat — Code Suivi + CRM (Juin 2026)
+- [x] Fix: priceData non persisté entre messages → ORDER_DATA créé sans prix → totalPrice=0, depositAmount=0
+- [x] Fix: system prompt doit inclure price_tnd dans ORDER_DATA directement (pas séparé)
+- [x] Fix: CRM Commandes AI affiche 0 commandes car ai_orders table vide (bug insert)
+- [x] Fix: AI dit "كود يوصلك عبر SMS" au lieu de donner le code directement dans le chat

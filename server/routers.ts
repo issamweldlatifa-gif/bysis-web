@@ -145,8 +145,9 @@ ${arrivageItems && arrivageItems.length > 0
 🛒 بعد ما يرسل العميل معلوماته لإتمام الطلب:
 ${isLoggedIn
   ? `- العميل مسجل دخول ✅ — اجمع: الاسم + اللقب + الولاية + المعتمدية + رقم الهاتف
-- لما تجمع كل المعلومات، رد بهذا الفورمات:
-[ORDER_DATA]{"name":"الاسم","lastName":"اللقب","phone":"الرقم","gouvernorat":"الولاية","moatamadia":"المعتمدية","productUrl":"الرابط لو موجود"}[/ORDER_DATA]`
+- لما تجمع كل المعلومات، رد بهذا الفورمات (ضروري تضمّن السعر والمنتج من حسابك السابق):
+[ORDER_DATA]{"name":"الاسم","lastName":"اللقب","phone":"الرقم","gouvernorat":"الولاية","moatamadia":"المعتمدية","productUrl":"الرابط لو موجود","price_tnd":السعر_بالدينار,"product_name":"اسم المنتج","price_eur":السعر_بالأورو}[/ORDER_DATA]
+⚠️ مهم جداً: price_tnd لازم يكون رقم (مثال: 120 وليس "120"). لو ما حسبتش السعر بعد، اطلب من العميل يرسل الرابط أو الصورة أول.`
   : `- العميل غير مسجل دخول ⚠️ — قوله:
 "باش تعدي كومند، لازم تسجل دخول أول. اضغط على زر 'تسجيل الدخول' وبعدها ارجع نكملو 😊"
 [REQUIRE_LOGIN]true[/REQUIRE_LOGIN]`
@@ -670,7 +671,11 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
               orderTrackingCode = `BY${Date.now().toString(36).toUpperCase()}`;
               const fullName = `${orderData.name || ""} ${orderData.lastName || ""}`.trim();
               const address = [orderData.gouvernorat, orderData.moatamadia].filter(Boolean).join(" — ");
-              const priceTnd = priceData?.price_tnd || null;
+              // Use price from ORDER_DATA first (AI includes it), fallback to priceData from same message
+              const priceTnd = (orderData.price_tnd && Number(orderData.price_tnd) > 0)
+                ? Number(orderData.price_tnd)
+                : (priceData?.price_tnd || null);
+              const productNameFinal = orderData.product_name || priceData?.product_name || null;
               const depositAmount = priceTnd ? Math.ceil(priceTnd * 0.5) : null;
 
               // Create in ai_orders table
@@ -686,7 +691,7 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
                   gouvernorat: orderData.gouvernorat || null,
                   moatamadia: orderData.moatamadia || null,
                   productUrl: orderData.productUrl || null,
-                  productName: priceData?.product_name || null,
+                  productName: productNameFinal,
                   totalPrice: priceTnd || 0,
                   depositAmount: depositAmount || 0,
                   productImageUrl: imageUrl || null,
@@ -801,7 +806,7 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
             } catch (e) { console.error("[Chatbot] Failed to store assistant message:", e); }
           }
 
-          return { message: assistantMessage, orderCreated, isBusy: false };
+          return { message: assistantMessage, orderCreated, isBusy: false, orderTrackingCode: orderTrackingCode || null };
         } catch (error: any) {
           console.error("[Chatbot] Error:", error);
           throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Erreur du chatbot: " + (error.message || "Erreur inconnue") });
