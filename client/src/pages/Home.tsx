@@ -32,8 +32,8 @@ const FALLBACK_SLIDES: CarouselSlide[] = [
   },
 ];
 
-/* ── Icon constants ──────────────────────────────────────────────────────── */
-const SW = '1.8';
+/* ── Icon constants — Nike thin style ───────────────────────────────────── */
+const SW = '1.2';
 
 /* ── Quick Action Icons (outline) ────────────────────────────────────────── */
 function IcoOrder({ color }: { color: string }) {
@@ -125,20 +125,20 @@ function IcoPackage({ color }: { color: string }) {
   );
 }
 
-/* ── Quick Actions data ──────────────────────────────────────────────────── */
+/* ── Quick Actions data — Nike: blanc + border noir ─────────────────────── */
 const QUICK_ACTIONS = [
-  { id: 'order',      label: 'Commander', path: '/order',      bg: '#FFF3E0', color: '#E65100' },
-  { id: 'track',      label: 'Suivre',    path: '/track',      bg: '#E8F5E9', color: '#2E7D32' },
-  { id: 'arrivage',   label: 'Arrivages', path: '/arrivage',   bg: '#E3F2FD', color: '#1565C0' },
-  { id: 'calculator', label: 'Calculer',  path: '/calculator', bg: '#F3E5F5', color: '#6A1B9A' },
+  { id: 'order',      label: 'Commander', labelAr: 'اطلب',    path: '/order',      bg: '#FFFFFF', color: '#0A0A0A' },
+  { id: 'track',      label: 'Suivre',    labelAr: 'تتبع',    path: '/track',      bg: '#FFFFFF', color: '#0A0A0A' },
+  { id: 'arrivage',   label: 'Arrivages', labelAr: 'جديد',    path: '/arrivage',   bg: '#FFFFFF', color: '#0A0A0A' },
+  { id: 'calculator', label: 'Calculer',  labelAr: 'احسب',    path: '/calculator', bg: '#FFFFFF', color: '#0A0A0A' },
 ];
 
-/* ── Features data ───────────────────────────────────────────────────────── */
+/* ── Features data — Nike: noir/blanc ────────────────────────────────────── */
 const FEATURES = [
-  { id: 'delivery', title: 'Livraison Rapide',   desc: 'Recevez vos commandes en 20–25 jours', color: '#E65100' },
-  { id: 'ai',       title: 'Bysis AI',            desc: 'Assistant intelligent pour vous aider', color: '#1565C0' },
-  { id: 'secure',   title: 'Paiement Sécurisé',   desc: 'Virement UIB ou mandat La Poste',       color: '#2E7D32' },
-  { id: 'track',    title: 'Suivi en Direct',      desc: 'Suivez votre colis à chaque étape',    color: '#6A1B9A' },
+  { id: 'delivery', title: 'Livraison Rapide',   desc: 'Recevez vos commandes en 20–25 jours', color: '#0A0A0A' },
+  { id: 'ai',       title: 'Bysis AI',            desc: 'Assistant intelligent pour vous aider', color: '#0A0A0A' },
+  { id: 'secure',   title: 'Paiement Sécurisé',   desc: 'Virement UIB ou mandat La Poste',       color: '#0A0A0A' },
+  { id: 'track',    title: 'Suivi en Direct',      desc: 'Suivez votre colis à chaque étape',    color: '#0A0A0A' },
 ];
 
 function FeatureIcon({ id, color }: { id: string; color: string }) {
@@ -217,18 +217,33 @@ function HomeContent() {
       {/* Hero Carousel */}
       <DynamicColorCarousel slides={carouselSlides} onColorChange={setCarouselColor} />
 
-      {/* Quick Actions */}
+      {/* Quick Actions — Nike style: blanc + border noir + icônes thin */}
       <section className="w-full px-4 py-4 bg-white">
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-4 gap-2.5">
           {QUICK_ACTIONS.map((a) => (
             <button
               key={a.id}
               onClick={() => navigate(a.path)}
-              className="flex flex-col items-center gap-2 py-3 px-1 rounded-2xl active:scale-95 transition-all duration-150"
-              style={{ background: a.bg }}
+              className="flex flex-col items-center gap-2 py-3.5 px-1 rounded-2xl transition-all duration-150"
+              style={{
+                background: '#FFFFFF',
+                border: '1px solid #E8E8E8',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.05)',
+              }}
+              onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.96)')}
+              onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
+              onTouchStart={e => (e.currentTarget.style.transform = 'scale(0.96)')}
+              onTouchEnd={e => (e.currentTarget.style.transform = 'scale(1)')}
             >
-              <QuickActionIcon id={a.id} color={a.color} />
-              <span className="text-[11px] font-bold leading-none" style={{ color: a.color }}>{a.label}</span>
+              <QuickActionIcon id={a.id} color="#0A0A0A" />
+              <span
+                className="leading-none text-center"
+                style={{ fontSize: 11, fontWeight: 700, color: '#0A0A0A', fontFamily: 'Poppins, sans-serif' }}
+              >{a.label}</span>
+              <span
+                className="leading-none text-center"
+                style={{ fontSize: 9, fontWeight: 300, color: '#AAAAAA', fontFamily: 'Poppins, sans-serif' }}
+              >{a.labelAr}</span>
             </button>
           ))}
         </div>
@@ -236,17 +251,27 @@ function HomeContent() {
 
 
 
-      {/* Why Bysis */}
+      {/* Why Bysis — Nike style: minimaliste noir/blanc */}
       <section className="px-4 pb-6 bg-white">
-        <h2 className="text-base font-black text-gray-900 mb-3">Pourquoi choisir Bysis ?</h2>
-        <div className="grid grid-cols-2 gap-3">
+        <h2
+          className="mb-4"
+          style={{ fontSize: 18, fontWeight: 900, color: '#0A0A0A', fontFamily: 'Poppins, sans-serif', letterSpacing: '-0.03em', textTransform: 'uppercase' }}
+        >Pourquoi Bysis ?</h2>
+        <div className="grid grid-cols-2 gap-2.5">
           {FEATURES.map((f) => (
-            <div key={f.id} className="p-4 rounded-2xl bg-gray-50 border border-gray-100">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center mb-2" style={{ background: f.color + '18' }}>
-                <FeatureIcon id={f.id} color={f.color} />
+            <div
+              key={f.id}
+              className="p-4 rounded-2xl"
+              style={{ background: '#FAFAFA', border: '1px solid #F0F0F0' }}
+            >
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center mb-3"
+                style={{ background: '#0A0A0A' }}
+              >
+                <FeatureIcon id={f.id} color="#FFFFFF" />
               </div>
-              <p className="font-bold text-sm text-gray-900">{f.title}</p>
-              <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{f.desc}</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: '#0A0A0A', fontFamily: 'Poppins, sans-serif', letterSpacing: '-0.01em' }}>{f.title}</p>
+              <p style={{ fontSize: 11, fontWeight: 300, color: '#888888', marginTop: 2, lineHeight: 1.5, fontFamily: 'Poppins, sans-serif' }}>{f.desc}</p>
             </div>
           ))}
         </div>

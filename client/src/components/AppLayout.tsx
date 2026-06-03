@@ -22,14 +22,15 @@ interface AppLayoutProps {
    Active color: #111111 (near-black)   Inactive color: #9CA3AF (gray-400)
 ───────────────────────────────────────────────────────────────────────────── */
 
-const STROKE = '1.8';
-const ACTIVE_COLOR   = '#111111';
-const INACTIVE_COLOR = '#9CA3AF';
+const STROKE = '1.2';
+const STROKE_ACTIVE = '1.6';
+const ACTIVE_COLOR   = '#0A0A0A';
+const INACTIVE_COLOR = '#AAAAAA';
 
 /* Home */
 function IcoHome({ active }: { active: boolean }) {
   const c = active ? ACTIVE_COLOR : INACTIVE_COLOR;
-  const sw = active ? '2.2' : STROKE;
+  const sw = active ? STROKE_ACTIVE : STROKE;
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/>
@@ -41,13 +42,13 @@ function IcoHome({ active }: { active: boolean }) {
 /* Grid / Boutiques */
 function IcoGrid({ active }: { active: boolean }) {
   const c = active ? ACTIVE_COLOR : INACTIVE_COLOR;
-  const sw = active ? '2.2' : STROKE;
+  const sw = active ? STROKE_ACTIVE : STROKE;
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-      <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-      <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-      <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+      <rect x="3" y="3" width="7" height="7" rx="1"/>
+      <rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/>
+      <rect x="14" y="14" width="7" height="7" rx="1"/>
     </svg>
   );
 }
@@ -55,7 +56,7 @@ function IcoGrid({ active }: { active: boolean }) {
 /* Shopping Bag / Panier */
 function IcoBag({ active, badge }: { active: boolean; badge?: number }) {
   const c = active ? ACTIVE_COLOR : INACTIVE_COLOR;
-  const sw = active ? '2.2' : STROKE;
+  const sw = active ? STROKE_ACTIVE : STROKE;
   return (
     <div className="relative">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
@@ -65,8 +66,8 @@ function IcoBag({ active, badge }: { active: boolean; badge?: number }) {
       </svg>
       {badge !== undefined && badge > 0 && (
         <span
-          className="absolute -top-1.5 -right-1.5 flex items-center justify-center rounded-full text-white font-bold"
-          style={{ background: '#E8192C', fontSize: 9, minWidth: 16, height: 16, padding: '0 3px', lineHeight: 1 }}
+          className="absolute -top-1.5 -right-1.5 flex items-center justify-center rounded-full text-white"
+          style={{ background: '#0A0A0A', fontSize: 9, fontWeight: 700, minWidth: 15, height: 15, padding: '0 3px', lineHeight: 1, fontFamily: 'Poppins, sans-serif' }}
         >
           {badge > 9 ? '9+' : badge}
         </span>
@@ -78,7 +79,7 @@ function IcoBag({ active, badge }: { active: boolean; badge?: number }) {
 /* User / Moi */
 function IcoUser({ active }: { active: boolean }) {
   const c = active ? ACTIVE_COLOR : INACTIVE_COLOR;
-  const sw = active ? '2.2' : STROKE;
+  const sw = active ? STROKE_ACTIVE : STROKE;
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="8" r="4"/>
@@ -90,9 +91,9 @@ function IcoUser({ active }: { active: boolean }) {
 /* Search */
 function IcoSearch() {
   return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth={STROKE} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="7"/>
-      <line x1="16.5" y1="16.5" x2="21" y2="21"/>
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#AAAAAA" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8"/>
+      <path d="M21 21l-4.35-4.35"/>
     </svg>
   );
 }
@@ -100,7 +101,7 @@ function IcoSearch() {
 /* Camera / Scanner */
 function IcoCamera() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111111" strokeWidth={STROKE} strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
       <circle cx="12" cy="13" r="4"/>
     </svg>
@@ -145,21 +146,22 @@ function TopHeader({ chatVisible, onChatClick, headerBgColor = '#FFFFFF' }: TopH
         {/* Search bar — ALWAYS white background, ALWAYS dark text/icon */}
         <button
           onClick={() => navigate('/search')}
-          className="flex-1 flex items-center gap-2 px-3 py-2 rounded-full"
+          className="flex-1 flex items-center gap-2 px-3.5 py-2 rounded-full"
           style={{
-            minHeight: 40,
+            minHeight: 42,
             background: '#FFFFFF',
-            boxShadow: isColored ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
+            border: isColored ? 'none' : '1px solid #EBEBEB',
+            boxShadow: isColored ? '0 1px 6px rgba(0,0,0,0.14)' : '0 1px 3px rgba(0,0,0,0.05)',
           }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="#9CA3AF"
-            strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+            stroke="#AAAAAA"
+            strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
           </svg>
           <span
-            className="flex-1 text-sm text-left select-none"
-            style={{ color: '#9CA3AF' }}
+            className="flex-1 text-left select-none"
+            style={{ color: '#BBBBBB', fontFamily: 'Poppins, sans-serif', fontWeight: 300, fontSize: 13 }}
           >
             Rechercher ou poser une question
           </span>
@@ -186,13 +188,14 @@ function TopHeader({ chatVisible, onChatClick, headerBgColor = '#FFFFFF' }: TopH
           className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full"
           style={{
             background: '#FFFFFF',
-            boxShadow: isColored ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
+            border: isColored ? 'none' : '1px solid #EBEBEB',
+            boxShadow: isColored ? '0 1px 6px rgba(0,0,0,0.14)' : '0 1px 3px rgba(0,0,0,0.05)',
           }}
           aria-label="Scanner"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-            stroke="#111111"
-            strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
+            stroke="#0A0A0A"
+            strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
             <circle cx="12" cy="13" r="4"/>
           </svg>
@@ -238,7 +241,7 @@ function BottomNav({ onProfileClick, onChatClick, visible }: BottomNavProps) {
   return (
     <motion.div
       className="fixed bottom-0 left-0 right-0 z-[9999] bg-white"
-      style={{ borderTop: '1px solid #E5E5E5' }}
+      style={{ borderTop: '1px solid #F0F0F0' }}
       animate={{ y: visible ? 0 : '100%' }}
       transition={{ type: 'spring', stiffness: 400, damping: 38, mass: 0.8 }}
     >
@@ -249,23 +252,26 @@ function BottomNav({ onProfileClick, onChatClick, visible }: BottomNavProps) {
           /* ── AI FAB (center) ── */
           if (tab.id === 'chat') {
             return (
-              <div key="chat" className="flex flex-col items-center justify-end flex-1">
+              <div key="chat" className="flex flex-col items-center justify-end flex-1 pb-0.5">
                 <motion.button
-                  whileTap={{ scale: 0.85 }}
+                  whileTap={{ scale: 0.88 }}
                   onClick={onChatClick}
-                  className="flex items-center justify-center rounded-full"
+                  className="flex items-center justify-center"
                   style={{
-                    width: 50,
-                    height: 50,
-                    background: '#111111',
-                    boxShadow: '0 4px 14px rgba(0,0,0,0.22)',
-                    marginBottom: 4,
+                    width: 52,
+                    height: 52,
+                    background: '#0A0A0A',
+                    borderRadius: 999,
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.18)',
+                    marginBottom: 2,
                   }}
                   aria-label="Bysis AI"
                 >
                   <IcoAI size={22} />
                 </motion.button>
-                <span className="text-[10px] font-semibold" style={{ color: INACTIVE_COLOR }}>AI</span>
+                <span
+                  style={{ fontSize: 10, color: INACTIVE_COLOR, fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}
+                >AI</span>
               </div>
             );
           }
@@ -284,8 +290,14 @@ function BottomNav({ onProfileClick, onChatClick, visible }: BottomNavProps) {
               {tab.id === 'panier'   && <IcoBag      active={active} badge={totalItems} />}
               {tab.id === 'moi'      && <IcoUser     active={active} />}
               <span
-                className="text-[10px] font-semibold leading-none"
-                style={{ color: active ? ACTIVE_COLOR : INACTIVE_COLOR }}
+                style={{
+                  fontSize: 10,
+                  fontWeight: active ? 700 : 400,
+                  color: active ? ACTIVE_COLOR : INACTIVE_COLOR,
+                  fontFamily: 'Poppins, sans-serif',
+                  letterSpacing: active ? '-0.01em' : '0',
+                  lineHeight: 1,
+                }}
               >
                 {tab.label}
               </span>

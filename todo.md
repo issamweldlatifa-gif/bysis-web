@@ -436,3 +436,11 @@
 - [x] Historique des changements de statut avec date/heure
 - [x] WhatsApp notification client lors confirmation: lien wa.me pré-rempli avec code de suivi (ouvre WhatsApp auto)
 - [x] Email de confirmation au client (pas seulement admin)
+
+## 🖤 Nike-Style Redesign (Juin 2026)
+- [x] index.css: Poppins Black 900 pour titres, thin pour corps, palette #000/#fff
+- [x] AppLayout: header thin icons (strokeWidth=1.2), bottom nav thin + active=noir
+- [x] Home.tsx: Quick Actions blanc + border noir + icônes thin + texte Bold noir
+- [x] Home.tsx: CTAs pill shape noir (#000) + texte blanc Bold
+- [x] Home.tsx: section "Pourquoi Bysis" avec icônes thin noir (fond noir, icône blanche)
+- [x] Boutons globaux: pill shape, noir/blanc, Bold text
