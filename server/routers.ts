@@ -26,6 +26,9 @@ import {
   createAiOrder, getAiOrderByTracking, getAiOrdersByUserId, getAllAiOrders,
   updateAiOrderStatus, updateAiOrderAdminNotes, updateAiOrderPaymentProof, searchAiOrdersByName,
 } from "./db";
+import {
+  getActiveSliders, getAllSliders, getSliderById, createSlider, updateSlider, deleteSlider, toggleSliderActive,
+} from "./db-sliders";
 import { invokeLLM } from "./_core/llm";
 import { notifyOwner } from "./_core/notification";
 import { transcribeAudio } from "./_core/voiceTranscription";
@@ -1563,6 +1566,73 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
             adminNotes: input.adminNotes,
           });
         }
+        return { success: true };
+      }),
+  }),
+
+  // ===== Sliders (Hero Carousel) =====
+  sliders: router({
+    // Get active sliders for frontend
+    getActive: publicProcedure.query(async () => {
+      return await getActiveSliders();
+    }),
+    // Get all sliders (admin only)
+    getAll: customAdminProcedure.query(async () => {
+      return await getAllSliders();
+    }),
+    // Get slider by ID
+    getById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        return await getSliderById(input.id);
+      }),
+    // Create slider (admin only)
+    create: customAdminProcedure
+      .input(z.object({
+        title: z.string(),
+        description: z.string().optional(),
+        videoUrl: z.string().optional(),
+        videoKey: z.string().optional(),
+        countdownEndTime: z.date().optional(),
+        backgroundColor: z.string().optional(),
+        backgroundGradient: z.string().optional(),
+        displayOrder: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await createSlider(input);
+        return { success: true };
+      }),
+    // Update slider (admin only)
+    update: customAdminProcedure
+      .input(z.object({
+        id: z.number(),
+        title: z.string().optional(),
+        description: z.string().optional(),
+        videoUrl: z.string().optional(),
+        videoKey: z.string().optional(),
+        countdownEndTime: z.date().optional(),
+        backgroundColor: z.string().optional(),
+        backgroundGradient: z.string().optional(),
+        isActive: z.number().optional(),
+        displayOrder: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        await updateSlider(id, data);
+        return { success: true };
+      }),
+    // Delete slider (admin only)
+    delete: customAdminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteSlider(input.id);
+        return { success: true };
+      }),
+    // Toggle slider active status (admin only)
+    toggle: customAdminProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await toggleSliderActive(input.id);
         return { success: true };
       }),
   }),

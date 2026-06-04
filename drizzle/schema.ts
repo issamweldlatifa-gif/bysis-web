@@ -419,3 +419,25 @@ export const aiOrders = mysqlTable("ai_orders", {
 });
 export type AiOrder = typeof aiOrders.$inferSelect;
 export type InsertAiOrder = typeof aiOrders.$inferInsert;
+
+
+/**
+ * Sliders table - stores carousel slides with video, countdown, and dynamic colors
+ */
+export const sliders = mysqlTable("sliders", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  videoUrl: text("videoUrl"), // URL to video file (stored in S3)
+  videoKey: varchar("videoKey", { length: 255 }), // S3 storage key
+  countdownEndTime: timestamp("countdownEndTime"), // When countdown timer ends
+  backgroundColor: varchar("backgroundColor", { length: 7 }).default("#FFC107"), // Hex color
+  backgroundGradient: text("backgroundGradient"), // Optional gradient CSS
+  isActive: tinyint("isActive").default(1).notNull(),
+  displayOrder: int("displayOrder").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Slider = typeof sliders.$inferSelect;
+export type InsertSlider = typeof sliders.$inferInsert;

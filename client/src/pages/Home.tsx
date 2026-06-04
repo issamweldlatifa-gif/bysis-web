@@ -2,6 +2,7 @@ import AppLayout from '@/components/AppLayout';
 import { useBgColor } from '@/contexts/BgColorContext';
 import { useLocation } from 'wouter';
 import DynamicColorCarousel, { CarouselSlide } from '@/components/DynamicColorCarousel';
+import HeroSlider, { HeroSlide } from '@/components/HeroSlider';
 import { trpc } from '@/lib/trpc';
 import { useMemo } from 'react';
 
@@ -195,6 +196,7 @@ function HomeContent() {
   const { setCarouselColor } = useBgColor();
   const [, navigate] = useLocation();
   const { data: dbSlides } = trpc.carousel.list.useQuery();
+  const { data: heroSlides = [] } = trpc.sliders.getActive.useQuery();
 
   const carouselSlides = useMemo((): CarouselSlide[] => {
     if (!dbSlides || dbSlides.length === 0) return FALLBACK_SLIDES;
@@ -212,8 +214,27 @@ function HomeContent() {
     }));
   }, [dbSlides]);
 
+  const heroSliderData = useMemo((): HeroSlide[] => {
+    return (heroSlides || []).map(s => ({
+      id: s.id,
+      title: s.title,
+      description: s.description || undefined,
+      videoUrl: s.videoUrl || undefined,
+      backgroundColor: s.backgroundColor || '#FFC107',
+      backgroundGradient: s.backgroundGradient || undefined,
+      countdownEndTime: s.countdownEndTime ? new Date(s.countdownEndTime) : undefined,
+    }));
+  }, [heroSlides]);
+
   return (
     <div className="w-full bg-white">
+      {/* Hero Slider with Video & Countdown */}
+      {heroSliderData && heroSliderData.length > 0 && (
+        <div className="px-4 py-4">
+          <HeroSlider slides={heroSliderData} />
+        </div>
+      )}
+
       {/* Hero Carousel */}
       <DynamicColorCarousel slides={carouselSlides} onColorChange={setCarouselColor} />
 
