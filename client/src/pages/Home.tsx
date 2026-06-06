@@ -1,37 +1,12 @@
 import AppLayout from '@/components/AppLayout';
 import { useBgColor } from '@/contexts/BgColorContext';
 import { useLocation } from 'wouter';
-import DynamicColorCarousel, { CarouselSlide } from '@/components/DynamicColorCarousel';
+
 import HeroSlider, { HeroSlide } from '@/components/HeroSlider';
 import { trpc } from '@/lib/trpc';
 import { useMemo } from 'react';
 
-/* ── Fallback Slides (si DB vide) ────────────────────────────────────────────────────────────────── */
-const FALLBACK_SLIDES: CarouselSlide[] = [
-  {
-    color: '#f5c518',
-    title: 'Organisez-vous',
-    subtitle: 'Découvrez les meilleures ventes',
-    cards: [{ label: 'Commander' }, { label: 'Arrivages' }, { label: 'Suivre' }, { label: 'Calculer' }],
-  },
-  {
-    color: '#006a2e',
-    title: 'Nos meilleures\nventes à\npetits prix',
-    cards: [{ label: 'Mode' }, { label: 'Électronique' }, { label: 'Maison' }, { label: 'Beauté' }],
-  },
-  {
-    color: '#1a3a5c',
-    title: 'Meilleures\nventes de livres',
-    subtitle: 'Découvrez maintenant',
-    cards: [{ label: 'Romans' }, { label: 'Sciences' }, { label: 'Enfants' }, { label: 'Cuisine' }],
-  },
-  {
-    color: '#ff3131',
-    title: 'Ventes Flash',
-    subtitle: "Offres limitées — jusqu'à -70%",
-    cards: [{ label: 'Chaussures' }, { label: 'Sacs' }, { label: 'Vêtements' }, { label: 'Accessoires' }],
-  },
-];
+
 
 /* ── Icon constants — Nike thin style ───────────────────────────────────── */
 const SW = '1.5';
@@ -193,26 +168,11 @@ function ArrivageCard({ item, onAdd }: { item: any; onAdd: () => void }) {
 
 /* ── Home Component ──────────────────────────────────────────────────────── */
 function HomeContent() {
-  const { setCarouselColor } = useBgColor();
+
   const [, navigate] = useLocation();
-  const { data: dbSlides } = trpc.carousel.list.useQuery();
   const { data: heroSlides = [] } = trpc.sliders.getActive.useQuery();
 
-  const carouselSlides = useMemo((): CarouselSlide[] => {
-    if (!dbSlides || dbSlides.length === 0) return FALLBACK_SLIDES;
-    return dbSlides.map(s => ({
-      color: s.bgColor,
-      textColor: s.textColor ?? undefined,
-      title: s.title,
-      subtitle: s.subtitle ?? undefined,
-      cards: [
-        s.card1Label || s.card1Image ? { label: s.card1Label ?? undefined, image: s.card1Image ?? undefined } : null,
-        s.card2Label || s.card2Image ? { label: s.card2Label ?? undefined, image: s.card2Image ?? undefined } : null,
-        s.card3Label || s.card3Image ? { label: s.card3Label ?? undefined, image: s.card3Image ?? undefined } : null,
-        s.card4Label || s.card4Image ? { label: s.card4Label ?? undefined, image: s.card4Image ?? undefined } : null,
-      ].filter(Boolean) as any[],
-    }));
-  }, [dbSlides]);
+
 
   const heroSliderData = useMemo((): HeroSlide[] => {
     return (heroSlides || []).map(s => ({
@@ -235,8 +195,7 @@ function HomeContent() {
         </div>
       )}
 
-      {/* Hero Carousel */}
-      <DynamicColorCarousel slides={carouselSlides} onColorChange={setCarouselColor} />
+
 
       {/* Quick Actions — Nike style: blanc + border noir + icônes thin */}
       <section className="w-full px-4 py-4 bg-white">
