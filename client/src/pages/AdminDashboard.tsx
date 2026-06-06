@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
+import AdminSliders from "@/components/AdminSliders";
 import {
   LayoutDashboard,
   Package,
@@ -644,6 +645,22 @@ function AdminContent() {
                   })}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          {/* Admin Sliders Management */}
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Image className="h-5 w-5" strokeWidth={1.5} />
+                Gestion des Sliders
+              </CardTitle>
+              <CardDescription>
+                Gérez les sliders Hero avec vidéos et compteurs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <AdminSliders />
             </CardContent>
           </Card>
         </div>
