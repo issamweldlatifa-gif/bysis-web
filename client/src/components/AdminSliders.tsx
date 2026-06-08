@@ -111,7 +111,7 @@ export default function AdminSliders() {
         <h2 className="text-2xl font-bold">Gestion des Sliders</h2>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => handleOpenDialog()} className="gap-2">
+            <Button className="gap-2" onClick={() => { setIsOpen(true); handleOpenDialog(); }}>
               <Plus className="w-4 h-4" strokeWidth={1.5} />
               Nouveau Slider
             </Button>
