@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Plus, Edit2, Trash2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
@@ -48,6 +48,18 @@ export default function AdminSliders() {
     setIsOpen(true);
   };
 
+  const handleCloseDialog = () => {
+    setIsOpen(false);
+    setEditingId(null);
+    setFormData({
+      title: "",
+      description: "",
+      videoUrl: "",
+      backgroundColor: "#FFC107",
+      countdownEndTime: "",
+    });
+  };
+
   const handleSubmit = async () => {
     if (!formData.title.trim()) {
       toast.error("Le titre est requis");
@@ -75,7 +87,7 @@ export default function AdminSliders() {
         });
         toast.success("Slider créé");
       }
-      setIsOpen(false);
+      handleCloseDialog();
       refetch();
     } catch (error) {
       toast.error("Erreur lors de la sauvegarde");
@@ -109,84 +121,83 @@ export default function AdminSliders() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Gestion des Sliders</h2>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button className="gap-2" onClick={() => { setIsOpen(true); handleOpenDialog(); }}>
-              <Plus className="w-4 h-4" strokeWidth={1.5} />
-              Nouveau Slider
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{editingId ? "Modifier" : "Créer"} un Slider</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium">Titre</label>
+        <Button className="gap-2" onClick={() => handleOpenDialog()}>
+          <Plus className="w-4 h-4" strokeWidth={1.5} />
+          Nouveau Slider
+        </Button>
+      </div>
+
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingId ? "Modifier" : "Créer"} un Slider</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Titre</label>
+              <Input
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Titre du slider"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Description</label>
+              <Textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Description optionnelle"
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">URL Vidéo</label>
+              <Input
+                value={formData.videoUrl}
+                onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                placeholder="https://..."
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium">Couleur de fond</label>
+              <div className="flex gap-2">
+                <input
+                  type="color"
+                  value={formData.backgroundColor}
+                  onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })}
+                  className="w-12 h-10 rounded cursor-pointer"
+                />
                 <Input
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Titre du slider"
+                  value={formData.backgroundColor}
+                  onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })}
+                  placeholder="#FFC107"
                 />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">Description</label>
-                <Textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Description optionnelle"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">URL Vidéo</label>
-                <Input
-                  value={formData.videoUrl}
-                  onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-                  placeholder="https://..."
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">Couleur de fond</label>
-                <div className="flex gap-2">
-                  <input
-                    type="color"
-                    value={formData.backgroundColor}
-                    onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })}
-                    className="w-12 h-10 rounded cursor-pointer"
-                  />
-                  <Input
-                    value={formData.backgroundColor}
-                    onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })}
-                    placeholder="#FFC107"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-sm font-medium">Fin du Countdown</label>
-                <Input
-                  type="datetime-local"
-                  value={formData.countdownEndTime}
-                  onChange={(e) => setFormData({ ...formData, countdownEndTime: e.target.value })}
-                />
-              </div>
-
-              <div className="flex gap-2 pt-4">
-                <Button onClick={handleSubmit} className="flex-1">
-                  {editingId ? "Mettre à jour" : "Créer"}
-                </Button>
-                <Button variant="outline" onClick={() => setIsOpen(false)} className="flex-1">
-                  Annuler
-                </Button>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+
+            <div>
+              <label className="text-sm font-medium">Fin du Countdown</label>
+              <Input
+                type="datetime-local"
+                value={formData.countdownEndTime}
+                onChange={(e) => setFormData({ ...formData, countdownEndTime: e.target.value })}
+              />
+            </div>
+
+            <div className="flex gap-2 pt-4">
+              <Button onClick={handleSubmit} className="flex-1">
+                {editingId ? "Mettre à jour" : "Créer"}
+              </Button>
+              <Button variant="outline" onClick={handleCloseDialog} className="flex-1">
+                Annuler
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid gap-4">
         {sliders.map((slider: any) => (
