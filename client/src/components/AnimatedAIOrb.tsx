@@ -11,9 +11,8 @@ export default function AnimatedAIOrb({
   isListening = false,
   size = "md",
 }: AnimatedAIOrbProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number | undefined>(undefined);
-  const particlesRef = useRef<Particle[]>([] as Particle[]);
 
   const sizeMap = {
     sm: 60,
@@ -23,146 +22,164 @@ export default function AnimatedAIOrb({
 
   const orbSize = sizeMap[size];
 
-  interface Particle {
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    life: number;
-    maxLife: number;
-    color: string;
-    size: number;
-  }
-
-  const createParticles = (count: number, colors: string[]): Particle[] => {
-    const particles: Particle[] = [];
-    for (let i = 0; i < count; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 1 + Math.random() * 2;
-      particles.push({
-        x: orbSize / 2,
-        y: orbSize / 2,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        life: 1,
-        maxLife: 1 + Math.random() * 0.5,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        size: 1 + Math.random() * 2,
-      });
-    }
-    return particles;
-  };
-
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!container) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    // Create SVG for better performance and compatibility
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", `0 0 ${orbSize} ${orbSize}`);
+    svg.setAttribute("width", orbSize.toString());
+    svg.setAttribute("height", orbSize.toString());
+    svg.style.filter = isThinking
+      ? "drop-shadow(0 0 20px rgba(236, 72, 153, 0.6))"
+      : "drop-shadow(0 0 20px rgba(168, 85, 247, 0.6))";
 
-    canvas.width = orbSize;
-    canvas.height = orbSize;
+    // Create defs for gradients and filters
+    const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
 
-    const colors = isListening
-      ? ["#06b6d4", "#a855f7", "#ec4899"] // Cyan, Purple, Pink
-      : ["#a855f7", "#ec4899", "#ff1493"]; // Purple, Pink, Magenta
+    // Radial gradient
+    const radialGradient = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "radialGradient"
+    );
+    radialGradient.setAttribute("id", "orbGradient");
+    radialGradient.setAttribute("cx", "50%");
+    radialGradient.setAttribute("cy", "50%");
+    radialGradient.setAttribute("r", "50%");
 
-    let frameCount = 0;
+    const stop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    stop1.setAttribute("offset", "0%");
+    stop1.setAttribute(
+      "stop-color",
+      isThinking ? "rgba(236, 72, 153, 0.8)" : "rgba(168, 85, 247, 0.8)"
+    );
+    radialGradient.appendChild(stop1);
 
-    const animate = () => {
-      ctx.clearRect(0, 0, orbSize, orbSize);
+    const stop2 = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+    stop2.setAttribute("offset", "100%");
+    stop2.setAttribute(
+      "stop-color",
+      isListening ? "rgba(6, 182, 212, 0.3)" : "rgba(236, 72, 153, 0.3)"
+    );
+    radialGradient.appendChild(stop2);
 
-      // Draw glassmorphism background
-      const gradient = ctx.createRadialGradient(
-        orbSize / 2,
-        orbSize / 2,
-        0,
-        orbSize / 2,
-        orbSize / 2,
-        orbSize / 2
-      );
-      gradient.addColorStop(0, "rgba(168, 85, 247, 0.3)");
-      gradient.addColorStop(0.5, "rgba(236, 72, 153, 0.2)");
-      gradient.addColorStop(1, "rgba(6, 182, 212, 0.1)");
+    defs.appendChild(radialGradient);
 
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(orbSize / 2, orbSize / 2, orbSize / 2, 0, Math.PI * 2);
-      ctx.fill();
+    // Glow filter
+    const filter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
+    filter.setAttribute("id", "glow");
+    filter.setAttribute("x", "-50%");
+    filter.setAttribute("y", "-50%");
+    filter.setAttribute("width", "200%");
+    filter.setAttribute("height", "200%");
 
-      // Draw neon border
-      ctx.strokeStyle = isThinking
-        ? "rgba(236, 72, 153, 0.8)"
-        : "rgba(168, 85, 247, 0.8)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(orbSize / 2, orbSize / 2, orbSize / 2 - 2, 0, Math.PI * 2);
-      ctx.stroke();
+    const feGaussianBlur = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "feGaussianBlur"
+    );
+    feGaussianBlur.setAttribute("stdDeviation", "3");
+    feGaussianBlur.setAttribute("result", "coloredBlur");
+    filter.appendChild(feGaussianBlur);
 
-      // Add glow effect
-      ctx.shadowColor = isThinking ? "#ec4899" : "#a855f7";
-      ctx.shadowBlur = 20;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
+    const feMerge = document.createElementNS("http://www.w3.org/2000/svg", "feMerge");
+    const feMergeNode1 = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "feMergeNode"
+    );
+    feMergeNode1.setAttribute("in", "coloredBlur");
+    feMerge.appendChild(feMergeNode1);
 
-      // Draw inner rotating gradient
-      const rotationAngle = (frameCount * 2) % 360;
-      const innerGradient = ctx.createLinearGradient(
-        orbSize / 2 - orbSize / 4,
-        orbSize / 2 - orbSize / 4,
-        orbSize / 2 + orbSize / 4,
-        orbSize / 2 + orbSize / 4
-      );
-      innerGradient.addColorStop(0, "rgba(168, 85, 247, 0.6)");
-      innerGradient.addColorStop(0.5, "rgba(236, 72, 153, 0.6)");
-      innerGradient.addColorStop(1, "rgba(6, 182, 212, 0.6)");
+    const feMergeNode2 = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "feMergeNode"
+    );
+    feMergeNode2.setAttribute("in", "SourceGraphic");
+    feMerge.appendChild(feMergeNode2);
 
-      ctx.save();
-      ctx.translate(orbSize / 2, orbSize / 2);
-      ctx.rotate((rotationAngle * Math.PI) / 180);
-      ctx.fillStyle = innerGradient;
-      ctx.beginPath();
-      ctx.arc(0, 0, orbSize / 3, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.restore();
+    filter.appendChild(feMerge);
+    defs.appendChild(filter);
 
-      // Generate particles on thinking/listening
-      if ((isThinking || isListening) && frameCount % 5 === 0) {
-        const newParticles = createParticles(3, colors);
-        particlesRef.current.push(...newParticles);
-      }
+    svg.appendChild(defs);
 
-      // Update and draw particles
-      particlesRef.current = particlesRef.current.filter((p) => p.life > 0);
-      particlesRef.current.forEach((p) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life -= 0.02;
+    // Background circle
+    const bgCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    bgCircle.setAttribute("cx", (orbSize / 2).toString());
+    bgCircle.setAttribute("cy", (orbSize / 2).toString());
+    bgCircle.setAttribute("r", (orbSize / 2 - 2).toString());
+    bgCircle.setAttribute("fill", "url(#orbGradient)");
+    bgCircle.setAttribute("filter", "url(#glow)");
+    svg.appendChild(bgCircle);
 
-        const alpha = p.life / p.maxLife;
-        ctx.fillStyle = p.color.replace(")", `, ${alpha})`).replace("rgb", "rgba");
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-      });
+    // Border circle
+    const borderCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    borderCircle.setAttribute("cx", (orbSize / 2).toString());
+    borderCircle.setAttribute("cy", (orbSize / 2).toString());
+    borderCircle.setAttribute("r", (orbSize / 2 - 2).toString());
+    borderCircle.setAttribute("fill", "none");
+    borderCircle.setAttribute(
+      "stroke",
+      isThinking ? "rgba(236, 72, 153, 0.8)" : "rgba(168, 85, 247, 0.8)"
+    );
+    borderCircle.setAttribute("stroke-width", "2");
+    svg.appendChild(borderCircle);
 
-      // Draw listening waves if listening
-      if (isListening) {
-        for (let i = 1; i <= 3; i++) {
-          const waveRadius = (orbSize / 2) * (0.7 + (frameCount % 20) / 20) * (i / 3);
-          ctx.strokeStyle = `rgba(6, 182, 212, ${0.6 - i * 0.15})`;
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          ctx.arc(orbSize / 2, orbSize / 2, waveRadius, 0, Math.PI * 2);
-          ctx.stroke();
+    // Rotating inner circle
+    const innerCircle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    innerCircle.setAttribute("cx", (orbSize / 2).toString());
+    innerCircle.setAttribute("cy", (orbSize / 2).toString());
+    innerCircle.setAttribute("r", (orbSize / 3).toString());
+    innerCircle.setAttribute("fill", "none");
+    innerCircle.setAttribute(
+      "stroke",
+      isListening ? "rgba(6, 182, 212, 0.6)" : "rgba(236, 72, 153, 0.6)"
+    );
+    innerCircle.setAttribute("stroke-width", "1.5");
+    innerCircle.style.animation = "rotate 3s linear infinite";
+    svg.appendChild(innerCircle);
+
+    // Add animation keyframes if not already present
+    if (!document.getElementById("orbAnimationStyle")) {
+      const style = document.createElement("style");
+      style.id = "orbAnimationStyle";
+      style.textContent = `
+        @keyframes rotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
+        @keyframes pulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // Listening waves
+    if (isListening) {
+      for (let i = 1; i <= 3; i++) {
+        const waveCircle = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "circle"
+        );
+        waveCircle.setAttribute("cx", (orbSize / 2).toString());
+        waveCircle.setAttribute("cy", (orbSize / 2).toString());
+        waveCircle.setAttribute("r", ((orbSize / 2) * (0.5 + i * 0.15)).toString());
+        waveCircle.setAttribute("fill", "none");
+        waveCircle.setAttribute(
+          "stroke",
+          `rgba(6, 182, 212, ${0.6 - i * 0.15})`
+        );
+        waveCircle.setAttribute("stroke-width", "1");
+        waveCircle.style.animation = `pulse 1.5s ease-in-out infinite`;
+        waveCircle.style.animationDelay = `${i * 0.3}s`;
+        svg.appendChild(waveCircle);
       }
+    }
 
-      frameCount++;
-      animationRef.current = requestAnimationFrame(animate);
-    };
-
-    animate();
+    // Clear previous SVG
+    container.innerHTML = "";
+    container.appendChild(svg);
 
     return () => {
       if (animationRef.current) {
@@ -172,16 +189,13 @@ export default function AnimatedAIOrb({
   }, [isThinking, isListening, orbSize]);
 
   return (
-    <div className="flex items-center justify-center">
-      <canvas
-        ref={canvasRef}
-        className="drop-shadow-2xl"
-        style={{
-          filter: isThinking
-            ? "drop-shadow(0 0 20px rgba(236, 72, 153, 0.6))"
-            : "drop-shadow(0 0 20px rgba(168, 85, 247, 0.6))",
-        }}
-      />
-    </div>
+    <div
+      ref={containerRef}
+      className="flex items-center justify-center"
+      style={{
+        width: orbSize,
+        height: orbSize,
+      }}
+    />
   );
 }
