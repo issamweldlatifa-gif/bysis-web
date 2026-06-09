@@ -95,7 +95,16 @@
   --safe-area-left: env(safe-area-inset-left, 0);
   --safe-area-right: env(safe-area-inset-right, 0);
   /* Dynamic background color — updated by BgColorContext via JS */
-  --app-bg-color: #cadfe2;
+  --app-bg-color: #0f0a1a;
+  
+  /* Futuristic AI Theme — Neon Gradients */
+  --neon-purple: #a855f7;
+  --neon-pink: #ec4899;
+  --neon-blue: #06b6d4;
+  --neon-magenta: #ff1493;
+  --dark-bg: #0f0a1a;
+  --dark-surface: #1a0f2e;
+  --dark-card: #2d1b3d;
 }
 
 /* ════════════════════════════════════════════════════════════════════════
@@ -117,39 +126,39 @@
      Error:         #DC3545  — System errors, delays, out of stock
    ════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Primary — Shein Red */
-  --primary: oklch(0.35 0.18 265);  /* #0047AB */               /* #1A1A1A */
-  --primary-foreground: oklch(1.00 0.00 0);     /* white */
+  /* Futuristic Dark Theme */
+  --primary: #a855f7;  /* Neon Purple */
+  --primary-foreground: #ffffff;
 
-  /* Background — Pure white */
-  --background: oklch(1.00 0.000 0);            /* #FFFFFF */
-  --foreground: oklch(0.04 0.01 0);  /* #0A0A0A */            /* #1A1A1A */
+  /* Background — Dark */
+  --background: #0f0a1a;  /* Very dark purple */
+  --foreground: #f0f0f0;  /* Light text */
 
-  /* Card */
-  --card: oklch(1.00 0.000 0);                  /* #FFFFFF */
-  --card-foreground: oklch(0.04 0.01 0);  /* #0A0A0A */       /* #1A1A1A */
+  /* Card — Glassmorphism */
+  --card: rgba(45, 27, 61, 0.7);  /* Semi-transparent dark purple */
+  --card-foreground: #f0f0f0;
 
-  --popover: oklch(1.00 0.000 0);
-  --popover-foreground: oklch(0.04 0.01 0);  /* #0A0A0A */
+  --popover: rgba(45, 27, 61, 0.8);
+  --popover-foreground: #f0f0f0;
 
-  /* Secondary — light gray */
-  --secondary: oklch(0.18 0.01 0);  /* #2D2D2D */             /* #F5F5F5 */
-  --secondary-foreground: oklch(1.00 0.00 0);  /* #FFFFFF */  /* #1A1A1A */
+  /* Secondary — Neon Pink */
+  --secondary: #ec4899;  /* Neon Pink */
+  --secondary-foreground: #ffffff;
 
   /* Muted */
-  --muted: oklch(0.88 0.000 0);  /* #E0E0E0 */                 /* #F5F5F5 */
-  --muted-foreground: oklch(0.30 0.01 0);  /* #4A4A4A */      /* #888888 */
+  --muted: rgba(255, 255, 255, 0.1);
+  --muted-foreground: #a0a0a0;
 
-  /* Accent — light red tint */
-  --accent: oklch(0.35 0.18 265);  /* #0047AB */               /* #FFF0F1 */
-  --accent-foreground: oklch(1.00 0.00 0);  /* #FFFFFF */     /* #1A1A1A */
+  /* Accent — Neon Cyan */
+  --accent: #06b6d4;  /* Neon Cyan */
+  --accent-foreground: #0f0a1a;
 
-  --destructive: oklch(0.50 0.18 30);  /* #DC3545 */           /* #1A1A1A */
-  --destructive-foreground: oklch(1.00 0 0);
+  --destructive: #ff1493;  /* Neon Magenta */
+  --destructive-foreground: #ffffff;
 
-  --border: oklch(0.88 0.000 0);  /* #E0E0E0 */                /* #E5E5E5 */
-  --input: oklch(0.96 0.000 0);                 /* #F5F5F5 */
-  --ring: oklch(0.35 0.18 265);  /* #0047AB */                  /* #1A1A1A */
+  --border: rgba(168, 85, 247, 0.2);  /* Purple border */
+  --input: rgba(45, 27, 61, 0.5);
+  --ring: #a855f7;  /* Purple ring */
 
   --radius: 0.375rem;
 
