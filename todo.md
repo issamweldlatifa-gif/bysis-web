@@ -465,3 +465,12 @@
 - [ ] ShipMasterDashboard.tsx : boutons épais, strokeWidth 1.5, labels FR
 - [ ] AIChat.tsx : boutons épais, strokeWidth 1.5, labels FR
 - [ ] server/routers.ts : system prompt multilingue (AR/FR/EN/dialecte tunisien)
+
+
+## Redesign AIChatBox — Premium AI Assistant (Futuristic)
+
+- [ ] Réécrire AIChatBox avec glassmorphism + gradient messages
+- [ ] Ajouter neon gradients (purple/pink/blue) aux messages
+- [ ] Améliorer AnimatedAIOrb avec états thinking/listening
+- [ ] Ajouter animations fluides et transitions premium
+- [ ] Tester et valider le design final

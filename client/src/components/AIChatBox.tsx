@@ -97,14 +97,14 @@ export function AIChatBox({
     <div
       ref={containerRef}
       className={cn(
-        "flex flex-col bg-gradient-to-b from-[#1a0f2e] to-[#0f0a1a] text-foreground rounded-2xl border border-purple-500/20 shadow-2xl backdrop-blur-xl",
-        "bg-opacity-80",
+        "flex flex-col bg-gradient-to-br from-[#1a0f2e] via-[#2d1b3d] to-[#0f0a1a] text-foreground rounded-3xl border border-white/10 shadow-2xl backdrop-blur-2xl",
+        "bg-opacity-90",
         className
       )}
       style={{ height }}
     >
       {/* Header with AI Orb */}
-      <div className="flex items-center justify-between p-6 border-b border-purple-500/10 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
+      <div className="flex items-center justify-between p-6 border-b border-white/10 bg-gradient-to-r from-purple-900/30 to-pink-900/30 backdrop-blur-md rounded-t-3xl">
         <div className="flex items-center gap-3">
           <div className="relative">
             <AnimatedAIOrb 
@@ -191,10 +191,10 @@ export function AIChatBox({
 
                     <div
                       className={cn(
-                        "max-w-xs lg:max-w-md xl:max-w-lg rounded-2xl px-4 py-3 text-sm",
+                        "max-w-xs lg:max-w-md xl:max-w-lg rounded-2xl px-4 py-3 text-sm backdrop-blur-md",
                         message.role === "user"
-                          ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30 rounded-br-none"
-                          : "bg-gradient-to-r from-purple-500/20 to-pink-500/10 text-foreground border border-purple-500/30 backdrop-blur-sm rounded-bl-none"
+                          ? "bg-gradient-to-br from-pink-500/90 to-purple-500/90 text-white shadow-lg shadow-pink-500/40 rounded-br-none border border-white/20"
+                          : "bg-gradient-to-br from-white/15 to-white/5 text-white border border-white/20 backdrop-blur-lg rounded-bl-none"
                       )}
                     >
                       {message.role === "assistant" ? (
@@ -230,7 +230,7 @@ export function AIChatBox({
       <form
         ref={inputAreaRef}
         onSubmit={handleSubmit}
-        className="flex-shrink-0 border-t border-purple-500/10 bg-gradient-to-t from-[#1a0f2e] to-transparent p-4 backdrop-blur-sm"
+        className="flex-shrink-0 border-t border-white/10 bg-gradient-to-t from-purple-900/30 to-transparent p-4 backdrop-blur-md rounded-b-3xl"
       >
         <div className="flex gap-3 items-end">
           <button
@@ -254,7 +254,7 @@ export function AIChatBox({
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             disabled={isLoading}
-            className="resize-none bg-purple-500/10 border border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-purple-500/60 focus:bg-purple-500/20 rounded-xl backdrop-blur-sm"
+            className="resize-none bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:border-purple-400/50 focus:bg-white/15 rounded-full backdrop-blur-sm transition-all"
             rows={1}
           />
 

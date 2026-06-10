@@ -32,7 +32,9 @@ export default function AnimatedAIOrb({
     svg.setAttribute("width", orbSize.toString());
     svg.setAttribute("height", orbSize.toString());
     svg.style.filter = isThinking
-      ? "drop-shadow(0 0 20px rgba(236, 72, 153, 0.6))"
+      ? "drop-shadow(0 0 30px rgba(236, 72, 153, 0.8))"
+      : isListening
+      ? "drop-shadow(0 0 30px rgba(59, 130, 246, 0.8))"
       : "drop-shadow(0 0 20px rgba(168, 85, 247, 0.6))";
 
     // Create defs for gradients and filters
@@ -52,7 +54,7 @@ export default function AnimatedAIOrb({
     stop1.setAttribute("offset", "0%");
     stop1.setAttribute(
       "stop-color",
-      isThinking ? "rgba(236, 72, 153, 0.8)" : "rgba(168, 85, 247, 0.8)"
+      isThinking ? "rgba(236, 72, 153, 0.95)" : isListening ? "rgba(59, 130, 246, 0.9)" : "rgba(168, 85, 247, 0.85)"
     );
     radialGradient.appendChild(stop1);
 
@@ -60,7 +62,7 @@ export default function AnimatedAIOrb({
     stop2.setAttribute("offset", "100%");
     stop2.setAttribute(
       "stop-color",
-      isListening ? "rgba(6, 182, 212, 0.3)" : "rgba(236, 72, 153, 0.3)"
+      isThinking ? "rgba(168, 85, 247, 0.6)" : isListening ? "rgba(168, 85, 247, 0.5)" : "rgba(59, 130, 246, 0.4)"
     );
     radialGradient.appendChild(stop2);
 
@@ -119,7 +121,7 @@ export default function AnimatedAIOrb({
     borderCircle.setAttribute("fill", "none");
     borderCircle.setAttribute(
       "stroke",
-      isThinking ? "rgba(236, 72, 153, 0.8)" : "rgba(168, 85, 247, 0.8)"
+      isThinking ? "rgba(236, 72, 153, 0.9)" : isListening ? "rgba(59, 130, 246, 0.8)" : "rgba(168, 85, 247, 0.8)"
     );
     borderCircle.setAttribute("stroke-width", "2");
     svg.appendChild(borderCircle);
@@ -132,7 +134,7 @@ export default function AnimatedAIOrb({
     innerCircle.setAttribute("fill", "none");
     innerCircle.setAttribute(
       "stroke",
-      isListening ? "rgba(6, 182, 212, 0.6)" : "rgba(236, 72, 153, 0.6)"
+      isThinking ? "rgba(236, 72, 153, 0.8)" : isListening ? "rgba(59, 130, 246, 0.7)" : "rgba(168, 85, 247, 0.6)"
     );
     innerCircle.setAttribute("stroke-width", "1.5");
     innerCircle.style.animation = "rotate 3s linear infinite";
@@ -168,7 +170,7 @@ export default function AnimatedAIOrb({
         waveCircle.setAttribute("fill", "none");
         waveCircle.setAttribute(
           "stroke",
-          `rgba(6, 182, 212, ${0.6 - i * 0.15})`
+          `rgba(59, 130, 246, ${0.7 - i * 0.15})`
         );
         waveCircle.setAttribute("stroke-width", "1");
         waveCircle.style.animation = `pulse 1.5s ease-in-out infinite`;
