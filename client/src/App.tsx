@@ -1,4 +1,3 @@
-import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Suspense, lazy, useState, createContext, useContext } from "react";
 import { CartProvider } from "./contexts/CartContext";
@@ -7,6 +6,7 @@ import { Route, Switch, useLocation } from "wouter";
 import { AnimatePresence } from "framer-motion";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { Toaster } from "sonner";
 // AIChat is lazy loaded below
 
 // Context to allow any page to open AIChat
@@ -99,7 +99,7 @@ function App() {
         <I18nProvider>
         <CartProvider>
         <TooltipProvider>
-          <ChatContext.Provider value={{ openChat: () => setChatOpen(v => !v), closeChat: () => setChatOpen(false), chatOpen }}>
+          <ChatContext.Provider value={{ openChat: () => setChatOpen(true), closeChat: () => setChatOpen(false), chatOpen }}>
             <Toaster />
             <Router />
             <AIChatWrapper chatOpen={chatOpen} setChatOpen={setChatOpen} />

@@ -1,11 +1,12 @@
-import { motion, AnimatePresence, type Transition } from 'framer-motion';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Mic, StopCircle, Upload, File, MoreHorizontal, ChevronRight, ChevronLeft, MessageSquare, Trash2, AlertTriangle, RefreshCw, Home, Calculator } from 'lucide-react';
+import { X, Send, Mic, StopCircle, Upload, File, MoreHorizontal, ChevronRight, ChevronLeft, MessageSquare, Trash2, AlertTriangle, RefreshCw, Home, Loader2 } from 'lucide-react';
 import { Streamdown } from 'streamdown';
 import { trpc } from '@/lib/trpc';
 import { toast } from 'sonner';
 import { useAuth } from '@/_core/hooks/useAuth';
 import { getLoginUrl } from '@/const';
+import { motion, AnimatePresence, Transition } from 'framer-motion';
+import AnimatedAIOrb from './AnimatedAIOrb';
 
 export type Message = {
   role: 'user' | 'assistant';
@@ -32,14 +33,15 @@ function getSessionId(): string {
   return id;
 }
 
-// ─── Bysis brand colors ──────────────────────────────────────────────────────
-const BYSIS_DOTS = ['#E53E3E', '#F6A623', '#1A1A1A']; // red, orange, black
-
-// ─── Typing indicator with Bysis multicolor dots ─────────────────────────────
+// ─── Neon Typing Indicator ──────────────────────────────────────────────────────
 function TypingDots() {
   return (
     <div className="flex gap-1.5 py-1 px-1">
-      {BYSIS_DOTS.map((color, i) => (
+      {[
+        'rgba(236, 72, 153, 1)',   // pink
+        'rgba(168, 85, 247, 1)',   // purple
+        'rgba(59, 130, 246, 1)',   // blue
+      ].map((color, i) => (
         <motion.div
           key={i}
           className="w-2.5 h-2.5 rounded-full"
@@ -77,7 +79,7 @@ function PriceActionButtons({
       <motion.button
         whileTap={{ scale: 0.97 }}
         onClick={onOrder}
-        className="w-full py-3 bg-black text-white rounded-2xl text-[14px] font-semibold tracking-tight flex items-center justify-center gap-2"
+        className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-2xl text-[14px] font-semibold tracking-tight flex items-center justify-center gap-2 shadow-lg shadow-pink-500/40"
         style={{ fontFamily: "'Inter', 'SF Pro Display', sans-serif" }}
       >
         🛒 عدي كومند
@@ -86,7 +88,7 @@ function PriceActionButtons({
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={onRecalculate}
-          className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-black rounded-2xl text-[13px] font-medium flex items-center justify-center gap-1.5 transition-colors"
+          className="flex-1 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-200 rounded-2xl text-[13px] font-medium flex items-center justify-center gap-1.5 transition-colors border border-purple-500/30"
         >
           <RefreshCw size={14} />
           عاود احسبلي
@@ -94,7 +96,7 @@ function PriceActionButtons({
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={onHome}
-          className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-black rounded-2xl text-[13px] font-medium flex items-center justify-center gap-1.5 transition-colors"
+          className="flex-1 py-2.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 rounded-2xl text-[13px] font-medium flex items-center justify-center gap-1.5 transition-colors border border-blue-500/30"
         >
           <Home size={14} />
           القائمة الرئيسية
@@ -110,18 +112,18 @@ function LoginGateCard({ onLogin }: { onLogin: () => void }) {
     <motion.div
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-4 border border-gray-200 mt-2"
+      className="bg-gradient-to-br from-purple-500/20 to-pink-500/10 rounded-2xl p-4 border border-purple-500/30 mt-2 backdrop-blur-md"
     >
-      <p className="text-[14px] font-semibold text-black mb-1" style={{ fontFamily: "'Inter', 'SF Pro Display', sans-serif" }}>
+      <p className="text-[14px] font-semibold text-purple-200 mb-1" style={{ fontFamily: "'Inter', 'SF Pro Display', sans-serif" }}>
         🔐 تسجيل الدخول مطلوب
       </p>
-      <p className="text-[12px] text-gray-500 mb-3 leading-relaxed">
+      <p className="text-[12px] text-purple-300/70 mb-3 leading-relaxed">
         باش تعدي كومند، لازم تسجل دخولك أولاً
       </p>
       <motion.button
         whileTap={{ scale: 0.97 }}
         onClick={onLogin}
-        className="w-full py-2.5 bg-black text-white rounded-xl text-[13px] font-semibold"
+        className="w-full py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl text-[13px] font-semibold shadow-lg shadow-purple-500/30"
       >
         سجل دخولك الآن
       </motion.button>
@@ -138,9 +140,9 @@ const SUGGESTED_QUESTIONS = [
   { label: 'شنوة bysis؟', text: 'شنوة bysis وكيفاش تخدم؟', emoji: 'ℹ️' },
 ];
 
-// Spring animation — same feel as Amazon Rufus
-const springIn: Transition = { type: 'spring', stiffness: 380, damping: 38, mass: 0.8 };
-const springOut: Transition = { type: 'spring', stiffness: 400, damping: 40, mass: 0.6 };
+// Spring animation
+const springIn: Transition = { type: 'spring', stiffness: 380, damping: 38, mass: 0.8 } as any;
+const springOut: Transition = { type: 'spring', stiffness: 400, damping: 40, mass: 0.6 } as any;
 const SLIDE_VARIANTS = {
   hidden: { y: '100%', opacity: 0 },
   visible: { y: 0, opacity: 1, transition: springIn },
@@ -214,7 +216,6 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
       setImagePreview(null);
       setPendingFile(null);
 
-      // Handle requireLogin from server
       if ((response as any).requireLogin) {
         setShowLoginGate(true);
       }
@@ -312,7 +313,6 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
     if (!content.trim() && !audioBase64 && !imageBase64Param && !imageBase64 && !fileBase64Param && !pendingFile) return;
     if (isLoading) return;
 
-    // Order intent check — require login
     const orderKeywords = ['نحب نعدي كومند', 'عدي كومند', 'commande', 'order'];
     const isOrderIntent = orderKeywords.some(k => content.toLowerCase().includes(k.toLowerCase()));
     if (isOrderIntent && !isAuthenticated) {
@@ -334,7 +334,6 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
     setIsLoading(true);
     setShowLoginGate(false);
 
-    // Add typing indicator
     setMessages((prev) => [...prev, { role: 'assistant', content: '', isTyping: true }]);
 
     const msgArray = [...messages, userMessage];
@@ -385,62 +384,62 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed inset-0 z-[9998] bg-black/30"
+            className="fixed inset-0 z-[9998] bg-black/50 backdrop-blur-sm"
             onClick={onClose}
           />
 
-          {/* Chat Panel — slides up from bottom, leaves bottom nav visible */}
+          {/* Chat Panel — Dark Futuristic Theme */}
           <motion.div
             key="chat-panel"
             variants={SLIDE_VARIANTS}
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed left-0 right-0 z-[9998] bg-white flex flex-col"
+            className="fixed left-0 right-0 z-[9998] flex flex-col bg-gradient-to-br from-[#1a0f2e] via-[#2d1b3d] to-[#0f0a1a]"
             style={{
               bottom: 'calc(env(safe-area-inset-bottom, 0px) + 64px)',
               height: 'calc(100dvh - 64px - env(safe-area-inset-bottom, 0px) - 64px)',
               borderTopLeftRadius: '24px',
               borderTopRightRadius: '24px',
-              boxShadow: '0 -8px 40px rgba(0,0,0,0.18)',
+              boxShadow: '0 -8px 40px rgba(168, 85, 247, 0.3)',
               fontFamily: "'Inter', 'SF Pro Display', -apple-system, sans-serif",
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(20px)',
             }}
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-              <div className="w-10 h-1 bg-gray-200 rounded-full" />
+              <div className="w-10 h-1 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-full" />
             </div>
 
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 flex-shrink-0">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 flex-shrink-0 bg-gradient-to-r from-purple-900/20 to-pink-900/20 backdrop-blur-md">
               <motion.button
                 whileTap={{ scale: 0.88 }}
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                className="p-2 hover:bg-white/10 rounded-xl transition-colors"
               >
-                <X size={20} className="text-black" />
+                <X size={20} className="text-white/70 hover:text-white" strokeWidth={1.5} />
               </motion.button>
 
               <div className="flex flex-col items-center">
-                <div className="flex items-center gap-1.5">
-                  {/* Bysis multicolor dots logo */}
-                  <div className="flex gap-0.5">
-                    {BYSIS_DOTS.map((color, i) => (
-                      <div key={i} className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
-                    ))}
+                <div className="flex items-center gap-2">
+                  <AnimatedAIOrb isThinking={false} isListening={false} size="sm" />
+                  <div>
+                    <h3 className="text-lg font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                      Bysis AI
+                    </h3>
+                    <p className="text-xs text-purple-300/60">Assistant Intelligent</p>
                   </div>
-                  <span className="text-[15px] font-bold text-black tracking-tight">Bysis</span>
-                  <span className="text-[15px] font-light text-gray-400">ai</span>
                 </div>
-                <span className="text-[10px] text-gray-400 tracking-widest uppercase -mt-0.5">beta</span>
               </div>
 
               <motion.button
                 whileTap={{ scale: 0.88 }}
                 onClick={() => setView(view === 'settings' ? 'chat' : 'settings')}
-                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                className="p-2 hover:bg-white/10 rounded-xl transition-colors"
               >
-                <MoreHorizontal size={20} className="text-black" />
+                <MoreHorizontal size={20} className="text-white/70 hover:text-white" strokeWidth={1.5} />
               </motion.button>
             </div>
 
@@ -454,45 +453,45 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                 transition={{ duration: 0.22 }}
                 className="flex-1 overflow-y-auto"
               >
-                <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100">
+                <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
                   <motion.button
                     whileTap={{ scale: 0.88 }}
                     onClick={() => setView('chat')}
-                    className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors"
+                    className="p-1.5 hover:bg-white/10 rounded-xl transition-colors"
                   >
-                    <ChevronLeft size={20} className="text-black" />
+                    <ChevronLeft size={20} className="text-white/70" strokeWidth={1.5} />
                   </motion.button>
-                  <span className="text-[15px] font-semibold text-black">الإعدادات</span>
+                  <span className="text-[15px] font-semibold text-white">الإعدادات</span>
                 </div>
 
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-white/10">
                   <motion.button
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setView('manage-history')}
-                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
+                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/5 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <MessageSquare size={18} className="text-black" />
-                      <span className="text-[14px] text-black">إدارة المحادثات</span>
+                      <MessageSquare size={18} className="text-purple-400" strokeWidth={1.5} />
+                      <span className="text-[14px] text-white">إدارة المحادثات</span>
                     </div>
-                    <ChevronRight size={18} className="text-gray-400" />
+                    <ChevronRight size={18} className="text-white/30" strokeWidth={1.5} />
                   </motion.button>
 
                   <motion.button
                     whileTap={{ scale: 0.98 }}
                     onClick={() => { setView('chat'); setMessages([]); }}
-                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-gray-50 transition-colors"
+                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/5 transition-colors"
                   >
                     <div className="flex items-center gap-3">
-                      <Home size={18} className="text-black" />
-                      <span className="text-[14px] text-black">محادثة جديدة</span>
+                      <Home size={18} className="text-pink-400" strokeWidth={1.5} />
+                      <span className="text-[14px] text-white">محادثة جديدة</span>
                     </div>
-                    <ChevronRight size={18} className="text-gray-400" />
+                    <ChevronRight size={18} className="text-white/30" strokeWidth={1.5} />
                   </motion.button>
                 </div>
 
                 <div className="px-5 py-6">
-                  <p className="text-xs text-gray-400 text-center leading-relaxed">
+                  <p className="text-xs text-white/40 text-center leading-relaxed">
                     Bysis AI قد يرتكب أخطاء. تحقق من المعلومات المهمة.
                   </p>
                 </div>
@@ -509,29 +508,29 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                 transition={{ duration: 0.22 }}
                 className="flex-1 flex flex-col overflow-hidden"
               >
-                <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 flex-shrink-0">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 flex-shrink-0">
                   <motion.button
                     whileTap={{ scale: 0.88 }}
                     onClick={() => setView('settings')}
-                    className="p-1.5 hover:bg-gray-100 rounded-xl transition-colors"
+                    className="p-1.5 hover:bg-white/10 rounded-xl transition-colors"
                   >
-                    <ChevronLeft size={20} className="text-black" />
+                    <ChevronLeft size={20} className="text-white/70" strokeWidth={1.5} />
                   </motion.button>
-                  <span className="text-[15px] font-semibold text-black">سجل المحادثات</span>
+                  <span className="text-[15px] font-semibold text-white">سجل المحادثات</span>
                   <motion.button
                     whileTap={{ scale: 0.88 }}
                     onClick={() => setConfirmClear(true)}
-                    className="p-1.5 hover:bg-red-50 rounded-xl transition-colors"
+                    className="p-1.5 hover:bg-red-500/20 rounded-xl transition-colors"
                   >
-                    <Trash2 size={18} className="text-red-500" />
+                    <Trash2 size={18} className="text-red-400" strokeWidth={1.5} />
                   </motion.button>
                 </div>
 
                 {confirmClear && (
-                  <div className="mx-4 my-3 p-4 bg-red-50 rounded-2xl border border-red-100 flex-shrink-0">
+                  <div className="mx-4 my-3 p-4 bg-red-500/20 rounded-2xl border border-red-500/30 flex-shrink-0 backdrop-blur-sm">
                     <div className="flex items-center gap-2 mb-3">
-                      <AlertTriangle size={16} className="text-red-500" />
-                      <span className="text-[13px] font-semibold text-red-700">مسح كل المحادثات؟</span>
+                      <AlertTriangle size={16} className="text-red-400" />
+                      <span className="text-[13px] font-semibold text-red-300">مسح كل المحادثات؟</span>
                     </div>
                     <div className="flex gap-2">
                       <motion.button
@@ -545,7 +544,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                       <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={() => setConfirmClear(false)}
-                        className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-black text-[13px] font-medium rounded-xl transition-colors"
+                        className="flex-1 py-2 bg-white/10 hover:bg-white/20 text-white text-[13px] font-medium rounded-xl transition-colors border border-white/20"
                       >
                         إلغاء
                       </motion.button>
@@ -559,25 +558,25 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                       <TypingDots />
                     </div>
                   ) : historyQuery.data && historyQuery.data.messages.length > 0 ? (
-                    <div className="divide-y divide-gray-50">
+                    <div className="divide-y divide-white/10">
                       {historyQuery.data.messages.map((msg, i) => (
                         <div key={i} className="px-4 py-3">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className={`text-[11px] font-semibold ${msg.role === 'user' ? 'text-black' : 'text-gray-500'}`}>
+                            <span className={`text-[11px] font-semibold ${msg.role === 'user' ? 'text-purple-300' : 'text-pink-300'}`}>
                               {msg.role === 'user' ? 'أنت' : 'Bysis AI'}
                             </span>
-                            <span className="text-[10px] text-gray-300">
+                            <span className="text-[10px] text-white/30">
                               {new Date(msg.createdAt).toLocaleTimeString('ar-TN', { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
-                          <p className="text-[12px] text-gray-600 line-clamp-2 leading-relaxed">{msg.content}</p>
+                          <p className="text-[12px] text-white/60 line-clamp-2 leading-relaxed">{msg.content}</p>
                         </div>
                       ))}
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-12 px-6">
-                      <MessageSquare size={32} className="text-gray-200 mb-3" />
-                      <p className="text-[13px] text-gray-400 text-center">لا يوجد سجل محادثات</p>
+                      <MessageSquare size={32} className="text-white/20 mb-3" />
+                      <p className="text-[13px] text-white/40 text-center">لا يوجد سجل محادثات</p>
                     </div>
                   )}
                 </div>
@@ -594,15 +593,12 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                     transition={{ delay: 0.1, duration: 0.3 }}
                     className="flex flex-col gap-5 pt-2"
                   >
-                    <p
-                      className="text-[17px] font-bold text-black leading-snug"
-                      style={{ fontFamily: "'Inter', 'SF Pro Display', -apple-system, sans-serif" }}
-                    >
+                    <p className="text-[17px] font-bold text-white leading-snug">
                       في أي مجال تحتاج مساعدة اليوم؟
                     </p>
 
                     <div className="space-y-3">
-                      <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest">
+                      <p className="text-[11px] font-semibold text-purple-300/60 uppercase tracking-widest">
                         استكشف الخيارات
                       </p>
                       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
@@ -611,15 +607,14 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                             key={i}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleSendMessage(q.text)}
-                            className="flex-shrink-0 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-full text-[13px] text-gray-800 font-medium transition-colors"
-                            style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}
+                            className="flex-shrink-0 px-4 py-2.5 bg-gradient-to-r from-purple-500/20 to-pink-500/10 hover:from-purple-500/30 hover:to-pink-500/20 rounded-full text-[13px] text-purple-200 font-medium transition-colors border border-purple-500/30"
                           >
                             {q.emoji} {q.label}
                           </motion.button>
                         ))}
                       </div>
 
-                      <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-widest">
+                      <p className="text-[11px] font-semibold text-pink-300/60 uppercase tracking-widest">
                         طلبات شائعة
                       </p>
                       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
@@ -628,8 +623,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                             key={i}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => handleSendMessage(q.text)}
-                            className="flex-shrink-0 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-full text-[13px] text-gray-800 font-medium transition-colors"
-                            style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}
+                            className="flex-shrink-0 px-4 py-2.5 bg-gradient-to-r from-pink-500/20 to-blue-500/10 hover:from-pink-500/30 hover:to-blue-500/20 rounded-full text-[13px] text-pink-200 font-medium transition-colors border border-pink-500/30"
                           >
                             {q.emoji} {q.label}
                           </motion.button>
@@ -647,10 +641,10 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                       className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[82%] px-4 py-3 rounded-2xl text-[14px] leading-relaxed ${
+                        className={`max-w-[82%] px-4 py-3 rounded-2xl text-[14px] leading-relaxed backdrop-blur-md border ${
                           msg.role === 'user'
-                            ? 'bg-black text-white rounded-br-sm'
-                            : 'bg-gray-100 text-black rounded-bl-sm'
+                            ? 'bg-gradient-to-br from-pink-500/90 to-purple-500/90 text-white rounded-br-sm border-white/20 shadow-lg shadow-pink-500/40'
+                            : 'bg-gradient-to-br from-white/15 to-white/5 text-white rounded-bl-sm border-white/20 shadow-lg shadow-purple-500/20'
                         }`}
                         style={{ fontFamily: "'Inter', 'SF Pro Text', -apple-system, sans-serif" }}
                       >
@@ -662,7 +656,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                               <img
                                 src={msg.imageUrl}
                                 alt="uploaded"
-                                className="w-full rounded-xl mb-2 max-h-48 object-cover"
+                                className="w-full rounded-xl mb-2 max-h-48 object-cover border border-white/20"
                                 loading="lazy"
                                 decoding="async"
                               />
@@ -701,12 +695,12 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
 
             {/* Image Preview */}
             {view === 'chat' && imagePreview && (
-              <div className="px-4 py-2 border-t border-gray-100 flex-shrink-0">
+              <div className="px-4 py-2 border-t border-white/10 flex-shrink-0">
                 <div className="relative inline-block">
-                  <img src={imagePreview} alt="preview" className="w-16 h-16 rounded-xl object-cover" />
+                  <img src={imagePreview} alt="preview" className="w-16 h-16 rounded-xl object-cover border border-white/20" />
                   <button
                     onClick={() => { setImagePreview(null); setImageBase64(null); }}
-                    className="absolute -top-1.5 -right-1.5 bg-black text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold"
+                    className="absolute -top-1.5 -right-1.5 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold"
                   >
                     ×
                   </button>
@@ -716,33 +710,33 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
 
             {/* File Preview */}
             {view === 'chat' && pendingFile && (
-              <div className="px-4 py-2 border-t border-gray-100 flex-shrink-0">
-                <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-xl">
-                  <File size={14} className="text-gray-600" />
-                  <span className="text-xs text-gray-700 flex-1 truncate">{pendingFile.name}</span>
-                  <button onClick={() => setPendingFile(null)} className="text-gray-400 hover:text-black text-lg leading-none">×</button>
+              <div className="px-4 py-2 border-t border-white/10 flex-shrink-0">
+                <div className="flex items-center gap-2 bg-purple-500/20 px-3 py-2 rounded-xl border border-purple-500/30 backdrop-blur-sm">
+                  <File size={14} className="text-purple-300" strokeWidth={1.5} />
+                  <span className="text-xs text-purple-200 flex-1 truncate">{pendingFile.name}</span>
+                  <button onClick={() => setPendingFile(null)} className="text-purple-300 hover:text-white text-lg leading-none">×</button>
                 </div>
               </div>
             )}
 
             {/* ─── Input Area ──────────────────────────────────────────────── */}
             {view === 'chat' && (
-              <div className="px-4 py-3 border-t border-gray-100 bg-white flex-shrink-0">
-                <div className="flex items-center gap-2 bg-gray-100 rounded-2xl px-3 py-2.5">
+              <div className="px-4 py-3 border-t border-white/10 bg-gradient-to-t from-purple-900/20 to-transparent flex-shrink-0 backdrop-blur-md">
+                <div className="flex items-center gap-2 bg-white/10 rounded-2xl px-3 py-2.5 border border-white/20 backdrop-blur-sm">
                   <motion.button
                     whileTap={{ scale: 0.88 }}
                     onClick={() => imageInputRef.current?.click()}
-                    className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0"
+                    className="p-1.5 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0"
                   >
-                    <Upload size={18} className="text-gray-500" />
+                    <Upload size={18} className="text-purple-300" strokeWidth={1.5} />
                   </motion.button>
 
                   <motion.button
                     whileTap={{ scale: 0.88 }}
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0"
+                    className="p-1.5 hover:bg-white/10 rounded-lg transition-colors flex-shrink-0"
                   >
-                    <File size={18} className="text-gray-500" />
+                    <File size={18} className="text-purple-300" strokeWidth={1.5} />
                   </motion.button>
 
                   <input
@@ -757,43 +751,61 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                       }
                     }}
                     placeholder="اسأل Bysis AI..."
-                    className="flex-1 bg-transparent text-[14px] text-black placeholder-gray-400 outline-none"
-                    style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}
                     disabled={isLoading}
+                    className="flex-1 bg-transparent text-white placeholder:text-white/40 outline-none text-[14px]"
+                    style={{ fontFamily: "'Inter', -apple-system, sans-serif" }}
                   />
 
-                  {input.trim() || imageBase64 || pendingFile ? (
-                    <motion.button
-                      whileTap={{ scale: 0.88 }}
-                      onClick={() => handleSendMessage(input)}
-                      disabled={isLoading}
-                      className="p-1.5 bg-black rounded-xl transition-colors disabled:opacity-50 flex-shrink-0"
-                    >
-                      <Send size={17} className="text-white" />
-                    </motion.button>
-                  ) : (
-                    <motion.button
-                      whileTap={{ scale: 0.88 }}
-                      onClick={isRecording ? stopRecording : startRecording}
-                      className={`p-1.5 rounded-xl transition-colors flex-shrink-0 ${isRecording ? 'bg-red-100' : 'hover:bg-gray-200'}`}
-                    >
-                      {isRecording ? (
-                        <div className="flex items-center gap-1">
-                          <StopCircle size={17} className="text-red-600" />
-                          <span className="text-xs text-red-600 font-mono">{recordingSeconds}s</span>
-                        </div>
-                      ) : (
-                        <Mic size={17} className="text-gray-500" />
-                      )}
-                    </motion.button>
-                  )}
+                  <motion.button
+                    whileTap={{ scale: 0.88 }}
+                    onClick={isRecording ? stopRecording : startRecording}
+                    className={`p-1.5 rounded-lg transition-colors flex-shrink-0 ${
+                      isRecording
+                        ? 'bg-red-500/30 text-red-300 hover:bg-red-500/40'
+                        : 'hover:bg-white/10 text-purple-300'
+                    }`}
+                  >
+                    {isRecording ? (
+                      <StopCircle size={18} strokeWidth={1.5} />
+                    ) : (
+                      <Mic size={18} strokeWidth={1.5} />
+                    )}
+                  </motion.button>
+
+                  <motion.button
+                    whileTap={{ scale: 0.88 }}
+                    onClick={() => handleSendMessage(input)}
+                    disabled={isLoading || !input.trim()}
+                    className={`p-1.5 rounded-lg transition-all flex-shrink-0 ${
+                      isLoading || !input.trim()
+                        ? 'bg-purple-500/10 text-purple-500/50 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg hover:shadow-purple-500/50 active:scale-95'
+                    }`}
+                  >
+                    {isLoading ? (
+                      <Loader2 size={18} className="animate-spin" strokeWidth={1.5} />
+                    ) : (
+                      <Send size={18} strokeWidth={1.5} />
+                    )}
+                  </motion.button>
                 </div>
               </div>
             )}
 
             {/* Hidden file inputs */}
-            <input ref={imageInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />
-            <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelect} />
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="hidden"
+            />
+            <input
+              ref={fileInputRef}
+              type="file"
+              onChange={handleFileSelect}
+              className="hidden"
+            />
           </motion.div>
         </>
       )}
