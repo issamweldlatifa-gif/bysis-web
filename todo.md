@@ -73,7 +73,7 @@
 - [x] Mobile responsiveness testing (responsive design implemented)
 
 ## Phase 10: Deployment & Finalization
-- [x] Create production checkpoint (manus-webdev://2f83280a)
+- [x] Create production checkpoint (manus-webdev://af316bec)
 - [ ] Deploy to Manus WebDev (click Publish button in UI)
 - [x] Verify all features in dev environment
 - [x] Setup custom domain (bysis.shop)
@@ -381,29 +381,29 @@
 - [x] 22/22 tests Vitest passent
 
 ## 🤖 AI Chat — Refonte Complète (Juin 2026)
-- [ ] DB: table ai_orders (id, userId, trackingCode, productName, productUrl, productImageUrl, totalPrice, depositAmount, status, customerName, customerLastName, gouvernorat, moatamadia, phone, paymentProofUrl, adminNotes, createdAt, updatedAt)
-- [ ] Backend: procedure ai.createOrder + sendEmail client + notifier admin CRM
-- [ ] Backend: procedure ai.trackOrder (par trackingCode ou nom)
-- [ ] Backend: procedure ai.confirmOrder / rejectOrder (admin + email client)
-- [ ] Backend: procedure ai.uploadPaymentProof
-- [ ] AI System Prompt: format prix fixe (💰 prix, 📦 produit, ✅ inclus, 💳 paiement, ⚠️ note, infos commande)
-- [ ] AI System Prompt: 3 boutons après calcul (عدّل كومند / عاود احسبلي / القائمة الرئيسية)
-- [ ] AI System Prompt: flow commande (collecte infos → login gate → création CRM + trackingCode)
-- [ ] AI System Prompt: premier message = demande nom ou numéro de suivi
-- [ ] AI System Prompt: ne pas révéler méthode de calcul ni commission
-- [ ] UI: dots d'attente multicolores (rouge #E8192C / orange #FF6B00 / noir #0A0A0A)
-- [ ] UI: bottom sheet animation (slide up/down depuis le bas)
-- [ ] UI: bottom nav reste visible sous le chat
-- [ ] UI: fermeture chat au 2ème clic sur bouton AI
-- [ ] UI: typographie élégante (Inter, taille lisible, espacement généreux)
-- [ ] UI: boutons d'action après calcul prix
-- [ ] UI: login gate avant confirmation commande (redirect → retour AI)
-- [ ] CRM: AI orders apparaissent dans ShipMaster avec section dédiée
-- [ ] CRM: admin peut confirmer/rejeter + envoyer email depuis CRM
-- [ ] Email: confirmation commande → client (sur email Manus/Google enregistré)
-- [ ] Email: changement statut → client
-- [ ] Paiement: UIB RIB 12067000013314111448 (Nermin mejrissi) + Mandat La Poste (Nermine mejressi, Monastir)
-- [ ] Dépôt: 50% du total de la commande
+- [x] DB: table ai_orders (id, userId, trackingCode, productName, productUrl, productImageUrl, totalPrice, depositAmount, status, customerName, customerLastName, gouvernorat, moatamadia, phone, paymentProofUrl, adminNotes, createdAt, updatedAt)
+- [x] Backend: procedure ai.createOrder + sendEmail client + notifier admin CRM
+- [x] Backend: procedure ai.trackOrder (par trackingCode ou nom)
+- [x] Backend: procedure ai.confirmOrder / rejectOrder (admin + email client)
+- [x] Backend: procedure ai.uploadPaymentProof
+- [x] AI System Prompt: format prix fixe (💰 prix, 📋 produit, ✅ inclus, 💳 paiement, ⚠️ note, infos commande)
+- [x] AI System Prompt: 3 boutons après calcul (عدي كومند / عاود احسبلي / القائمة الرئيسية)
+- [x] AI System Prompt: flow commande (collecte infos → login gate → création CRM + trackingCode)
+- [x] AI System Prompt: premier message = demande nom ou numéro de suivi
+- [x] AI System Prompt: ne pas révéler méthode de calcul ni commission
+- [x] UI: dots d'attente multicolores (rouge #E8192C / orange #FF6B00 / noir #0A0A0A)
+- [x] UI: bottom sheet animation (slide up/down depuis le bas)
+- [x] UI: bottom nav reste visible sous le chat
+- [x] UI: fermeture chat au 2ème clic sur bouton AI
+- [x] UI: typographie élégante (Inter, taille lisible, espacement généreux)
+- [x] UI: boutons d'action après calcul prix
+- [x] UI: login gate avant confirmation commande (redirect → retour AI)
+- [x] CRM: AI orders apparaissent dans ShipMaster avec section dédiée
+- [x] CRM: admin peut confirmer/rejeter + envoyer email depuis CRM
+- [x] Email: confirmation commande → client (sur email Manus/Google enregistré)
+- [x] Email: changement statut → client
+- [x] Paiement: UIB RIB 12067000013314111448 (Nermin mejrissi) + Mandat La Poste (Nermine mejressi, Monastir)
+- [x] Dépôt: 50% du total de la commande
 
 ## 🤖 AI Chat Orders — Admin Integration (Juin 2026)
 - [x] Fix TypeScript errors in AdminAiOrders.tsx (trpc.aiOrders.reject, .confirm, .updateStatus)
@@ -446,25 +446,25 @@
 - [x] Boutons globaux: pill shape, noir/blanc, Bold text
 
 ## 🔥 Refonte Nike Radicale — Toutes les pages (Juin 2026)
-- [ ] Ajouter Barlow Condensed Black (700/900) dans client/index.html
-- [ ] Mettre à jour index.css : classe .font-display + variables boutons globales
-- [ ] AppLayout.tsx : strokeWidth 1.2 → 1.5 sur toutes les icônes
-- [ ] Home.tsx : Barlow Condensed pour Hero, boutons épais, labels FR
-- [ ] Calculator.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] OrderForm.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] Arrivage.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] Cart/Panier : boutons épais, strokeWidth 1.5, labels FR
-- [ ] History.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] OrderConfirmation.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] Search.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] Scanner.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] ProfileSheet.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] Catalogue.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] TrackOrder.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] AdminAiOrders.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] ShipMasterDashboard.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] AIChat.tsx : boutons épais, strokeWidth 1.5, labels FR
-- [ ] server/routers.ts : system prompt multilingue (AR/FR/EN/dialecte tunisien)
+- [x] Ajouter Barlow Condensed Black (700/900) dans client/index.html
+- [x] Mettre à jour index.css : classe .font-display + variables boutons globales
+- [x] AppLayout.tsx : strokeWidth 1.2 → 1.5 sur toutes les icônes
+- [x] Home.tsx : Barlow Condensed pour Hero, boutons épais, labels FR
+- [x] Calculator.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] OrderForm.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] Arrivage.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] Cart/Panier : boutons épais, strokeWidth 1.5, labels FR
+- [x] History.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] OrderConfirmation.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] Search.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] Scanner.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] ProfileSheet.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] Catalogue.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] TrackOrder.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] AdminAiOrders.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] ShipMasterDashboard.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] AIChat.tsx : boutons épais, strokeWidth 1.5, labels FR
+- [x] server/routers.ts : system prompt multilingue (AR/FR/EN/dialecte tunisien)
 
 
 ## Redesign AIChatBox — Premium AI Assistant (Futuristic)
