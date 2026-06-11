@@ -1,10 +1,12 @@
-/**
- * AppLayout — Main app shell
- * All icons: clean Outline / Line-Art style, stroke 1.8px, Lucide-compatible
+/*
+ * AppLayout — Main app shell with new Bottom Nav design
+ * Bottom Nav: Lens | Suivi•• | Commander•• | AI
+ * Colors: Black #121212, White #F2F2F7, Gold #D4AF37
  */
 import { useState, useRef, useCallback, useEffect, ReactNode } from 'react';
 import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Package, ShoppingBag } from 'lucide-react';
 import AuthGateModal from '@/components/AuthGateModal';
 import ProfileSheet from '@/components/ProfileSheet';
 import { useCart } from '@/contexts/CartContext';
@@ -18,292 +20,128 @@ interface AppLayoutProps {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   ICON SYSTEM — all outline, stroke="currentColor", strokeWidth="1.8"
-   Active color: #111111 (near-black)   Inactive color: #9CA3AF (gray-400)
+   BOTTOM NAV ICONS — New design with specific colors
 ───────────────────────────────────────────────────────────────────────────── */
 
-const STROKE = '1.5';
-const STROKE_ACTIVE = '1.8';
-const ACTIVE_COLOR   = '#0A0A0A';
-const INACTIVE_COLOR = '#AAAAAA';
-
-/* Home */
-function IcoHome({ active }: { active: boolean }) {
-  const c = active ? ACTIVE_COLOR : INACTIVE_COLOR;
-  const sw = active ? STROKE_ACTIVE : STROKE;
+/* Lens Icon */
+function IcoLens() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"/>
-      <path d="M9 21V12h6v9"/>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="10" cy="10" r="6" stroke="white" strokeWidth="2"/>
+      <path d="M14 14L20 20" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M10 7V13M7 10H13" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
     </svg>
   );
 }
 
-/* Grid / Boutiques */
-function IcoGrid({ active }: { active: boolean }) {
-  const c = active ? ACTIVE_COLOR : INACTIVE_COLOR;
-  const sw = active ? STROKE_ACTIVE : STROKE;
+/* AI Dots Icon */
+function IcoAIDots() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="7" height="7" rx="1"/>
-      <rect x="14" y="3" width="7" height="7" rx="1"/>
-      <rect x="3" y="14" width="7" height="7" rx="1"/>
-      <rect x="14" y="14" width="7" height="7" rx="1"/>
-    </svg>
-  );
-}
-
-/* Shopping Bag / Panier */
-function IcoBag({ active, badge }: { active: boolean; badge?: number }) {
-  const c = active ? ACTIVE_COLOR : INACTIVE_COLOR;
-  const sw = active ? STROKE_ACTIVE : STROKE;
-  return (
-    <div className="relative">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-        <line x1="3" y1="6" x2="21" y2="6"/>
-        <path d="M16 10a4 4 0 01-8 0"/>
-      </svg>
-      {badge !== undefined && badge > 0 && (
-        <span
-          className="absolute -top-1.5 -right-1.5 flex items-center justify-center rounded-full text-white"
-          style={{ background: '#0A0A0A', fontSize: 9, fontWeight: 700, minWidth: 15, height: 15, padding: '0 3px', lineHeight: 1, fontFamily: 'Poppins, sans-serif' }}
-        >
-          {badge > 9 ? '9+' : badge}
-        </span>
-      )}
-    </div>
-  );
-}
-
-/* User / Moi */
-function IcoUser({ active }: { active: boolean }) {
-  const c = active ? ACTIVE_COLOR : INACTIVE_COLOR;
-  const sw = active ? STROKE_ACTIVE : STROKE;
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="8" r="4"/>
-      <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7"/>
-    </svg>
-  );
-}
-
-/* Search */
-function IcoSearch() {
-  return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#AAAAAA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8"/>
-      <path d="M21 21l-4.35-4.35"/>
-    </svg>
-  );
-}
-
-/* Camera / Scanner */
-function IcoCamera() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
-      <circle cx="12" cy="13" r="4"/>
-    </svg>
-  );
-}
-
-/* Bysis AI dots (colored — brand identity, not a line icon) */
-function IcoAI({ size = 22 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <circle cx="6"  cy="12" r="3" fill="#FF3131"/>
-      <circle cx="12" cy="12" r="3" fill="#F5C518"/>
-      <circle cx="18" cy="12" r="3" fill="#006A2E"/>
+    <svg width="24" height="24" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="8" fill="white"/>
+      <circle cx="50" cy="25" r="5" fill="white" opacity="0.8"/>
+      <circle cx="64.1" cy="28.4" r="5" fill="white" opacity="0.8"/>
+      <circle cx="71.6" cy="42.1" r="5" fill="white" opacity="0.8"/>
+      <circle cx="64.1" cy="71.6" r="5" fill="white" opacity="0.8"/>
+      <circle cx="50" cy="75" r="5" fill="white" opacity="0.8"/>
+      <circle cx="35.9" cy="71.6" r="5" fill="white" opacity="0.8"/>
+      <circle cx="28.4" cy="57.9" r="5" fill="white" opacity="0.8"/>
+      <circle cx="35.9" cy="28.4" r="5" fill="white" opacity="0.8"/>
+      <circle cx="50" cy="15" r="3" fill="white" opacity="0.6"/>
+      <circle cx="70.7" cy="29.3" r="3" fill="white" opacity="0.6"/>
+      <circle cx="85" cy="50" r="3" fill="white" opacity="0.6"/>
+      <circle cx="70.7" cy="70.7" r="3" fill="white" opacity="0.6"/>
+      <circle cx="50" cy="85" r="3" fill="white" opacity="0.6"/>
+      <circle cx="29.3" cy="70.7" r="3" fill="white" opacity="0.6"/>
+      <circle cx="15" cy="50" r="3" fill="white" opacity="0.6"/>
+      <circle cx="29.3" cy="29.3" r="3" fill="white" opacity="0.6"/>
     </svg>
   );
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   TOP HEADER
-───────────────────────────────────────────────────────────────────────────── */
-interface TopHeaderProps {
-  chatVisible: boolean;
-  onChatClick: () => void;
-  headerBgColor?: string;
-}
-
-function TopHeader({ chatVisible, onChatClick, headerBgColor = '#FFFFFF' }: TopHeaderProps) {
-  const [, navigate] = useLocation();
-  const isColored = headerBgColor !== '#FFFFFF' && headerBgColor !== '#ffffff';
-
-  return (
-    <header
-      className="sticky top-0 z-40 w-full"
-      style={{
-        background: headerBgColor,
-        transition: 'background-color 0.5s ease',
-        borderBottom: isColored ? 'none' : '1px solid #F0F0F0',
-      }}
-    >
-      <div style={{ height: 'env(safe-area-inset-top, 0px)', background: 'inherit' }} />
-      <div className="w-full px-3 py-2.5 flex items-center gap-2">
-        {/* Search bar — ALWAYS white background, ALWAYS dark text/icon */}
-        <button
-          onClick={() => navigate('/search')}
-          className="flex-1 flex items-center gap-2 px-3.5 py-2 rounded-full"
-          style={{
-            minHeight: 42,
-            background: '#FFFFFF',
-            border: isColored ? 'none' : '1px solid #EBEBEB',
-            boxShadow: isColored ? '0 1px 6px rgba(0,0,0,0.14)' : '0 1px 3px rgba(0,0,0,0.05)',
-          }}
-        >
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-            stroke="#AAAAAA"
-            strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-          </svg>
-          <span
-            className="flex-1 text-left select-none"
-            style={{ color: '#BBBBBB', fontFamily: 'Poppins, sans-serif', fontWeight: 300, fontSize: 13 }}
-          >
-            Rechercher ou poser une question
-          </span>
-          <AnimatePresence mode="popLayout">
-            {chatVisible && (
-              <motion.span
-                key="ai-dots"
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.5, opacity: 0 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 32 }}
-                onClick={(e) => { e.stopPropagation(); onChatClick(); }}
-                className="shrink-0 flex items-center justify-center"
-              >
-                <IcoAI size={20} />
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
-
-        {/* Camera / Scanner button — ALWAYS white background, ALWAYS dark icon */}
-        <button
-          onClick={() => navigate('/scanner')}
-          className="shrink-0 flex items-center justify-center w-10 h-10 rounded-full"
-          style={{
-            background: '#FFFFFF',
-            border: isColored ? 'none' : '1px solid #EBEBEB',
-            boxShadow: isColored ? '0 1px 6px rgba(0,0,0,0.14)' : '0 1px 3px rgba(0,0,0,0.05)',
-          }}
-          aria-label="Scanner"
-        >
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
-            stroke="#0A0A0A"
-            strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
-            <circle cx="12" cy="13" r="4"/>
-          </svg>
-        </button>
-      </div>
-    </header>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   BOTTOM NAV — 5 tabs: Accueil | Boutiques | [AI FAB] | Panier | Moi
+   BOTTOM NAV — 4 buttons: Lens | Suivi•• | Commander•• | AI
 ───────────────────────────────────────────────────────────────────────────── */
 interface BottomNavProps {
-  onProfileClick: () => void;
-  onChatClick: () => void;
+  onLensClick: () => void;
+  onSuiviClick: () => void;
+  onCommanderClick: () => void;
+  onAIClick: () => void;
   visible: boolean;
 }
 
-const NAV_TABS = [
-  { id: 'home',     path: '/',         label: 'Accueil'   },
-  { id: 'boutique', path: '/catalogue', label: 'Catalogue' },
-  { id: 'chat',     path: null,        label: 'AI'        },
-  { id: 'panier',   path: '/panier',   label: 'Panier'    },
-  { id: 'moi',      path: null,        label: 'Moi'       },
-] as const;
-
-function BottomNav({ onProfileClick, onChatClick, visible }: BottomNavProps) {
-  const [location, navigate] = useLocation();
-  const { totalItems } = useCart();
-
-  const isActive = (path: string | null) => {
-    if (!path) return false;
-    if (path === '/') return location === '/';
-    return location.startsWith(path);
-  };
-
-  const handleTab = (tab: typeof NAV_TABS[number]) => {
-    if (tab.id === 'moi')  { onProfileClick(); return; }
-    if (tab.id === 'chat') { onChatClick();    return; }
-    if (tab.path) navigate(tab.path);
-  };
-
+function BottomNav({ onLensClick, onSuiviClick, onCommanderClick, onAIClick, visible }: BottomNavProps) {
   return (
     <motion.div
       className="fixed bottom-0 left-0 right-0 z-[9999] bg-white"
-      style={{ borderTop: '1px solid #F0F0F0' }}
+      style={{ borderTop: '1px solid #E5E5E5' }}
       animate={{ y: visible ? 0 : '100%' }}
       transition={{ type: 'spring', stiffness: 400, damping: 38, mass: 0.8 }}
     >
-      <div className="flex items-end justify-around px-1 pt-2 pb-1">
-        {NAV_TABS.map((tab) => {
-          const active = isActive(tab.path);
+      <div className="flex items-center justify-around px-4 py-3 gap-2">
+        {/* Lens Button */}
+        <motion.button
+          whileTap={{ scale: 0.92 }}
+          onClick={onLensClick}
+          className="flex items-center justify-center"
+          style={{
+            width: 48,
+            height: 48,
+            background: '#121212',
+            borderRadius: 14,
+          }}
+          aria-label="Lens"
+        >
+          <IcoLens />
+        </motion.button>
 
-          /* ── AI FAB (center) ── */
-          if (tab.id === 'chat') {
-            return (
-              <div key="chat" className="flex flex-col items-center justify-end flex-1 pb-0.5">
-                <motion.button
-                  whileTap={{ scale: 0.88 }}
-                  onClick={onChatClick}
-                  className="flex items-center justify-center"
-                  style={{
-                    width: 52,
-                    height: 52,
-                    background: '#0A0A0A',
-                    borderRadius: 999,
-                    boxShadow: '0 2px 12px rgba(0,0,0,0.18)',
-                    marginBottom: 2,
-                  }}
-                  aria-label="Bysis AI"
-                >
-                  <IcoAI size={22} />
-                </motion.button>
-                <span
-                  style={{ fontSize: 10, color: INACTIVE_COLOR, fontFamily: 'Poppins, sans-serif', fontWeight: 500 }}
-                >AI</span>
-              </div>
-            );
-          }
+        {/* Suivi•• Button */}
+        <motion.button
+          whileTap={{ scale: 0.92 }}
+          onClick={onSuiviClick}
+          className="flex items-center justify-center"
+          style={{
+            width: 48,
+            height: 48,
+            background: '#F2F2F7',
+            borderRadius: 14,
+          }}
+          aria-label="Suivi"
+        >
+          <Package size={24} color="#121212" strokeWidth={2} />
+        </motion.button>
 
-          return (
-            <motion.button
-              key={tab.id}
-              whileTap={{ scale: 0.88 }}
-              onClick={() => handleTab(tab)}
-              className="flex flex-col items-center justify-center flex-1 py-1.5 gap-1"
-              style={{ minHeight: 52 }}
-              aria-label={tab.label}
-            >
-              {tab.id === 'home'     && <IcoHome     active={active} />}
-              {tab.id === 'boutique' && <IcoGrid     active={active} />}
-              {tab.id === 'panier'   && <IcoBag      active={active} badge={totalItems} />}
-              {tab.id === 'moi'      && <IcoUser     active={active} />}
-              <span
-                style={{
-                  fontSize: 10,
-                  fontWeight: active ? 700 : 400,
-                  color: active ? ACTIVE_COLOR : INACTIVE_COLOR,
-                  fontFamily: 'Poppins, sans-serif',
-                  letterSpacing: active ? '-0.01em' : '0',
-                  lineHeight: 1,
-                }}
-              >
-                {tab.label}
-              </span>
-            </motion.button>
-          );
-        })}
+        {/* Commander•• Button (Gold) */}
+        <motion.button
+          whileTap={{ scale: 0.92 }}
+          onClick={onCommanderClick}
+          className="flex items-center justify-center"
+          style={{
+            width: 48,
+            height: 48,
+            background: '#D4AF37',
+            borderRadius: 14,
+          }}
+          aria-label="Commander"
+        >
+          <ShoppingBag size={24} color="#121212" strokeWidth={2} />
+        </motion.button>
+
+        {/* AI Button */}
+        <motion.button
+          whileTap={{ scale: 0.92 }}
+          onClick={onAIClick}
+          className="flex items-center justify-center"
+          style={{
+            width: 48,
+            height: 48,
+            background: '#121212',
+            borderRadius: 14,
+          }}
+          aria-label="AI"
+        >
+          <IcoAIDots />
+        </motion.button>
       </div>
       <div style={{ height: 'env(safe-area-inset-bottom, 0px)', background: '#FFFFFF' }} />
     </motion.div>
@@ -351,33 +189,35 @@ function AppLayoutInner({ children, showNav = true, onChatOpen }: AppLayoutProps
   }, [handleScroll]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white" style={{ fontFamily: '"Inter", -apple-system, sans-serif' }}>
-      <AuthGateModal open={authOpen} onClose={() => setAuthOpen(false)} action="order" />
-      <ProfileSheet open={profileOpen} onClose={() => setProfileOpen(false)} />
-
-      <TopHeader chatVisible={navVisible} onChatClick={handleChatOpen} headerBgColor={carouselColor} />
-
-      <main
+    <>
+      <div
         ref={mainRef}
-        className="flex-1 overflow-y-auto bg-white"
-        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 80px)' }}
+        className="w-full overflow-y-auto"
+        style={{
+          height: '100vh',
+          paddingBottom: showNav ? 'calc(75px + env(safe-area-inset-bottom, 0px))' : 0,
+        }}
       >
         {children}
-      </main>
+      </div>
 
       {showNav && (
         <BottomNav
-          onProfileClick={() => setProfileOpen(true)}
-          onChatClick={handleChatOpen}
-          visible={navVisible || isChatOpen}
+          visible={navVisible}
+          onLensClick={() => {}} // TODO: Implement lens/search
+          onSuiviClick={() => {}} // TODO: Implement tracking
+          onCommanderClick={() => {}} // TODO: Implement order
+          onAIClick={handleChatOpen}
         />
       )}
-    </div>
+
+      {/* ProfileSheet and AuthGateModal handled by context */}
+    </>
   );
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   PUBLIC EXPORT
+   OUTER LAYOUT (with BgColorProvider)
 ───────────────────────────────────────────────────────────────────────────── */
 export default function AppLayout(props: AppLayoutProps) {
   return (

@@ -1,0 +1,24 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Center circle -->
+  <circle cx="50" cy="50" r="8" fill="currentColor"/>
+  
+  <!-- Inner ring (12 dots) -->
+  <circle cx="50" cy="25" r="5" fill="currentColor" opacity="0.8"/>
+  <circle cx="64.1" cy="28.4" r="5" fill="currentColor" opacity="0.8"/>
+  <circle cx="71.6" cy="42.1" r="5" fill="currentColor" opacity="0.8"/>
+  <circle cx="64.1" cy="71.6" r="5" fill="currentColor" opacity="0.8"/>
+  <circle cx="50" cy="75" r="5" fill="currentColor" opacity="0.8"/>
+  <circle cx="35.9" cy="71.6" r="5" fill="currentColor" opacity="0.8"/>
+  <circle cx="28.4" cy="57.9" r="5" fill="currentColor" opacity="0.8"/>
+  <circle cx="35.9" cy="28.4" r="5" fill="currentColor" opacity="0.8"/>
+  
+  <!-- Outer ring (8 dots) -->
+  <circle cx="50" cy="15" r="3" fill="currentColor" opacity="0.6"/>
+  <circle cx="70.7" cy="29.3" r="3" fill="currentColor" opacity="0.6"/>
+  <circle cx="85" cy="50" r="3" fill="currentColor" opacity="0.6"/>
+  <circle cx="70.7" cy="70.7" r="3" fill="currentColor" opacity="0.6"/>
+  <circle cx="50" cy="85" r="3" fill="currentColor" opacity="0.6"/>
+  <circle cx="29.3" cy="70.7" r="3" fill="currentColor" opacity="0.6"/>
+  <circle cx="15" cy="50" r="3" fill="currentColor" opacity="0.6"/>
+  <circle cx="29.3" cy="29.3" r="3" fill="currentColor" opacity="0.6"/>
+</svg>
