@@ -210,7 +210,7 @@ importers:
         specifier: ^1.13.3
         version: 1.13.3
       swiper:
-        specifier: ^12.1.4
+        specifier: ^12.2.0
         version: 12.2.0
       tailwind-merge:
         specifier: ^3.3.1

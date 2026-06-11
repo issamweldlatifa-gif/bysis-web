@@ -4,6 +4,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Package, ShoppingBag } from 'lucide-react';
+import VideoSlider from '@/components/VideoSlider';
+import StoreSlider from '@/components/StoreSlider';
 
 export default function Home() {
   const [, navigate] = useLocation();
