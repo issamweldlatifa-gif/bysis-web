@@ -474,3 +474,10 @@
 - [x] Améliorer AnimatedAIOrb avec états thinking/listening
 - [x] Ajouter animations fluides et transitions premium
 - [x] Tester et valider le design final en navigateur
+
+
+## Latest Updates (June 2026)
+- [x] Add VideoSlider component (Swiper carousel for videos)
+- [x] Add StoreSlider component (Swiper carousel for stores)
+- [x] Implement responsive breakpoints for sliders
+- [x] Add navigation and pagination to sliders
