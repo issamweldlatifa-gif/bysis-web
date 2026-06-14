@@ -1,6 +1,6 @@
 /**
  * AdminHomepage — Full CMS control for homepage content
- * Controls: Hero video, Slider videos, Stores, Colors, Fonts, Texts
+ * Controls: Hero video, Slider videos, Stores, Colors, Fonts, Texts, Cards (card1-4)
  */
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Trash2, Plus, Edit2, Video, Store, Settings, Palette } from "lucide-react";
+import { Trash2, Plus, Edit2, Video, Store, Settings, Palette, LayoutGrid } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminHomepage() {
@@ -46,6 +46,22 @@ export default function AdminHomepage() {
     footerEmail: settings?.footerEmail ?? "",
   });
 
+  // Cards form state (card1-4)
+  const [cardsForm, setCardsForm] = useState({
+    card1Label: settings?.card1Label ?? "Commander",
+    card1Image: settings?.card1Image ?? "",
+    card1Link: settings?.card1Link ?? "/commander",
+    card2Label: settings?.card2Label ?? "Arrivages",
+    card2Image: settings?.card2Image ?? "",
+    card2Link: settings?.card2Link ?? "/arrivage",
+    card3Label: settings?.card3Label ?? "Suivre",
+    card3Image: settings?.card3Image ?? "",
+    card3Link: settings?.card3Link ?? "/suivi",
+    card4Label: settings?.card4Label ?? "Calculer",
+    card4Image: settings?.card4Image ?? "",
+    card4Link: settings?.card4Link ?? "/catalogue",
+  });
+
   // Video form
   const [videoDialog, setVideoDialog] = useState(false);
   const [editingVideo, setEditingVideo] = useState<any>(null);
@@ -61,6 +77,30 @@ export default function AdminHomepage() {
     try {
       await updateSettingsMut.mutateAsync(settingsForm);
       toast.success("Paramètres sauvegardés ✓");
+      refetch();
+    } catch {
+      toast.error("Erreur lors de la sauvegarde");
+    }
+  };
+
+  // ── Cards ─────────────────────────────────────────────────────────────────
+  const saveCards = async () => {
+    try {
+      await updateSettingsMut.mutateAsync({
+        card1Label: cardsForm.card1Label || undefined,
+        card1Image: cardsForm.card1Image || undefined,
+        card1Link: cardsForm.card1Link || undefined,
+        card2Label: cardsForm.card2Label || undefined,
+        card2Image: cardsForm.card2Image || undefined,
+        card2Link: cardsForm.card2Link || undefined,
+        card3Label: cardsForm.card3Label || undefined,
+        card3Image: cardsForm.card3Image || undefined,
+        card3Link: cardsForm.card3Link || undefined,
+        card4Label: cardsForm.card4Label || undefined,
+        card4Image: cardsForm.card4Image || undefined,
+        card4Link: cardsForm.card4Link || undefined,
+      });
+      toast.success("Cartes sauvegardées ✓");
       refetch();
     } catch {
       toast.error("Erreur lors de la sauvegarde");
@@ -150,6 +190,9 @@ export default function AdminHomepage() {
     refetchStores();
   };
 
+  // Card numbers for iteration
+  const cardNums = [1, 2, 3, 4] as const;
+
   return (
     <div className="space-y-6">
       <Tabs defaultValue="videos">
@@ -160,6 +203,9 @@ export default function AdminHomepage() {
             </TabsTrigger>
             <TabsTrigger value="stores" className="flex-shrink-0 flex items-center gap-1 px-3 py-2 text-sm">
               <Store size={14} />Magasins
+            </TabsTrigger>
+            <TabsTrigger value="cards" className="flex-shrink-0 flex items-center gap-1 px-3 py-2 text-sm">
+              <LayoutGrid size={14} />Cartes
             </TabsTrigger>
             <TabsTrigger value="texts" className="flex-shrink-0 flex items-center gap-1 px-3 py-2 text-sm">
               <Settings size={14} />Textes
@@ -247,6 +293,75 @@ export default function AdminHomepage() {
               </div>
             ))}
           </div>
+        </TabsContent>
+
+        {/* ── CARDS TAB ──────────────────────────────────────────────────── */}
+        <TabsContent value="cards" className="space-y-4 mt-4">
+          <div>
+            <h3 className="font-semibold text-lg mb-1">Cartes d'accès rapide</h3>
+            <p className="text-sm text-muted-foreground">Ces 4 cartes apparaissent sur la page d'accueil sous la section hero. Chaque carte a un label, une image optionnelle et un lien.</p>
+          </div>
+
+          {/* Preview of cards */}
+          <div className="grid grid-cols-4 gap-2 p-3 bg-muted/30 rounded-xl">
+            {cardNums.map(n => {
+              const label = cardsForm[`card${n}Label` as keyof typeof cardsForm];
+              const image = cardsForm[`card${n}Image` as keyof typeof cardsForm];
+              const link = cardsForm[`card${n}Link` as keyof typeof cardsForm];
+              return (
+                <div key={n} className="flex flex-col items-center gap-1 p-2 bg-white dark:bg-zinc-900 rounded-lg border text-center min-h-[72px] justify-center">
+                  {image ? (
+                    <img src={image} alt={label} className="w-8 h-8 object-cover rounded-full" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">{n}</div>
+                  )}
+                  <span className="text-xs font-semibold truncate w-full text-center">{label || `Carte ${n}`}</span>
+                  <span className="text-[10px] text-muted-foreground truncate w-full text-center">{link}</span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Card editors */}
+          <div className="space-y-4">
+            {cardNums.map(n => (
+              <Card key={n}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Carte {n}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium">Label (texte affiché)</label>
+                    <Input
+                      value={cardsForm[`card${n}Label` as keyof typeof cardsForm]}
+                      onChange={e => setCardsForm(p => ({ ...p, [`card${n}Label`]: e.target.value }))}
+                      placeholder={`Ex: Commander`}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Image URL (optionnel)</label>
+                    <Input
+                      value={cardsForm[`card${n}Image` as keyof typeof cardsForm]}
+                      onChange={e => setCardsForm(p => ({ ...p, [`card${n}Image`]: e.target.value }))}
+                      placeholder="https://... ou /manus-storage/..."
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Lien (URL)</label>
+                    <Input
+                      value={cardsForm[`card${n}Link` as keyof typeof cardsForm]}
+                      onChange={e => setCardsForm(p => ({ ...p, [`card${n}Link`]: e.target.value }))}
+                      placeholder="/commander"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <Button className="w-full" onClick={saveCards} disabled={updateSettingsMut.isPending}>
+            {updateSettingsMut.isPending ? "Sauvegarde..." : "💾 Enregistrer les cartes"}
+          </Button>
         </TabsContent>
 
         {/* ── TEXTS TAB ──────────────────────────────────────────────────── */}

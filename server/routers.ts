@@ -1688,6 +1688,10 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         footerInstagram: z.string().optional(),
         footerWhatsapp: z.string().optional(),
         footerEmail: z.string().optional(),
+        card1Label: z.string().optional(), card1Image: z.string().optional(), card1Link: z.string().optional(),
+        card2Label: z.string().optional(), card2Image: z.string().optional(), card2Link: z.string().optional(),
+        card3Label: z.string().optional(), card3Image: z.string().optional(), card3Link: z.string().optional(),
+        card4Label: z.string().optional(), card4Image: z.string().optional(), card4Link: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });

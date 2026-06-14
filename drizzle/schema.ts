@@ -468,6 +468,19 @@ export const homepageSettings = mysqlTable("homepage_settings", {
   footerInstagram: varchar("footerInstagram", { length: 512 }).default("https://instagram.com/bysis"),
   footerWhatsapp: varchar("footerWhatsapp", { length: 64 }).default("+21623868982"),
   footerEmail: varchar("footerEmail", { length: 320 }).default("support@bysis.shop"),
+  // Quick-access cards (card1-4)
+  card1Label: varchar("card1Label", { length: 128 }),
+  card1Image: text("card1Image"),
+  card1Link: text("card1Link"),
+  card2Label: varchar("card2Label", { length: 128 }),
+  card2Image: text("card2Image"),
+  card2Link: text("card2Link"),
+  card3Label: varchar("card3Label", { length: 128 }),
+  card3Image: text("card3Image"),
+  card3Link: text("card3Link"),
+  card4Label: varchar("card4Label", { length: 128 }),
+  card4Image: text("card4Image"),
+  card4Link: text("card4Link"),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 export type HomepageSettings = typeof homepageSettings.$inferSelect;

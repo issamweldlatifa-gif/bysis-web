@@ -253,6 +253,13 @@ export default function Home() {
   const adminButtonText = s?.adminButtonText ?? "VOIR LES OFFRES ••";
   const adminButtonLink = s?.adminButtonLink ?? "/arrivage";
   const storesSectionTitle = s?.storesSectionTitle ?? "نشريو منهم مباشرة ليك ••";
+  // Quick-access cards
+  const cards = [
+    { label: s?.card1Label, image: s?.card1Image, link: s?.card1Link },
+    { label: s?.card2Label, image: s?.card2Image, link: s?.card2Link },
+    { label: s?.card3Label, image: s?.card3Image, link: s?.card3Link },
+    { label: s?.card4Label, image: s?.card4Image, link: s?.card4Link },
+  ].filter(c => c.label || c.link);
 
   // ── Header scroll effect ──────────────────────────────────────────────────
   useEffect(() => {
@@ -406,6 +413,58 @@ export default function Home() {
           </button>
         </Link>
       </section>
+
+      {/* ── QUICK-ACCESS CARDS ────────────────────────────────────────────── */}
+      {cards.length > 0 && (
+        <section style={{ background: "#fff", padding: "20px 16px 8px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+            {cards.map((card, i) => (
+              <Link key={i} href={card.link ?? "/"} style={{ textDecoration: "none" }}>
+                <div
+                  style={{
+                    display: "flex", flexDirection: "column", alignItems: "center",
+                    gap: 8, padding: "14px 6px 12px",
+                    background: "#f8f8f8", borderRadius: 14,
+                    cursor: "pointer", transition: "transform 0.16s ease-out, background 0.16s",
+                    border: "1.5px solid rgba(0,0,0,0.06)",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = "#f0f0f0"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = "#f8f8f8"; }}
+                  onMouseDown={e => { (e.currentTarget as HTMLDivElement).style.transform = "scale(0.96)"; }}
+                  onMouseUp={e => { (e.currentTarget as HTMLDivElement).style.transform = "scale(1)"; }}
+                  onTouchStart={e => { (e.currentTarget as HTMLDivElement).style.transform = "scale(0.96)"; }}
+                  onTouchEnd={e => { (e.currentTarget as HTMLDivElement).style.transform = "scale(1)"; }}
+                >
+                  {card.image ? (
+                    <img
+                      src={card.image}
+                      alt={card.label ?? ""}
+                      style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div style={{
+                      width: 40, height: 40, borderRadius: "50%",
+                      background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 16, fontWeight: 700, color: "#fff",
+                    }}>
+                      {(card.label ?? "?")[0].toUpperCase()}
+                    </div>
+                  )}
+                  <span style={{
+                    fontSize: 11, fontWeight: 700, color: primaryColor,
+                    textAlign: "center", letterSpacing: "0.03em",
+                    lineHeight: 1.2, wordBreak: "break-word",
+                  }}>
+                    {card.label}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── VIDEO SLIDER ───────────────────────────────────────────────────── */}
       {sliderVideos.length > 0 && (

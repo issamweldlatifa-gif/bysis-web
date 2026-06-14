@@ -517,3 +517,11 @@
 - [x] Backend: /api/scheduled/priceCheck registered in index.ts before tRPC fallthrough
 - [x] UI: LensSheet.tsx upgraded — 4 tabs (Camera, Gallery, Text, Voice), voice uses tRPC mutation with audioBase64, price tracking button on each product, AR Try-On modal, price tracking list panel, multimodal text input
 - [x] 31/31 tests passing, 0 TypeScript errors
+
+## Cartes d'accès rapide (card1-4) — Juin 2026
+- [x] Ajouter champs card1-4 (label, image, link) dans schema.ts (homepageSettings)
+- [x] Appliquer migration SQL (ALTER TABLE homepage_settings ADD COLUMN card1Label, card1Image, card1Link, card2Label, card2Image, card2Link, card3Label, card3Image, card3Link, card4Label, card4Image, card4Link)
+- [x] Mettre à jour updateSettings dans routers.ts pour accepter les champs card1-4
+- [x] Ajouter onglet "Cartes" dans AdminHomepage.tsx avec éditeur card1-4 (label, image URL, lien) + aperçu en temps réel
+- [x] Afficher les cartes dans Home.tsx (section QUICK-ACCESS CARDS entre admin section et video slider)
+- [x] TypeScript 0 erreurs, 31 tests vitest passants
