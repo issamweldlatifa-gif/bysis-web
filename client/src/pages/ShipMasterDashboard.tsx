@@ -32,7 +32,7 @@ import AdminSliders from "@/components/AdminSliders";
 function SlidesTabWrapper() { return <AdminSlides />; }
 function ProductsTabWrapper() { return <AdminProducts />; }
 function CategoriesTabWrapper() { return <AdminCategories />; }
-function HomepageTabWrapper() { return <div className="space-y-8"><AdminHomepage /><AdminSliders /></div>; }
+function HomepageTabWrapper() { return <div className="space-y-8"><AdminHomepage /></div>; }
 
 // ─── Color constants (light theme matching mockup) ────────────────────────────
 const BG = "#F4F6F9";

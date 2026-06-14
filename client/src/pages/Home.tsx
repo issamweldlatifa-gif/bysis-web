@@ -101,7 +101,7 @@ function UserHeaderButton({ headerScrolled, primaryColor, accentColor }: { heade
             { icon: "👤", label: "Mon profil", href: "/parametres" },
             { icon: "📦", label: "Mes commandes", href: "/parametres" },
             { icon: "🔍", label: "Suivi commande", href: "/suivi" },
-            ...(user?.role === "admin" ? [{ icon: "⚙️", label: "Admin panel", href: "/admin/panel" }] : []),
+            ...(user?.role === "admin" ? [{ icon: "⚙️", label: "Admin panel", href: "/admin/shipmaster" }] : []),
           ] as { icon: string; label: string; href: string }[]).map((item) => (
             <button
               key={item.href + item.label}

@@ -153,12 +153,22 @@ export default function AdminHomepage() {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="videos">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="videos"><Video size={14} className="mr-1" />Vidéos</TabsTrigger>
-          <TabsTrigger value="stores"><Store size={14} className="mr-1" />Magasins</TabsTrigger>
-          <TabsTrigger value="texts"><Settings size={14} className="mr-1" />Textes</TabsTrigger>
-          <TabsTrigger value="colors"><Palette size={14} className="mr-1" />Couleurs</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+          <TabsList className="inline-flex w-auto min-w-full gap-0.5 h-auto p-1">
+            <TabsTrigger value="videos" className="flex-shrink-0 flex items-center gap-1 px-3 py-2 text-sm">
+              <Video size={14} />Vidéos
+            </TabsTrigger>
+            <TabsTrigger value="stores" className="flex-shrink-0 flex items-center gap-1 px-3 py-2 text-sm">
+              <Store size={14} />Magasins
+            </TabsTrigger>
+            <TabsTrigger value="texts" className="flex-shrink-0 flex items-center gap-1 px-3 py-2 text-sm">
+              <Settings size={14} />Textes
+            </TabsTrigger>
+            <TabsTrigger value="colors" className="flex-shrink-0 flex items-center gap-1 px-3 py-2 text-sm">
+              <Palette size={14} />Couleurs
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* ── VIDEOS TAB ─────────────────────────────────────────────────── */}
         <TabsContent value="videos" className="space-y-4 mt-4">
