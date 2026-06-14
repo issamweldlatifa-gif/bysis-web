@@ -534,10 +534,10 @@
 - [x] Mettre à jour Home.tsx : afficher <video autoPlay muted loop playsInline> dans les cartes
 
 ## Cartes style Amazon/Meta (bandes horizontales) — Juin 2026
-- [ ] Ajouter card*BgColor, card*TextColor, card*Image dans schema.ts + migration SQL
-- [ ] Mettre à jour routers.ts pour les nouveaux champs
-- [ ] AdminHomepage : contrôles couleur bg, couleur texte, image URL + aperçu live
-- [ ] Home.tsx : redesign en bandes horizontales (image droite, texte gauche, flèche, couleur bg)
+- [x] Ajouter card*BgColor, card*TextColor, card*Image dans schema.ts + migration SQL
+- [x] Mettre à jour routers.ts pour les nouveaux champs
+- [x] AdminHomepage : contrôles couleur bg, couleur texte, image URL + aperçu live
+- [x] Home.tsx : redesign en bandes horizontales (image droite, texte gauche, flèche, couleur bg)
 
 ## Cartes style Amazon/Meta (bandes horizontales) — Juin 2026
 - [x] Ajouter card*BgColor, card*TextColor, card*Image dans schema.ts + migration SQL

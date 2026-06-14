@@ -225,11 +225,11 @@ export default function AdminHomepage() {
             <TabsTrigger value="videos" className="flex-shrink-0 flex items-center gap-1 px-3 py-2 text-sm">
               <Video size={14} />Vidéos
             </TabsTrigger>
-            <TabsTrigger value="stores" className="flex-shrink-0 flex items-center gap-1 px-3 py-2 text-sm">
-              <Store size={14} />Magasins
-            </TabsTrigger>
             <TabsTrigger value="cards" className="flex-shrink-0 flex items-center gap-1 px-3 py-2 text-sm">
               <LayoutGrid size={14} />Cartes
+            </TabsTrigger>
+            <TabsTrigger value="stores" className="flex-shrink-0 flex items-center gap-1 px-3 py-2 text-sm">
+              <Store size={14} />Magasins
             </TabsTrigger>
             <TabsTrigger value="texts" className="flex-shrink-0 flex items-center gap-1 px-3 py-2 text-sm">
               <Settings size={14} />Textes
