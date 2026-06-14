@@ -50,9 +50,18 @@ function BottomNav({ accentColor, primaryColor }: { accentColor: string; primary
         <span style={{ color: "#F2F2F7", fontSize: 10, letterSpacing: "0.05em" }}>Suivi ••</span>
       </Link>
       <Link href="/chat" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, textDecoration: "none" }}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F2F2F7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
+        <img
+          src="/manus-storage/ai-icon-48_36db3133.gif"
+          alt="AI"
+          width={28}
+          height={28}
+          style={{
+            width: 28, height: 28,
+            objectFit: "contain",
+            imageRendering: "crisp-edges",
+            filter: "brightness(1.1)",
+          }}
+        />
         <span style={{ color: "#F2F2F7", fontSize: 10, letterSpacing: "0.05em" }}>AI ••</span>
       </Link>
     </nav>
