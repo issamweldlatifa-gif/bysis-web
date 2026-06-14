@@ -4,10 +4,143 @@
  * Data: loaded from DB via trpc.homepage.getData
  */
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useChatContext } from "@/App";
 import LensSheet from "@/components/LensSheet";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { getLoginUrl } from "@/const";
+
+// ─── User Header Button ──────────────────────────────────────────────────────
+function UserHeaderButton({ headerScrolled, primaryColor, accentColor }: { headerScrolled: boolean; primaryColor: string; accentColor: string }) {
+  const { user, isAuthenticated, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [, navigate] = useLocation();
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const iconColor = headerScrolled ? primaryColor : "#fff";
+  const initials = user?.name ? user.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase() : "?";
+
+  return (
+    <div ref={ref} style={{ position: "relative" }}>
+      <button
+        onClick={() => {
+          if (!isAuthenticated) {
+            window.location.href = getLoginUrl();
+          } else {
+            setOpen((v) => !v);
+          }
+        }}
+        style={{
+          background: "none", border: "none", cursor: "pointer", padding: 4,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          transition: "transform 0.16s ease-out",
+        }}
+        onMouseDown={e => (e.currentTarget.style.transform = "scale(0.9)")}
+        onMouseUp={e => (e.currentTarget.style.transform = "scale(1)")}
+        aria-label="Compte utilisateur"
+      >
+        {isAuthenticated && user?.avatarUrl ? (
+          <img
+            src={user.avatarUrl}
+            alt={user.name ?? ""}
+            style={{ width: 34, height: 34, borderRadius: "50%", objectFit: "cover", border: `2px solid ${accentColor}` }}
+          />
+        ) : isAuthenticated ? (
+          <div style={{
+            width: 34, height: 34, borderRadius: "50%",
+            background: `linear-gradient(135deg, ${accentColor} 0%, #B8962E 100%)`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 13, fontWeight: 700, color: primaryColor, letterSpacing: "0.05em",
+          }}>{initials}</div>
+        ) : (
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        )}
+      </button>
+
+      {/* Dropdown */}
+      {open && isAuthenticated && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 10px)", right: 0,
+          background: "#fff", borderRadius: 16,
+          boxShadow: "0 8px 40px rgba(0,0,0,0.15)",
+          border: "1px solid rgba(0,0,0,0.07)",
+          minWidth: 220, overflow: "hidden", zIndex: 2000,
+        }}>
+          {/* User info */}
+          <div style={{ padding: "16px 18px", borderBottom: "1px solid #f0f0f0", display: "flex", alignItems: "center", gap: 12 }}>
+            {user?.avatarUrl ? (
+              <img src={user.avatarUrl} alt="" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }} />
+            ) : (
+              <div style={{
+                width: 40, height: 40, borderRadius: "50%",
+                background: `linear-gradient(135deg, ${accentColor} 0%, #B8962E 100%)`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 15, fontWeight: 700, color: primaryColor,
+              }}>{initials}</div>
+            )}
+            <div>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: "#1C2B33" }}>{user?.name ?? "Client"}</p>
+              <p style={{ margin: 0, fontSize: 11, color: "#888", marginTop: 2 }}>{user?.role === "admin" ? "Administrateur" : "Client"}</p>
+            </div>
+          </div>
+          {/* Menu items */}
+          {([
+            { icon: "👤", label: "Mon profil", href: "/parametres" },
+            { icon: "📦", label: "Mes commandes", href: "/parametres" },
+            { icon: "🔍", label: "Suivi commande", href: "/suivi" },
+            ...(user?.role === "admin" ? [{ icon: "⚙️", label: "Admin panel", href: "/admin/panel" }] : []),
+          ] as { icon: string; label: string; href: string }[]).map((item) => (
+            <button
+              key={item.href + item.label}
+              onClick={() => { setOpen(false); navigate(item.href); }}
+              style={{
+                width: "100%", background: "none", border: "none", cursor: "pointer",
+                padding: "13px 18px", display: "flex", alignItems: "center", gap: 12,
+                fontSize: 14, color: "#1C2B33", textAlign: "left",
+                transition: "background 0.15s",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = "#f8f8f8")}
+              onMouseLeave={e => (e.currentTarget.style.background = "none")}
+            >
+              <span style={{ fontSize: 16 }}>{item.icon}</span>
+              {item.label}
+            </button>
+          ))}
+          {/* Logout */}
+          <div style={{ borderTop: "1px solid #f0f0f0" }}>
+            <button
+              onClick={async () => { setOpen(false); await logout(); }}
+              style={{
+                width: "100%", background: "none", border: "none", cursor: "pointer",
+                padding: "13px 18px", display: "flex", alignItems: "center", gap: 12,
+                fontSize: 14, color: "#e53935", textAlign: "left",
+                transition: "background 0.15s",
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = "#fff5f5")}
+              onMouseLeave={e => (e.currentTarget.style.background = "none")}
+            >
+              <span style={{ fontSize: 16 }}>🚪</span>
+              Se déconnecter
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ─── Bottom Nav ───────────────────────────────────────────────────────────────
 function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen, onOpenLens, lensOpen }: { accentColor: string; primaryColor: string; onOpenChat: () => void; chatOpen: boolean; onOpenLens: () => void; lensOpen: boolean }) {
@@ -174,18 +307,7 @@ export default function Home() {
             transition: "color 0.3s",
           }}>BYSIS ••</span>
         </Link>
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-          <Link href="/arrivage" style={{ textDecoration: "none" }}>
-            <span style={{ color: headerScrolled ? primaryColor : "#fff", fontSize: 13, fontWeight: 500, letterSpacing: "0.05em", transition: "color 0.3s" }}>Arrivage</span>
-          </Link>
-          <Link href="/commander" style={{ textDecoration: "none" }}>
-            <span style={{
-              background: accentColor, color: primaryColor,
-              padding: "8px 18px", borderRadius: 36, fontSize: 12, fontWeight: 700,
-              letterSpacing: "0.05em",
-            }}>Commander ••</span>
-          </Link>
-        </div>
+        <UserHeaderButton headerScrolled={headerScrolled} primaryColor={primaryColor} accentColor={accentColor} />
       </header>
 
       {/* ── HERO VIDEO ─────────────────────────────────────────────────────── */}
