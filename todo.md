@@ -525,3 +525,10 @@
 - [x] Ajouter onglet "Cartes" dans AdminHomepage.tsx avec éditeur card1-4 (label, image URL, lien) + aperçu en temps réel
 - [x] Afficher les cartes dans Home.tsx (section QUICK-ACCESS CARDS entre admin section et video slider)
 - [x] TypeScript 0 erreurs, 31 tests vitest passants
+
+## Cartes avec vidéos (card1-4 videoUrl) — Juin 2026
+- [x] Renommer card*Image → card*Video dans schema.ts (homepageSettings)
+- [x] Appliquer migration SQL (RENAME COLUMN ou ADD+DROP)
+- [x] Mettre à jour routers.ts pour card*Video
+- [x] Mettre à jour AdminHomepage.tsx : champ videoUrl au lieu d'imageUrl
+- [x] Mettre à jour Home.tsx : afficher <video autoPlay muted loop playsInline> dans les cartes

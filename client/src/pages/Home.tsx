@@ -255,10 +255,10 @@ export default function Home() {
   const storesSectionTitle = s?.storesSectionTitle ?? "نشريو منهم مباشرة ليك ••";
   // Quick-access cards
   const cards = [
-    { label: s?.card1Label, image: s?.card1Image, link: s?.card1Link },
-    { label: s?.card2Label, image: s?.card2Image, link: s?.card2Link },
-    { label: s?.card3Label, image: s?.card3Image, link: s?.card3Link },
-    { label: s?.card4Label, image: s?.card4Image, link: s?.card4Link },
+    { label: s?.card1Label, video: s?.card1Video, link: s?.card1Link },
+    { label: s?.card2Label, video: s?.card2Video, link: s?.card2Link },
+    { label: s?.card3Label, video: s?.card3Video, link: s?.card3Link },
+    { label: s?.card4Label, video: s?.card4Video, link: s?.card4Link },
   ].filter(c => c.label || c.link);
 
   // ── Header scroll effect ──────────────────────────────────────────────────
@@ -435,19 +435,23 @@ export default function Home() {
                   onTouchStart={e => { (e.currentTarget as HTMLDivElement).style.transform = "scale(0.96)"; }}
                   onTouchEnd={e => { (e.currentTarget as HTMLDivElement).style.transform = "scale(1)"; }}
                 >
-                  {card.image ? (
-                    <img
-                      src={card.image}
-                      alt={card.label ?? ""}
-                      style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }}
-                      loading="lazy"
-                    />
+                  {card.video ? (
+                    <div style={{ width: 56, height: 80, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
+                      <video
+                        src={card.video}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    </div>
                   ) : (
                     <div style={{
-                      width: 40, height: 40, borderRadius: "50%",
+                      width: 56, height: 80, borderRadius: 10,
                       background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
                       display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 16, fontWeight: 700, color: "#fff",
+                      fontSize: 22, fontWeight: 700, color: "#fff",
                     }}>
                       {(card.label ?? "?")[0].toUpperCase()}
                     </div>

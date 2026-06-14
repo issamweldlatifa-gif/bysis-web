@@ -49,16 +49,16 @@ export default function AdminHomepage() {
   // Cards form state (card1-4)
   const [cardsForm, setCardsForm] = useState({
     card1Label: settings?.card1Label ?? "Commander",
-    card1Image: settings?.card1Image ?? "",
+    card1Video: settings?.card1Video ?? "",
     card1Link: settings?.card1Link ?? "/commander",
     card2Label: settings?.card2Label ?? "Arrivages",
-    card2Image: settings?.card2Image ?? "",
+    card2Video: settings?.card2Video ?? "",
     card2Link: settings?.card2Link ?? "/arrivage",
     card3Label: settings?.card3Label ?? "Suivre",
-    card3Image: settings?.card3Image ?? "",
+    card3Video: settings?.card3Video ?? "",
     card3Link: settings?.card3Link ?? "/suivi",
     card4Label: settings?.card4Label ?? "Calculer",
-    card4Image: settings?.card4Image ?? "",
+    card4Video: settings?.card4Video ?? "",
     card4Link: settings?.card4Link ?? "/catalogue",
   });
 
@@ -88,16 +88,16 @@ export default function AdminHomepage() {
     try {
       await updateSettingsMut.mutateAsync({
         card1Label: cardsForm.card1Label || undefined,
-        card1Image: cardsForm.card1Image || undefined,
+        card1Video: cardsForm.card1Video || undefined,
         card1Link: cardsForm.card1Link || undefined,
         card2Label: cardsForm.card2Label || undefined,
-        card2Image: cardsForm.card2Image || undefined,
+        card2Video: cardsForm.card2Video || undefined,
         card2Link: cardsForm.card2Link || undefined,
         card3Label: cardsForm.card3Label || undefined,
-        card3Image: cardsForm.card3Image || undefined,
+        card3Video: cardsForm.card3Video || undefined,
         card3Link: cardsForm.card3Link || undefined,
         card4Label: cardsForm.card4Label || undefined,
-        card4Image: cardsForm.card4Image || undefined,
+        card4Video: cardsForm.card4Video || undefined,
         card4Link: cardsForm.card4Link || undefined,
       });
       toast.success("Cartes sauvegardées ✓");
@@ -297,23 +297,22 @@ export default function AdminHomepage() {
 
         {/* ── CARDS TAB ──────────────────────────────────────────────────── */}
         <TabsContent value="cards" className="space-y-4 mt-4">
-          <div>
+                    <div>
             <h3 className="font-semibold text-lg mb-1">Cartes d'accès rapide</h3>
-            <p className="text-sm text-muted-foreground">Ces 4 cartes apparaissent sur la page d'accueil sous la section hero. Chaque carte a un label, une image optionnelle et un lien.</p>
+            <p className="text-sm text-muted-foreground">Ces 4 cartes apparaissent sur la page d'accueil. Chaque carte affiche une vidéo en boucle (autoplay/muted) avec un label et un lien de navigation.</p>
           </div>
-
           {/* Preview of cards */}
           <div className="grid grid-cols-4 gap-2 p-3 bg-muted/30 rounded-xl">
             {cardNums.map(n => {
               const label = cardsForm[`card${n}Label` as keyof typeof cardsForm];
-              const image = cardsForm[`card${n}Image` as keyof typeof cardsForm];
+              const video = cardsForm[`card${n}Video` as keyof typeof cardsForm];
               const link = cardsForm[`card${n}Link` as keyof typeof cardsForm];
               return (
-                <div key={n} className="flex flex-col items-center gap-1 p-2 bg-white dark:bg-zinc-900 rounded-lg border text-center min-h-[72px] justify-center">
-                  {image ? (
-                    <img src={image} alt={label} className="w-8 h-8 object-cover rounded-full" />
+                <div key={n} className="flex flex-col items-center gap-1 p-2 bg-white dark:bg-zinc-900 rounded-lg border text-center min-h-[90px] justify-center">
+                  {video ? (
+                    <video src={video} autoPlay muted loop playsInline className="w-10 h-14 object-cover rounded-lg" />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">{n}</div>
+                    <div className="w-10 h-14 rounded-lg bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">{n}</div>
                   )}
                   <span className="text-xs font-semibold truncate w-full text-center">{label || `Carte ${n}`}</span>
                   <span className="text-[10px] text-muted-foreground truncate w-full text-center">{link}</span>
@@ -321,7 +320,6 @@ export default function AdminHomepage() {
               );
             })}
           </div>
-
           {/* Card editors */}
           <div className="space-y-4">
             {cardNums.map(n => (
@@ -339,12 +337,19 @@ export default function AdminHomepage() {
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Image URL (optionnel)</label>
+                    <label className="text-sm font-medium">URL Vidéo (MP4)</label>
                     <Input
-                      value={cardsForm[`card${n}Image` as keyof typeof cardsForm]}
-                      onChange={e => setCardsForm(p => ({ ...p, [`card${n}Image`]: e.target.value }))}
+                      value={cardsForm[`card${n}Video` as keyof typeof cardsForm]}
+                      onChange={e => setCardsForm(p => ({ ...p, [`card${n}Video`]: e.target.value }))}
                       placeholder="https://... ou /manus-storage/..."
                     />
+                    {cardsForm[`card${n}Video` as keyof typeof cardsForm] && (
+                      <video
+                        src={cardsForm[`card${n}Video` as keyof typeof cardsForm]}
+                        autoPlay muted loop playsInline
+                        className="mt-2 w-full max-h-32 object-cover rounded-lg border"
+                      />
+                    )}
                   </div>
                   <div>
                     <label className="text-sm font-medium">Lien (URL)</label>
