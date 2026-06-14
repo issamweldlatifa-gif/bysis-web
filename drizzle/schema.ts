@@ -532,3 +532,43 @@ export const lensHistory = mysqlTable("lens_history", {
 });
 export type LensHistory = typeof lensHistory.$inferSelect;
 export type InsertLensHistory = typeof lensHistory.$inferInsert;
+
+/**
+ * Price Tracking - users track product prices for alerts
+ */
+export const priceTracking = mysqlTable("price_tracking", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: varchar("userId", { length: 128 }),
+  sessionId: varchar("sessionId", { length: 128 }),
+  productId: int("productId"),
+  productName: varchar("productName", { length: 256 }).notNull(),
+  productUrl: text("productUrl"),
+  productImageUrl: text("productImageUrl"),
+  platform: varchar("platform", { length: 64 }).default("bysis"),
+  targetPrice: decimal("targetPrice", { precision: 10, scale: 2 }),
+  currentPrice: decimal("currentPrice", { precision: 10, scale: 2 }),
+  lastCheckedAt: timestamp("lastCheckedAt"),
+  alertSent: tinyint("alertSent").default(0).notNull(),
+  isActive: tinyint("isActive").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type PriceTracking = typeof priceTracking.$inferSelect;
+export type InsertPriceTracking = typeof priceTracking.$inferInsert;
+
+/**
+ * AR Try-On Results - AI photo merge results
+ */
+export const arTryOnResults = mysqlTable("ar_try_on_results", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: varchar("userId", { length: 128 }),
+  sessionId: varchar("sessionId", { length: 128 }),
+  userPhotoUrl: text("userPhotoUrl").notNull(),
+  productImageUrl: text("productImageUrl").notNull(),
+  resultImageUrl: text("resultImageUrl"),
+  productName: varchar("productName", { length: 256 }),
+  status: mysqlEnum("status", ["pending", "processing", "done", "failed"]).default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type ArTryOnResult = typeof arTryOnResults.$inferSelect;
+export type InsertArTryOnResult = typeof arTryOnResults.$inferInsert;

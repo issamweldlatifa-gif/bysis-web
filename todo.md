@@ -502,3 +502,12 @@
   - [x] Footer with social icons (from DB)
   - [x] Bottom nav (5 icons, gold commander button)
 - [x] All 31 tests passing (9 new homepage tests added)
+
+## 🔭 Lens Advanced Features (Phase 2 & 3)
+- [ ] Multimodal Search: image + text + voice simultaneously (parallel AI calls)
+- [ ] Visual Similarity: AI extracts visual keywords, finds 95% similar products from DB
+- [ ] Voice + Vision: Web Speech API + invokeLLM Vision in parallel
+- [ ] Real-time Price Tracking: price_tracking table + Heartbeat scheduler + Push Notifications
+- [ ] On-device AI: MediaPipe integration for local image pre-processing
+- [ ] AR Try-On: AI Photo Merge (user photo + product photo → combined via invokeLLM)
+- [ ] Admin: Price tracking management dashboard tab
