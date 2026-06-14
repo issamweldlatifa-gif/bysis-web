@@ -6,9 +6,10 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { useChatContext } from "@/App";
 
 // ─── Bottom Nav ───────────────────────────────────────────────────────────────
-function BottomNav({ accentColor, primaryColor }: { accentColor: string; primaryColor: string }) {
+function BottomNav({ accentColor, primaryColor, onOpenChat }: { accentColor: string; primaryColor: string; onOpenChat: () => void }) {
   return (
     <nav style={{
       position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 1000,
@@ -57,7 +58,10 @@ function BottomNav({ accentColor, primaryColor }: { accentColor: string; primary
         </svg>
         <span style={{ color: "#F2F2F7", fontSize: 10, letterSpacing: "0.05em" }}>Suivi ••</span>
       </Link>
-      <Link href="/chat" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, textDecoration: "none" }}>
+      <button
+        onClick={onOpenChat}
+        style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: "none", border: "none", cursor: "pointer", padding: 0 }}
+      >
         <img
           src="/manus-storage/ai-icon-48_36db3133.gif"
           alt="AI"
@@ -71,13 +75,14 @@ function BottomNav({ accentColor, primaryColor }: { accentColor: string; primary
           }}
         />
         <span style={{ color: "#F2F2F7", fontSize: 10, letterSpacing: "0.05em" }}>AI ••</span>
-      </Link>
+      </button>
     </nav>
   );
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function Home() {
+  const { openChat } = useChatContext();
   const { data: homepageData, isLoading } = trpc.homepage.getData.useQuery();
 
   const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -440,7 +445,7 @@ export default function Home() {
       </footer>
 
       {/* ── BOTTOM NAV ─────────────────────────────────────────────────────── */}
-      <BottomNav accentColor={accentColor} primaryColor={primaryColor} />
+      <BottomNav accentColor={accentColor} primaryColor={primaryColor} onOpenChat={openChat} />
     </div>
   );
 }
