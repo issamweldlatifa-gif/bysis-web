@@ -146,7 +146,7 @@ function UserHeaderButton({ headerScrolled, primaryColor, accentColor }: { heade
 function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen, onOpenLens, lensOpen }: { accentColor: string; primaryColor: string; onOpenChat: () => void; chatOpen: boolean; onOpenLens: () => void; lensOpen: boolean }) {
   return (
     <nav style={{
-      position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 1000,
+      position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 10000,
       background: "#121212", borderTop: "1px solid #2a2a2a",
       display: "flex", justifyContent: "space-around", alignItems: "center",
       padding: "10px 0 calc(10px + env(safe-area-inset-bottom))",
@@ -217,7 +217,14 @@ function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen, onOpenLens
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function Home() {
   const { openChat, closeChat, chatOpen } = useChatContext();
-  const toggleChat = useCallback(() => { chatOpen ? closeChat() : openChat(); }, [chatOpen, openChat, closeChat]);
+  // When chat is open, AI button closes it; when closed, opens it
+  const toggleChat = useCallback(() => {
+    if (chatOpen) {
+      closeChat();
+    } else {
+      openChat();
+    }
+  }, [chatOpen, openChat, closeChat]);
   const [lensOpen, setLensOpen] = useState(false);
   const toggleLens = useCallback(() => setLensOpen((v) => !v), []);
   const { data: homepageData, isLoading } = trpc.homepage.getData.useQuery();
@@ -571,9 +578,7 @@ export default function Home() {
       </footer>
 
       {/* ── BOTTOM NAV ─────────────────────────────────────────────────────── */}
-      <div style={{ pointerEvents: chatOpen ? 'none' : 'auto', opacity: chatOpen ? 0 : 1, transition: 'opacity 0.2s ease' }}>
-        <BottomNav accentColor={accentColor} primaryColor={primaryColor} onOpenChat={toggleChat} chatOpen={chatOpen} onOpenLens={toggleLens} lensOpen={lensOpen} />
-      </div>
+      <BottomNav accentColor={accentColor} primaryColor={primaryColor} onOpenChat={toggleChat} chatOpen={chatOpen} onOpenLens={toggleLens} lensOpen={lensOpen} />
       <LensSheet isOpen={lensOpen} onClose={() => setLensOpen(false)} />
     </div>
   );
