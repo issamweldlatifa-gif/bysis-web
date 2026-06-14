@@ -50,15 +50,27 @@ export default function AdminHomepage() {
   const [cardsForm, setCardsForm] = useState({
     card1Label: settings?.card1Label ?? "Commander",
     card1Video: settings?.card1Video ?? "",
+    card1Image: settings?.card1Image ?? "",
+    card1BgColor: settings?.card1BgColor ?? "#1A1A1A",
+    card1TextColor: settings?.card1TextColor ?? "#FFFFFF",
     card1Link: settings?.card1Link ?? "/commander",
     card2Label: settings?.card2Label ?? "Arrivages",
     card2Video: settings?.card2Video ?? "",
+    card2Image: settings?.card2Image ?? "",
+    card2BgColor: settings?.card2BgColor ?? "#1A1A1A",
+    card2TextColor: settings?.card2TextColor ?? "#FFFFFF",
     card2Link: settings?.card2Link ?? "/arrivage",
     card3Label: settings?.card3Label ?? "Suivre",
     card3Video: settings?.card3Video ?? "",
+    card3Image: settings?.card3Image ?? "",
+    card3BgColor: settings?.card3BgColor ?? "#1A1A1A",
+    card3TextColor: settings?.card3TextColor ?? "#FFFFFF",
     card3Link: settings?.card3Link ?? "/suivi",
     card4Label: settings?.card4Label ?? "Calculer",
     card4Video: settings?.card4Video ?? "",
+    card4Image: settings?.card4Image ?? "",
+    card4BgColor: settings?.card4BgColor ?? "#1A1A1A",
+    card4TextColor: settings?.card4TextColor ?? "#FFFFFF",
     card4Link: settings?.card4Link ?? "/catalogue",
   });
 
@@ -89,15 +101,27 @@ export default function AdminHomepage() {
       await updateSettingsMut.mutateAsync({
         card1Label: cardsForm.card1Label || undefined,
         card1Video: cardsForm.card1Video || undefined,
+        card1Image: cardsForm.card1Image || undefined,
+        card1BgColor: cardsForm.card1BgColor || undefined,
+        card1TextColor: cardsForm.card1TextColor || undefined,
         card1Link: cardsForm.card1Link || undefined,
         card2Label: cardsForm.card2Label || undefined,
         card2Video: cardsForm.card2Video || undefined,
+        card2Image: cardsForm.card2Image || undefined,
+        card2BgColor: cardsForm.card2BgColor || undefined,
+        card2TextColor: cardsForm.card2TextColor || undefined,
         card2Link: cardsForm.card2Link || undefined,
         card3Label: cardsForm.card3Label || undefined,
         card3Video: cardsForm.card3Video || undefined,
+        card3Image: cardsForm.card3Image || undefined,
+        card3BgColor: cardsForm.card3BgColor || undefined,
+        card3TextColor: cardsForm.card3TextColor || undefined,
         card3Link: cardsForm.card3Link || undefined,
         card4Label: cardsForm.card4Label || undefined,
         card4Video: cardsForm.card4Video || undefined,
+        card4Image: cardsForm.card4Image || undefined,
+        card4BgColor: cardsForm.card4BgColor || undefined,
+        card4TextColor: cardsForm.card4TextColor || undefined,
         card4Link: cardsForm.card4Link || undefined,
       });
       toast.success("Cartes sauvegardées ✓");
@@ -297,59 +321,112 @@ export default function AdminHomepage() {
 
         {/* ── CARDS TAB ──────────────────────────────────────────────────── */}
         <TabsContent value="cards" className="space-y-4 mt-4">
-                    <div>
+          <div>
             <h3 className="font-semibold text-lg mb-1">Cartes d'accès rapide</h3>
-            <p className="text-sm text-muted-foreground">Ces 4 cartes apparaissent sur la page d'accueil. Chaque carte affiche une vidéo en boucle (autoplay/muted) avec un label et un lien de navigation.</p>
+            <p className="text-sm text-muted-foreground">4 bandes horizontales style Amazon/Meta — texte à gauche, image à droite, couleur de fond et texte personnalisables.</p>
           </div>
-          {/* Preview of cards */}
-          <div className="grid grid-cols-4 gap-2 p-3 bg-muted/30 rounded-xl">
+
+          {/* Live preview — Meta style */}
+          <div className="rounded-xl overflow-hidden border shadow-sm">
+            <p className="text-xs text-muted-foreground px-3 py-1.5 bg-muted/40 font-medium">Aperçu en direct</p>
             {cardNums.map(n => {
-              const label = cardsForm[`card${n}Label` as keyof typeof cardsForm];
-              const video = cardsForm[`card${n}Video` as keyof typeof cardsForm];
-              const link = cardsForm[`card${n}Link` as keyof typeof cardsForm];
+              const label = (cardsForm[`card${n}Label` as keyof typeof cardsForm] as string) || `Carte ${n}`;
+              const image = cardsForm[`card${n}Image` as keyof typeof cardsForm] as string;
+              const video = cardsForm[`card${n}Video` as keyof typeof cardsForm] as string;
+              const bg = (cardsForm[`card${n}BgColor` as keyof typeof cardsForm] as string) || "#1A1A1A";
+              const tc = (cardsForm[`card${n}TextColor` as keyof typeof cardsForm] as string) || "#FFFFFF";
               return (
-                <div key={n} className="flex flex-col items-center gap-1 p-2 bg-white dark:bg-zinc-900 rounded-lg border text-center min-h-[90px] justify-center">
-                  {video ? (
-                    <video src={video} autoPlay muted loop playsInline className="w-10 h-14 object-cover rounded-lg" />
-                  ) : (
-                    <div className="w-10 h-14 rounded-lg bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">{n}</div>
-                  )}
-                  <span className="text-xs font-semibold truncate w-full text-center">{label || `Carte ${n}`}</span>
-                  <span className="text-[10px] text-muted-foreground truncate w-full text-center">{link}</span>
+                <div key={n} style={{ background: bg, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px", height: 72, borderBottom: "1px solid rgba(128,128,128,0.15)", position: "relative", overflow: "hidden" }}>
+                  <span style={{ color: tc, fontWeight: 700, fontSize: 15 }}>{label}</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    {image ? (
+                      <img src={image} alt={label} style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8 }} />
+                    ) : video ? (
+                      <video src={video} autoPlay muted loop playsInline style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8 }} />
+                    ) : null}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={tc} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                  </div>
                 </div>
               );
             })}
           </div>
+
           {/* Card editors */}
           <div className="space-y-4">
             {cardNums.map(n => (
               <Card key={n}>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm">Carte {n}</CardTitle>
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <span
+                      className="w-5 h-5 rounded-full border-2 border-white shadow inline-block"
+                      style={{ background: (cardsForm[`card${n}BgColor` as keyof typeof cardsForm] as string) || "#1A1A1A" }}
+                    />
+                    Carte {n}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <label className="text-sm font-medium">Label (texte affiché)</label>
+                    <label className="text-sm font-medium">Texte (label)</label>
                     <Input
                       value={cardsForm[`card${n}Label` as keyof typeof cardsForm]}
                       onChange={e => setCardsForm(p => ({ ...p, [`card${n}Label`]: e.target.value }))}
-                      placeholder={`Ex: Commander`}
+                      placeholder="Ex: Commander"
                     />
                   </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium block mb-1">Couleur fond</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={(cardsForm[`card${n}BgColor` as keyof typeof cardsForm] as string) || "#1A1A1A"}
+                          onChange={e => setCardsForm(p => ({ ...p, [`card${n}BgColor`]: e.target.value }))}
+                          className="w-10 h-10 rounded cursor-pointer border p-0.5"
+                        />
+                        <Input
+                          value={cardsForm[`card${n}BgColor` as keyof typeof cardsForm]}
+                          onChange={e => setCardsForm(p => ({ ...p, [`card${n}BgColor`]: e.target.value }))}
+                          placeholder="#1A1A1A"
+                          className="font-mono text-sm"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium block mb-1">Couleur texte</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={(cardsForm[`card${n}TextColor` as keyof typeof cardsForm] as string) || "#FFFFFF"}
+                          onChange={e => setCardsForm(p => ({ ...p, [`card${n}TextColor`]: e.target.value }))}
+                          className="w-10 h-10 rounded cursor-pointer border p-0.5"
+                        />
+                        <Input
+                          value={cardsForm[`card${n}TextColor` as keyof typeof cardsForm]}
+                          onChange={e => setCardsForm(p => ({ ...p, [`card${n}TextColor`]: e.target.value }))}
+                          placeholder="#FFFFFF"
+                          className="font-mono text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
                   <div>
-                    <label className="text-sm font-medium">URL Vidéo (MP4)</label>
+                    <label className="text-sm font-medium">Image URL (droite)</label>
+                    <Input
+                      value={cardsForm[`card${n}Image` as keyof typeof cardsForm]}
+                      onChange={e => setCardsForm(p => ({ ...p, [`card${n}Image`]: e.target.value }))}
+                      placeholder="https://... ou /manus-storage/..."
+                    />
+                    {(cardsForm[`card${n}Image` as keyof typeof cardsForm] as string) && (
+                      <img src={cardsForm[`card${n}Image` as keyof typeof cardsForm] as string} alt="" className="mt-2 h-16 rounded-lg object-cover border" />
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Vidéo URL (si pas d'image)</label>
                     <Input
                       value={cardsForm[`card${n}Video` as keyof typeof cardsForm]}
                       onChange={e => setCardsForm(p => ({ ...p, [`card${n}Video`]: e.target.value }))}
-                      placeholder="https://... ou /manus-storage/..."
+                      placeholder="https://... .mp4"
                     />
-                    {cardsForm[`card${n}Video` as keyof typeof cardsForm] && (
-                      <video
-                        src={cardsForm[`card${n}Video` as keyof typeof cardsForm]}
-                        autoPlay muted loop playsInline
-                        className="mt-2 w-full max-h-32 object-cover rounded-lg border"
-                      />
-                    )}
                   </div>
                   <div>
                     <label className="text-sm font-medium">Lien (URL)</label>
@@ -368,8 +445,7 @@ export default function AdminHomepage() {
             {updateSettingsMut.isPending ? "Sauvegarde..." : "💾 Enregistrer les cartes"}
           </Button>
         </TabsContent>
-
-        {/* ── TEXTS TAB ──────────────────────────────────────────────────── */}
+                {/* ── TEXTS TAB ──────────────────────────────────────────────────── */}
         <TabsContent value="texts" className="space-y-4 mt-4">
           <Card>
             <CardHeader><CardTitle>Section Hero</CardTitle></CardHeader>

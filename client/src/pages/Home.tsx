@@ -255,10 +255,10 @@ export default function Home() {
   const storesSectionTitle = s?.storesSectionTitle ?? "نشريو منهم مباشرة ليك ••";
   // Quick-access cards
   const cards = [
-    { label: s?.card1Label, video: s?.card1Video, link: s?.card1Link },
-    { label: s?.card2Label, video: s?.card2Video, link: s?.card2Link },
-    { label: s?.card3Label, video: s?.card3Video, link: s?.card3Link },
-    { label: s?.card4Label, video: s?.card4Video, link: s?.card4Link },
+    { label: s?.card1Label, video: s?.card1Video, image: s?.card1Image, bgColor: s?.card1BgColor ?? "#1A1A1A", textColor: s?.card1TextColor ?? "#FFFFFF", link: s?.card1Link },
+    { label: s?.card2Label, video: s?.card2Video, image: s?.card2Image, bgColor: s?.card2BgColor ?? "#1A1A1A", textColor: s?.card2TextColor ?? "#FFFFFF", link: s?.card2Link },
+    { label: s?.card3Label, video: s?.card3Video, image: s?.card3Image, bgColor: s?.card3BgColor ?? "#1A1A1A", textColor: s?.card3TextColor ?? "#FFFFFF", link: s?.card3Link },
+    { label: s?.card4Label, video: s?.card4Video, image: s?.card4Image, bgColor: s?.card4BgColor ?? "#1A1A1A", textColor: s?.card4TextColor ?? "#FFFFFF", link: s?.card4Link },
   ].filter(c => c.label || c.link);
 
   // ── Header scroll effect ──────────────────────────────────────────────────
@@ -414,63 +414,70 @@ export default function Home() {
         </Link>
       </section>
 
-      {/* ── QUICK-ACCESS CARDS ────────────────────────────────────────────── */}
+      {/* ── QUICK-ACCESS CARDS (Amazon/Meta style) ─────────────────────────── */}
       {cards.length > 0 && (
-        <section style={{ background: "#fff", padding: "20px 16px 8px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
-            {cards.map((card, i) => (
-              <Link key={i} href={card.link ?? "/"} style={{ textDecoration: "none" }}>
-                <div
-                  style={{
-                    display: "flex", flexDirection: "column", alignItems: "center",
-                    gap: 8, padding: "14px 6px 12px",
-                    background: "#f8f8f8", borderRadius: 14,
-                    cursor: "pointer", transition: "transform 0.16s ease-out, background 0.16s",
-                    border: "1.5px solid rgba(0,0,0,0.06)",
-                  }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = "#f0f0f0"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = "#f8f8f8"; }}
-                  onMouseDown={e => { (e.currentTarget as HTMLDivElement).style.transform = "scale(0.96)"; }}
-                  onMouseUp={e => { (e.currentTarget as HTMLDivElement).style.transform = "scale(1)"; }}
-                  onTouchStart={e => { (e.currentTarget as HTMLDivElement).style.transform = "scale(0.96)"; }}
-                  onTouchEnd={e => { (e.currentTarget as HTMLDivElement).style.transform = "scale(1)"; }}
-                >
-                  {card.video ? (
-                    <div style={{ width: 56, height: 80, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
-                      <video
-                        src={card.video}
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                      />
-                    </div>
-                  ) : (
-                    <div style={{
-                      width: 56, height: 80, borderRadius: 10,
-                      background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 22, fontWeight: 700, color: "#fff",
-                    }}>
-                      {(card.label ?? "?")[0].toUpperCase()}
-                    </div>
-                  )}
-                  <span style={{
-                    fontSize: 11, fontWeight: 700, color: primaryColor,
-                    textAlign: "center", letterSpacing: "0.03em",
-                    lineHeight: 1.2, wordBreak: "break-word",
-                  }}>
-                    {card.label}
-                  </span>
+        <section style={{ background: "#fff", padding: "0 0 4px" }}>
+          {cards.map((card, i) => (
+            <Link key={i} href={card.link ?? "/"} style={{ textDecoration: "none", display: "block" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "0 16px",
+                  height: 72,
+                  background: card.bgColor || "#1A1A1A",
+                  borderBottom: "1px solid rgba(128,128,128,0.12)",
+                  cursor: "pointer",
+                  transition: "filter 0.15s ease-out",
+                  overflow: "hidden",
+                  position: "relative",
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.filter = "brightness(1.08)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.filter = "brightness(1)"; }}
+                onTouchStart={e => { (e.currentTarget as HTMLDivElement).style.filter = "brightness(0.92)"; }}
+                onTouchEnd={e => { (e.currentTarget as HTMLDivElement).style.filter = "brightness(1)"; }}
+              >
+                {/* Left: label */}
+                <span style={{
+                  color: card.textColor || "#FFFFFF",
+                  fontWeight: 700,
+                  fontSize: 15,
+                  letterSpacing: "0.01em",
+                  flex: 1,
+                  paddingRight: 12,
+                  zIndex: 1,
+                }}>
+                  {card.label}
+                </span>
+                {/* Right: image/video + chevron */}
+                <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, zIndex: 1 }}>
+                  {card.image ? (
+                    <img
+                      src={card.image}
+                      alt={card.label ?? ""}
+                      style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8 }}
+                    />
+                  ) : card.video ? (
+                    <video
+                      src={card.video}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8 }}
+                    />
+                  ) : null}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={card.textColor || "#FFFFFF"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9 18l6-6-6-6"/>
+                  </svg>
                 </div>
-              </Link>
-            ))}
-          </div>
+              </div>
+            </Link>
+          ))}
         </section>
       )}
-
-      {/* ── VIDEO SLIDER ───────────────────────────────────────────────────── */}
+            {/* ── VIDEO SLIDER ───────────────────────────────────────────────────── */}
       {sliderVideos.length > 0 && (
         <section style={{ padding: "40px 0", background: "#f8f8f8", overflow: "hidden" }}>
           <div
