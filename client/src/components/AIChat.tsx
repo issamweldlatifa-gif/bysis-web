@@ -404,7 +404,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed left-0 right-0 z-[999] flex flex-col bg-gradient-to-br from-[#1a0f2e] via-[#2d1b3d] to-[#0f0a1a]"
+            className="fixed left-0 right-0 z-[9999] flex flex-col bg-gradient-to-br from-[#1a0f2e] via-[#2d1b3d] to-[#0f0a1a]"
             style={{
               bottom: 'calc(64px + env(safe-area-inset-bottom, 0px))',
               height: 'calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))',
