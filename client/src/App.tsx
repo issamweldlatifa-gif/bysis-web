@@ -75,6 +75,7 @@ function Router() {
           <Route path={"/panier"} component={Panier} />
           <Route path={"/scanner"} component={Scanner} />
           <Route path={"/catalogue"} component={Catalogue} />
+          <Route path={"/commander"} component={Catalogue} />
           <Route path={"/produit/:id"} component={ProduitDetail} />
           <Route path={"/admin/panel"} component={AdminPanel} />
           <Route path={"/404"} component={NotFound} />

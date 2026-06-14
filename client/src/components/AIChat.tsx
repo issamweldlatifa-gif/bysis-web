@@ -406,8 +406,9 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
             exit="exit"
             className="fixed left-0 right-0 z-[9999] flex flex-col bg-gradient-to-br from-[#1a0f2e] via-[#2d1b3d] to-[#0f0a1a]"
             style={{
-              bottom: 'calc(64px + env(safe-area-inset-bottom, 0px))',
-              height: 'calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))',
+              bottom: 0,
+              height: '100dvh',
+              paddingBottom: 'calc(64px + env(safe-area-inset-bottom, 0px))',
               borderTopLeftRadius: '24px',
               borderTopRightRadius: '24px',
               boxShadow: '0 -8px 40px rgba(168, 85, 247, 0.3)',
