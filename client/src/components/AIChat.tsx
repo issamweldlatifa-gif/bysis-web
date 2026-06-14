@@ -395,12 +395,12 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="fixed left-0 right-0 z-[10000] flex flex-col bg-gradient-to-br from-[#1a0f2e] via-[#2d1b3d] to-[#0f0a1a]"
+            className="fixed left-0 right-0 z-[999] flex flex-col bg-gradient-to-br from-[#1a0f2e] via-[#2d1b3d] to-[#0f0a1a]"
             style={{
-              bottom: 0,
-              height: '100dvh',
-              borderTopLeftRadius: '0px',
-              borderTopRightRadius: '0px',
+              bottom: 'calc(64px + env(safe-area-inset-bottom, 0px))',
+              height: 'calc(100dvh - 64px - env(safe-area-inset-bottom, 0px))',
+              borderTopLeftRadius: '24px',
+              borderTopRightRadius: '24px',
               boxShadow: '0 -8px 40px rgba(168, 85, 247, 0.3)',
               fontFamily: "'Inter', 'SF Pro Display', -apple-system, sans-serif",
               border: '1px solid rgba(255, 255, 255, 0.1)',
