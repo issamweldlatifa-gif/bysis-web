@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import AdminSliders from '@/components/AdminSliders';
+import AdminHomepage from '@/components/AdminHomepage';
 
 interface CardItem {
   id: number;
@@ -84,14 +85,20 @@ export default function AdminPanel() {
     <div className="w-full max-w-6xl mx-auto p-6 space-y-8">
       <h1 className="text-4xl font-bold mb-8">Admin Panel ••</h1>
 
-      <Tabs defaultValue="sliders" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+      <Tabs defaultValue="homepage" className="w-full">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="homepage">🏠 Homepage</TabsTrigger>
           <TabsTrigger value="sliders">Sliders</TabsTrigger>
           <TabsTrigger value="hero">Hero</TabsTrigger>
           <TabsTrigger value="cards">Cards</TabsTrigger>
           <TabsTrigger value="stores">Stores</TabsTrigger>
           <TabsTrigger value="footer">Footer</TabsTrigger>
         </TabsList>
+
+        {/* HOMEPAGE CMS TAB */}
+        <TabsContent value="homepage" className="space-y-6">
+          <AdminHomepage />
+        </TabsContent>
 
         {/* SLIDERS TAB */}
         <TabsContent value="sliders" className="space-y-6">

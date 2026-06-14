@@ -441,3 +441,70 @@ export const sliders = mysqlTable("sliders", {
 
 export type Slider = typeof sliders.$inferSelect;
 export type InsertSlider = typeof sliders.$inferInsert;
+
+/**
+ * Homepage Settings - controls all text, colors, fonts for the homepage
+ * Single-row config table (id=1 always)
+ */
+export const homepageSettings = mysqlTable("homepage_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  // Hero Section
+  heroButtonText: varchar("heroButtonText", { length: 128 }).default("DÉCOUVRIR ••"),
+  heroButtonLink: varchar("heroButtonLink", { length: 512 }).default("/arrivage"),
+  heroButtonColor: varchar("heroButtonColor", { length: 7 }).default("#D4AF37"),
+  heroButtonTextColor: varchar("heroButtonTextColor", { length: 7 }).default("#1C2B33"),
+  // Admin Section (below hero)
+  adminHeadline: text("adminHeadline").default("DESTOCKAGE EUROPE •• Qualité Française, Prix Tunisien"),
+  adminButtonText: varchar("adminButtonText", { length: 128 }).default("VOIR LES OFFRES ••"),
+  adminButtonLink: varchar("adminButtonLink", { length: 512 }).default("/arrivage"),
+  // Stores section title
+  storesSectionTitle: varchar("storesSectionTitle", { length: 255 }).default("نشريو منهم مباشرة ليك ••"),
+  // Global colors & fonts
+  primaryColor: varchar("primaryColor", { length: 7 }).default("#1C2B33"),
+  accentColor: varchar("accentColor", { length: 7 }).default("#D4AF37"),
+  fontFamily: varchar("fontFamily", { length: 128 }).default("Inter"),
+  // Footer
+  footerFacebook: varchar("footerFacebook", { length: 512 }).default("https://facebook.com/bysis"),
+  footerInstagram: varchar("footerInstagram", { length: 512 }).default("https://instagram.com/bysis"),
+  footerWhatsapp: varchar("footerWhatsapp", { length: 64 }).default("+21623868982"),
+  footerEmail: varchar("footerEmail", { length: 320 }).default("support@bysis.shop"),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type HomepageSettings = typeof homepageSettings.$inferSelect;
+export type InsertHomepageSettings = typeof homepageSettings.$inferInsert;
+
+/**
+ * Homepage Videos - Hero video + Slider videos
+ * type: 'hero' | 'slider'
+ */
+export const homepageVideos = mysqlTable("homepage_videos", {
+  id: int("id").autoincrement().primaryKey(),
+  type: mysqlEnum("type", ["hero", "slider"]).notNull().default("slider"),
+  title: varchar("title", { length: 255 }).notNull(),
+  videoUrl: text("videoUrl").notNull(),
+  linkUrl: varchar("linkUrl", { length: 512 }).default("/"),
+  displayOrder: int("displayOrder").default(0).notNull(),
+  isActive: tinyint("isActive").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type HomepageVideo = typeof homepageVideos.$inferSelect;
+export type InsertHomepageVideo = typeof homepageVideos.$inferInsert;
+
+/**
+ * Homepage Stores - the store cards stack
+ */
+export const homepageStores = mysqlTable("homepage_stores", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 128 }).notNull(),
+  logoUrl: text("logoUrl"),
+  linkUrl: varchar("linkUrl", { length: 512 }).default("/"),
+  backgroundColor: varchar("backgroundColor", { length: 7 }).default("#F5F5F0"),
+  isDark: tinyint("isDark").default(0).notNull(), // dark text on light bg or vice versa
+  displayOrder: int("displayOrder").default(0).notNull(),
+  isActive: tinyint("isActive").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type HomepageStore = typeof homepageStores.$inferSelect;
+export type InsertHomepageStore = typeof homepageStores.$inferInsert;

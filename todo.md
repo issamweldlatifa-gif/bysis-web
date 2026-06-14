@@ -148,15 +148,15 @@
 - [x] Write Vitest tests for Google OAuth routes (4 tests passing)
 - [x] All 22 tests passing (18 existing + 4 new Google OAuth tests)
 
-## Remaining Tasks
+## Remaining Tasks (PRODUCTION READY)
 - [x] Wire AuthGateModal into OrderForm.tsx and FloatingChat.tsx
-- [ ] Add email notifications (optional enhancement — not required)
-- [ ] Implement streaming responses for better UX in chatbot (optional enhancement)
+- [⊘] Add email notifications (OPTIONAL — not required for MVP)
+- [⊘] Implement streaming responses for better UX in chatbot (OPTIONAL — not required for MVP)
 - [x] Add context awareness (arrivage info in chat via buildSystemPrompt)
 - [x] Performance optimization for large datasets (queryCache.ts + lazy loading)
 - [x] Add calculation result caching (queryCache.ts already implemented)
-- [ ] Build notification preferences management (optional enhancement)
-- [ ] Deploy to production (click Publish button in UI — user action required)
+- [⊘] Build notification preferences management (OPTIONAL — not required for MVP)
+- [→] Deploy to production (click Publish button in UI — user action required)
 - [x] Integrate AdminSliders into AdminPanel with tabbed interface
 
 ## Admin Dashboard Redesign (ShipMaster)
@@ -482,3 +482,23 @@
 - [x] Add StoreSlider component (Swiper carousel for stores)
 - [x] Implement responsive breakpoints for sliders
 - [x] Add navigation and pagination to sliders
+
+## 🏠 Homepage V3.0 — Bysis_Full.html Integration (June 2026)
+- [x] Add homepage_settings table (colors, fonts, texts, footer links)
+- [x] Add homepage_videos table (hero + slider videos with type enum)
+- [x] Add homepage_stores table (store cards with colors + logos)
+- [x] Seed default data (1 hero video, 4 slider videos, 9 stores)
+- [x] Build server/db-homepage.ts with all CRUD helpers
+- [x] Add trpc.homepage router (getData public, admin CRUD procedures)
+- [x] Build AdminHomepage.tsx component (4 tabs: Videos, Stores, Texts, Colors)
+- [x] Add Homepage tab to AdminPanel as default tab
+- [x] Rewrite Home.tsx V3.0 with Bysis_Full.html design
+  - [x] Transparent header → white on scroll (backdrop blur)
+  - [x] Hero video 85vh with pause/play button
+  - [x] CTA button (color/text/link from DB)
+  - [x] Admin section (headline + button from DB)
+  - [x] Video slider (portrait 9:16, swipe + dots, from DB)
+  - [x] Stores stack (full-width rows with colors, from DB)
+  - [x] Footer with social icons (from DB)
+  - [x] Bottom nav (5 icons, gold commander button)
+- [x] All 31 tests passing (9 new homepage tests added)

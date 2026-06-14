@@ -29,6 +29,13 @@ import {
 import {
   getActiveSliders, getAllSliders, getSliderById, createSlider, updateSlider, deleteSlider, toggleSliderActive,
 } from "./db-sliders";
+import {
+  getHomepageSettings, updateHomepageSettings,
+  getHeroVideo, getSliderVideos, getAllHomepageVideos,
+  createHomepageVideo, updateHomepageVideo, deleteHomepageVideo,
+  getActiveHomepageStores, getAllHomepageStores,
+  createHomepageStore, updateHomepageStore, deleteHomepageStore,
+} from "./db-homepage";
 import { invokeLLM } from "./_core/llm";
 import { notifyOwner } from "./_core/notification";
 import { transcribeAudio } from "./_core/voiceTranscription";
@@ -1633,6 +1640,144 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
         await toggleSliderActive(input.id);
+        return { success: true };
+      }),
+  }),
+
+  // ===== Homepage CMS =====
+  homepage: router({
+    // Public: get all homepage data in one call
+    getData: publicProcedure.query(async () => {
+      const [settings, heroVideo, sliderVideos, stores] = await Promise.all([
+        getHomepageSettings(),
+        getHeroVideo(),
+        getSliderVideos(),
+        getActiveHomepageStores(),
+      ]);
+      return { settings, heroVideo, sliderVideos, stores };
+    }),
+
+    // Admin: get settings
+    getSettings: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+      return getHomepageSettings();
+    }),
+
+    // Admin: update settings
+    updateSettings: protectedProcedure
+      .input(z.object({
+        heroButtonText: z.string().optional(),
+        heroButtonLink: z.string().optional(),
+        heroButtonColor: z.string().optional(),
+        heroButtonTextColor: z.string().optional(),
+        adminHeadline: z.string().optional(),
+        adminButtonText: z.string().optional(),
+        adminButtonLink: z.string().optional(),
+        storesSectionTitle: z.string().optional(),
+        primaryColor: z.string().optional(),
+        accentColor: z.string().optional(),
+        fontFamily: z.string().optional(),
+        footerFacebook: z.string().optional(),
+        footerInstagram: z.string().optional(),
+        footerWhatsapp: z.string().optional(),
+        footerEmail: z.string().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        return updateHomepageSettings(input);
+      }),
+
+    // Admin: get all videos
+    getVideos: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+      return getAllHomepageVideos();
+    }),
+
+    // Admin: create video
+    createVideo: protectedProcedure
+      .input(z.object({
+        type: z.enum(["hero", "slider"]),
+        title: z.string(),
+        videoUrl: z.string().url(),
+        linkUrl: z.string().optional(),
+        displayOrder: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        return createHomepageVideo({ ...input, isActive: 1 });
+      }),
+
+    // Admin: update video
+    updateVideo: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        type: z.enum(["hero", "slider"]).optional(),
+        title: z.string().optional(),
+        videoUrl: z.string().optional(),
+        linkUrl: z.string().optional(),
+        displayOrder: z.number().optional(),
+        isActive: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        const { id, ...data } = input;
+        return updateHomepageVideo(id, data);
+      }),
+
+    // Admin: delete video
+    deleteVideo: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        await deleteHomepageVideo(input.id);
+        return { success: true };
+      }),
+
+    // Admin: get all stores
+    getStores: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+      return getAllHomepageStores();
+    }),
+
+    // Admin: create store
+    createStore: protectedProcedure
+      .input(z.object({
+        name: z.string(),
+        logoUrl: z.string().optional(),
+        linkUrl: z.string().optional(),
+        backgroundColor: z.string().optional(),
+        isDark: z.number().optional(),
+        displayOrder: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        return createHomepageStore({ ...input, isActive: 1 });
+      }),
+
+    // Admin: update store
+    updateStore: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().optional(),
+        logoUrl: z.string().optional(),
+        linkUrl: z.string().optional(),
+        backgroundColor: z.string().optional(),
+        isDark: z.number().optional(),
+        displayOrder: z.number().optional(),
+        isActive: z.number().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        const { id, ...data } = input;
+        return updateHomepageStore(id, data);
+      }),
+
+    // Admin: delete store
+    deleteStore: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+        await deleteHomepageStore(input.id);
         return { success: true };
       }),
   }),
