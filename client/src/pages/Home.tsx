@@ -17,9 +17,17 @@ function BottomNav({ accentColor, primaryColor }: { accentColor: string; primary
       padding: "10px 0 calc(10px + env(safe-area-inset-bottom))",
     }}>
       <Link href="/search" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, textDecoration: "none" }}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F2F2F7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
+        <img
+          src="/manus-storage/lens-icon-final_394b0a96.png"
+          alt="Lens"
+          width={28}
+          height={28}
+          style={{
+            width: 28, height: 28,
+            objectFit: "contain",
+            imageRendering: "crisp-edges",
+          }}
+        />
         <span style={{ color: "#F2F2F7", fontSize: 10, letterSpacing: "0.05em" }}>Lens</span>
       </Link>
       <Link href="/arrivage" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, textDecoration: "none" }}>
