@@ -47,7 +47,10 @@ import { savePushSubscription, sendPushToPhone } from "./pushNotifications";
 import {
   saveLensSearch, getLensHistory, searchProductsByKeywords,
   searchProductsByText, getTrendingProducts,
+  addPriceTracking, getUserPriceTracking, removePriceTracking,
+  saveArTryOn, updateArTryOnResult, getArTryOnResult,
 } from "./db-lens";
+import { generateImage } from "./_core/imageGeneration";
 import { notifyAdminNewAiOrder, sendOrderConfirmationToAdmin, sendStatusUpdateToAdmin } from "./emailService";
 
 // Admin session cookie name (separate from Manus OAuth)
@@ -1904,6 +1907,212 @@ Retourne UNIQUEMENT du JSON valide, sans markdown.`,
     history: publicProcedure
       .input(z.object({ sessionId: z.string() }))
       .query(async ({ input }) => getLensHistory(input.sessionId, 10)),
+
+    // Voice search: transcribe audio then search products
+    voiceSearch: publicProcedure
+      .input(z.object({
+        audioUrl: z.string(),
+        sessionId: z.string().optional(),
+        language: z.string().optional().default("fr"),
+      }))
+      .mutation(async ({ input }) => {
+        const transcription = await transcribeAudio({
+          audioUrl: input.audioUrl,
+          language: input.language,
+          prompt: "Recherche de produit e-commerce",
+        });
+        const query = ("text" in transcription ? transcription.text : "")?.trim() ?? "";
+        if (!query) return { query: "", results: [], transcription: "" };
+        const results = await searchProductsByText(query, 12);
+        await saveLensSearch({
+          sessionId: input.sessionId,
+          queryType: "text",
+          queryText: query,
+          resultCount: results.length,
+        }).catch(() => {});
+        return { query, results, transcription: query };
+      }),
+
+    // Multimodal search: image + optional text query simultaneously
+    multimodalSearch: publicProcedure
+      .input(z.object({
+        imageBase64: z.string(),
+        textQuery: z.string().optional(),
+        sessionId: z.string().optional(),
+        userId: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        // Upload image
+        const base64Data = input.imageBase64.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, "base64");
+        const mimeMatch = input.imageBase64.match(/^data:(image\/\w+);base64,/);
+        const mime = (mimeMatch?.[1] ?? "image/jpeg") as string;
+        const ext = mime.split("/")[1] ?? "jpg";
+        const key = `lens/multi-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { url: imageUrl } = await storagePut(key, buffer, mime);
+
+        // AI Vision analysis
+        const aiResponse = await invokeLLM({
+          messages: [
+            {
+              role: "system",
+              content: `Tu es un moteur de reconnaissance de produits pour Bysis.
+Analyse l'image${input.textQuery ? ` en tenant compte de la requête: "${input.textQuery}"` : ""}.
+Retourne un JSON avec productType, colors, keywords (3-6 mots-clés), estimatedPrice, confidence, platform, similarityScore (0-1).
+Retourne UNIQUEMENT du JSON valide.`,
+            },
+            {
+              role: "user",
+              content: [
+                { type: "image_url", image_url: { url: input.imageBase64, detail: "high" } },
+                { type: "text", text: input.textQuery ? `Requête: ${input.textQuery}` : "Analyse ce produit." },
+              ],
+            },
+          ],
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "multimodal_analysis",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  productType: { type: "string" },
+                  colors: { type: "array", items: { type: "string" } },
+                  keywords: { type: "array", items: { type: "string" } },
+                  estimatedPrice: { type: ["number", "null"] },
+                  confidence: { type: "number" },
+                  platform: { type: ["string", "null"] },
+                  similarityScore: { type: "number" },
+                },
+                required: ["productType", "colors", "keywords", "estimatedPrice", "confidence", "platform", "similarityScore"],
+                additionalProperties: false,
+              },
+            },
+          },
+        });
+
+        const raw = aiResponse.choices?.[0]?.message?.content ?? "{}";
+        let analysis: { productType: string; colors: string[]; keywords: string[]; estimatedPrice: number | null; confidence: number; platform: string | null; similarityScore: number };
+        try {
+          analysis = JSON.parse(typeof raw === "string" ? raw : JSON.stringify(raw));
+        } catch {
+          analysis = { productType: "Produit", colors: [], keywords: [], estimatedPrice: null, confidence: 0.5, platform: null, similarityScore: 0.5 };
+        }
+
+        // Merge text query keywords with AI keywords
+        const allKeywords = [...analysis.keywords];
+        if (input.textQuery) {
+          allKeywords.push(...input.textQuery.split(/\s+/).filter(Boolean).slice(0, 3));
+        }
+
+        const results = await searchProductsByKeywords([...new Set(allKeywords)], 16);
+
+        await saveLensSearch({
+          userId: input.userId,
+          sessionId: input.sessionId,
+          queryType: "image",
+          imageUrl,
+          aiAnalysis: {
+            productType: analysis.productType,
+            colors: analysis.colors,
+            keywords: allKeywords,
+            estimatedPrice: analysis.estimatedPrice ?? undefined,
+            confidence: analysis.confidence,
+            platform: analysis.platform ?? undefined,
+          },
+          resultCount: results.length,
+        }).catch(() => {});
+
+        return { analysis, results, imageUrl };
+      }),
+
+    // Price tracking: add product to tracking list
+    trackPrice: publicProcedure
+      .input(z.object({
+        sessionId: z.string(),
+        userId: z.string().optional(),
+        productId: z.number().optional(),
+        productName: z.string(),
+        productUrl: z.string().optional(),
+        productImageUrl: z.string().optional(),
+        platform: z.string().optional(),
+        targetPrice: z.number().optional(),
+        currentPrice: z.number().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        await addPriceTracking(input);
+        return { success: true };
+      }),
+
+    // Get user's price tracking list
+    getPriceTracking: publicProcedure
+      .input(z.object({ sessionId: z.string() }))
+      .query(async ({ input }) => getUserPriceTracking(input.sessionId, 20)),
+
+    // Remove a price tracking entry
+    removePriceTracking: publicProcedure
+      .input(z.object({ id: z.number(), sessionId: z.string() }))
+      .mutation(async ({ input }) => {
+        await removePriceTracking(input.id, input.sessionId);
+        return { success: true };
+      }),
+
+    // AR Try-On: upload user photo + product image → AI generates merged result
+    arTryOn: publicProcedure
+      .input(z.object({
+        userPhotoBase64: z.string(),
+        productImageUrl: z.string(),
+        productName: z.string().optional(),
+        sessionId: z.string().optional(),
+        userId: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        // Upload user photo
+        const base64Data = input.userPhotoBase64.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, "base64");
+        const mimeMatch = input.userPhotoBase64.match(/^data:(image\/\w+);base64,/);
+        const mime = (mimeMatch?.[1] ?? "image/jpeg") as string;
+        const ext = mime.split("/")[1] ?? "jpg";
+        const key = `ar-tryon/user-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { url: userPhotoUrl } = await storagePut(key, buffer, mime);
+
+        // Save initial record
+        const record = await saveArTryOn({
+          userId: input.userId,
+          sessionId: input.sessionId,
+          userPhotoUrl,
+          productImageUrl: input.productImageUrl,
+          productName: input.productName,
+        });
+
+        // Generate AR merge with AI (async - fire and forget, update DB when done)
+        const tryOnId = (record as any)?.insertId ?? 0;
+
+        // Run AI image generation in background
+        (async () => {
+          try {
+            const prompt = `Habille cette personne avec ce vêtement/produit: ${input.productName ?? "produit"}. Garde le visage et la posture de la personne, remplace seulement les vêtements. Style photo réaliste, haute qualité.`;
+            const { url: resultUrl } = await generateImage({
+              prompt,
+              originalImages: [
+                { url: userPhotoUrl, mimeType: mime as string },
+                { url: input.productImageUrl, mimeType: "image/jpeg" },
+              ],
+            });
+            if (tryOnId) await updateArTryOnResult(tryOnId, resultUrl ?? "", "done");
+          } catch {
+            if (tryOnId) await updateArTryOnResult(tryOnId, "", "failed");
+          }
+        })();
+
+        return { id: tryOnId, status: "processing" };
+      }),
+
+    // Poll AR Try-On result by ID
+    getArTryOnResult: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => getArTryOnResult(input.id)),
   }),
 
   // ===== Push Notifications =====
