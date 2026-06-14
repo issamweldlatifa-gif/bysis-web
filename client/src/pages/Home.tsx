@@ -571,7 +571,9 @@ export default function Home() {
       </footer>
 
       {/* ── BOTTOM NAV ─────────────────────────────────────────────────────── */}
-      <BottomNav accentColor={accentColor} primaryColor={primaryColor} onOpenChat={toggleChat} chatOpen={chatOpen} onOpenLens={toggleLens} lensOpen={lensOpen} />
+      <div style={{ pointerEvents: chatOpen ? 'none' : 'auto', opacity: chatOpen ? 0 : 1, transition: 'opacity 0.2s ease' }}>
+        <BottomNav accentColor={accentColor} primaryColor={primaryColor} onOpenChat={toggleChat} chatOpen={chatOpen} onOpenLens={toggleLens} lensOpen={lensOpen} />
+      </div>
       <LensSheet isOpen={lensOpen} onClose={() => setLensOpen(false)} />
     </div>
   );
