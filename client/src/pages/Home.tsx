@@ -17,7 +17,7 @@ function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen }: { accent
       display: "flex", justifyContent: "space-around", alignItems: "center",
       padding: "10px 0 calc(10px + env(safe-area-inset-bottom))",
     }}>
-      <Link href="/search" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, textDecoration: "none" }}>
+      <Link href="/scanner" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, textDecoration: "none" }}>
         <img
           src="/manus-storage/lens-icon-final_394b0a96.png"
           alt="Lens"
