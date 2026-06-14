@@ -9,7 +9,7 @@ import { trpc } from "@/lib/trpc";
 import { useChatContext } from "@/App";
 
 // ─── Bottom Nav ───────────────────────────────────────────────────────────────
-function BottomNav({ accentColor, primaryColor, onOpenChat }: { accentColor: string; primaryColor: string; onOpenChat: () => void }) {
+function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen }: { accentColor: string; primaryColor: string; onOpenChat: () => void; chatOpen: boolean }) {
   return (
     <nav style={{
       position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 1000,
@@ -60,7 +60,7 @@ function BottomNav({ accentColor, primaryColor, onOpenChat }: { accentColor: str
       </Link>
       <button
         onClick={onOpenChat}
-        style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: "none", border: "none", cursor: "pointer", padding: 0 }}
+        style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: "none", border: "none", cursor: "pointer", padding: 0, opacity: chatOpen ? 1 : 0.85 }}
       >
         <img
           src="/manus-storage/ai-icon-48_36db3133.gif"
@@ -82,7 +82,8 @@ function BottomNav({ accentColor, primaryColor, onOpenChat }: { accentColor: str
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function Home() {
-  const { openChat } = useChatContext();
+  const { openChat, closeChat, chatOpen } = useChatContext();
+  const toggleChat = useCallback(() => { chatOpen ? closeChat() : openChat(); }, [chatOpen, openChat, closeChat]);
   const { data: homepageData, isLoading } = trpc.homepage.getData.useQuery();
 
   const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -445,7 +446,7 @@ export default function Home() {
       </footer>
 
       {/* ── BOTTOM NAV ─────────────────────────────────────────────────────── */}
-      <BottomNav accentColor={accentColor} primaryColor={primaryColor} onOpenChat={openChat} />
+      <BottomNav accentColor={accentColor} primaryColor={primaryColor} onOpenChat={toggleChat} chatOpen={chatOpen} />
     </div>
   );
 }
