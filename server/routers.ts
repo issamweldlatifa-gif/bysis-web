@@ -1908,16 +1908,27 @@ Retourne UNIQUEMENT du JSON valide, sans markdown.`,
       .input(z.object({ sessionId: z.string() }))
       .query(async ({ input }) => getLensHistory(input.sessionId, 10)),
 
-    // Voice search: transcribe audio then search products
+    // Voice search: accept base64 audio, upload to storage, transcribe, then search products
     voiceSearch: publicProcedure
       .input(z.object({
-        audioUrl: z.string(),
+        audioBase64: z.string(), // base64 encoded audio (data:audio/webm;base64,...)
         sessionId: z.string().optional(),
         language: z.string().optional().default("fr"),
       }))
       .mutation(async ({ input }) => {
+        // Upload audio to storage to get a real URL for transcription
+        let audioUrl: string | null = null;
+        try {
+          const base64Data = input.audioBase64.replace(/^data:audio\/[^;]+;base64,/, "");
+          const buffer = Buffer.from(base64Data, "base64");
+          const result = await storagePut(`lens/audio-${Date.now()}.webm`, buffer, "audio/webm");
+          audioUrl = await storageGetSignedUrl(result.key);
+        } catch (e) {
+          console.error("[Lens] Audio upload error:", e);
+          return { query: "", results: [], transcription: "" };
+        }
         const transcription = await transcribeAudio({
-          audioUrl: input.audioUrl,
+          audioUrl,
           language: input.language,
           prompt: "Recherche de produit e-commerce",
         });

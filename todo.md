@@ -48,13 +48,13 @@
 - [x] Build chat UI with message history
 - [x] Integrate LLM for intelligent responses (Anthropic Claude Sonnet)
 - [x] Add context awareness (arrivage info in chat via buildSystemPrompt)
-- [ ] Implement streaming responses for better UX (optional enhancement)
+- [⊘] Implement streaming responses for better UX (optional enhancement — skipped)
 
 ## Phase 7: Notifications & Email
 - [x] Implement owner notification system for new orders
 - [x] Create notification service integration (push notifications)
-- [ ] Build notification preferences management (optional enhancement)
-- [ ] Add email notifications (optional enhancement — not required)
+- [⊘] Build notification preferences management (optional enhancement — skipped)
+- [⊘] Add email notifications (optional enhancement — skipped)
 
 ## Phase 8: Authentication & Authorization
 - [x] Verify Manus OAuth integration
@@ -74,10 +74,10 @@
 
 ## Phase 10: Deployment & Finalization
 - [x] Create production checkpoint (manus-webdev://1957b836)
-- [ ] Deploy to Manus WebDev (click Publish button in UI)
+- [→] Deploy to Manus WebDev (click Publish button in UI — user action required)
 - [x] Verify all features in dev environment
 - [x] Setup custom domain (bysis.shop)
-- [ ] Monitor and fix any production issues (post-deployment)
+- [→] Monitor and fix any production issues (post-deployment — user action required)
 
 ## Admin Dashboard ShipMaster (CRM + Analytics + Audit Log)
 
@@ -510,7 +510,10 @@
 - [x] Real-time Price Tracking: price_tracking table + tRPC trackPrice/getPriceTracking/removePriceTracking
 - [x] AR Try-On: AI Photo Merge (user photo + product photo → generateImage → resultImageUrl in DB)
 - [x] DB: price_tracking and ar_try_on_results tables created in schema.ts and live DB
+- [x] DB: scheduleCronTaskUid column added to price_tracking for heartbeat tracking
 - [x] Backend: db-lens.ts extended with addPriceTracking, getUserPriceTracking, removePriceTracking, saveArTryOn, updateArTryOnResult, getArTryOnResult
-- [x] Backend: routers.ts extended with voiceSearch, multimodalSearch, trackPrice, getPriceTracking, removePriceTracking, arTryOn, getArTryOnResult procedures
-- [x] UI: LensSheet.tsx upgraded — 4 tabs (Camera, Gallery, Text, Voice), price tracking button on each product, AR Try-On modal, price tracking list panel, multimodal text input
+- [x] Backend: routers.ts extended with voiceSearch (audioBase64 → storagePut → transcribeAudio), multimodalSearch, trackPrice, getPriceTracking, removePriceTracking, arTryOn, getArTryOnResult procedures
+- [x] Backend: pricecheckHandler.ts — Heartbeat POST /api/scheduled/priceCheck (price drop detection + push notifications + admin alert)
+- [x] Backend: /api/scheduled/priceCheck registered in index.ts before tRPC fallthrough
+- [x] UI: LensSheet.tsx upgraded — 4 tabs (Camera, Gallery, Text, Voice), voice uses tRPC mutation with audioBase64, price tracking button on each product, AR Try-On modal, price tracking list panel, multimodal text input
 - [x] 31/31 tests passing, 0 TypeScript errors

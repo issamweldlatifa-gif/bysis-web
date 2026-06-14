@@ -352,7 +352,11 @@ export default function LensSheet({ isOpen, onClose }: LensSheetProps) {
   // ─── tRPC hooks ──────────────────────────────────────────────────────────
   const analyzeImageMutation = trpc.lens.analyzeImage.useMutation();
   const multimodalMutation = trpc.lens.multimodalSearch.useMutation();
-  const voiceSearchMutation = trpc.lens.voiceSearch.useMutation();
+  const voiceSearchMutation = trpc.lens.voiceSearch.useMutation({
+    onSuccess: (data) => {
+      if (data.transcription) setVoiceTranscript(data.transcription);
+    },
+  });
   const trackPriceMutation = trpc.lens.trackPrice.useMutation({
     onSuccess: () => setToastMessage("Prix ajouté au suivi ✓"),
   });
@@ -452,28 +456,14 @@ export default function LensSheet({ isOpen, onClose }: LensSheetProps) {
       audioChunksRef.current = [];
       const mr = new MediaRecorder(stream, { mimeType: "audio/webm" });
       mr.ondataavailable = (e) => { if (e.data.size > 0) audioChunksRef.current.push(e.data); };
-      mr.onstop = async () => {
+      mr.onstop = () => {
         stream.getTracks().forEach((t) => t.stop());
         const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
-        // Convert to base64 and upload
+        // Convert to base64 and call tRPC mutation
         const reader = new FileReader();
-        reader.onload = async (ev) => {
-          const base64 = ev.target?.result as string;
-          // Upload audio to storage via fetch
-          try {
-            const res = await fetch("/api/trpc/lens.voiceSearch", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ json: { audioUrl: base64, sessionId, language: "fr" } }),
-            });
-            if (res.ok) {
-              const data = await res.json();
-              const result = data?.result?.data?.json;
-              if (result?.transcription) setVoiceTranscript(result.transcription);
-            }
-          } catch {
-            // fallback: use text search with empty
-          }
+        reader.onload = (ev) => {
+          const audioBase64 = ev.target?.result as string;
+          voiceSearchMutation.mutate({ audioBase64, sessionId, language: "fr" });
         };
         reader.readAsDataURL(blob);
       };

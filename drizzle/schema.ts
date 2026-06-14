@@ -550,6 +550,7 @@ export const priceTracking = mysqlTable("price_tracking", {
   lastCheckedAt: timestamp("lastCheckedAt"),
   alertSent: tinyint("alertSent").default(0).notNull(),
   isActive: tinyint("isActive").default(1).notNull(),
+  scheduleCronTaskUid: varchar("scheduleCronTaskUid", { length: 65 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
