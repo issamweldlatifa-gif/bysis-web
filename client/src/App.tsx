@@ -66,6 +66,7 @@ function Router() {
           <Route path={"/admin/login"} component={AdminLogin} />
           <Route path={"/admin/conversations"} component={AdminConversations} />
           <Route path={"/track"} component={TrackOrder} />
+          <Route path={"/suivi"} component={TrackOrder} />
           <Route path={"/confirmation"} component={OrderConfirmation} />
           <Route path={"/arrivage"} component={Arrivage} />
           <Route path={"/admin/arrivage"} component={AdminArrivage} />
