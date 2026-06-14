@@ -44,6 +44,10 @@ import { storagePut, storageGetSignedUrl } from "./storage";
 import { parse as parseCookieHeader } from "cookie";
 import crypto from "crypto";
 import { savePushSubscription, sendPushToPhone } from "./pushNotifications";
+import {
+  saveLensSearch, getLensHistory, searchProductsByKeywords,
+  searchProductsByText, getTrendingProducts,
+} from "./db-lens";
 import { notifyAdminNewAiOrder, sendOrderConfirmationToAdmin, sendStatusUpdateToAdmin } from "./emailService";
 
 // Admin session cookie name (separate from Manus OAuth)
@@ -1780,6 +1784,126 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         await deleteHomepageStore(input.id);
         return { success: true };
       }),
+  }),
+
+  // ===== Lens AI Visual Search =====
+  lens: router({
+    // Analyze image with AI Vision
+    analyzeImage: publicProcedure
+      .input(z.object({
+        imageBase64: z.string(),
+        sessionId: z.string().optional(),
+        userId: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        // Upload image to storage
+        const base64Data = input.imageBase64.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, "base64");
+        const mimeMatch = input.imageBase64.match(/^data:(image\/\w+);base64,/);
+        const mime = (mimeMatch?.[1] ?? "image/jpeg") as string;
+        const ext = mime.split("/")[1] ?? "jpg";
+        const key = `lens/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { url: imageUrl } = await storagePut(key, buffer, mime);
+
+        // Call AI Vision for product analysis
+        const aiResponse = await invokeLLM({
+          messages: [
+            {
+              role: "system",
+              content: `Tu es un moteur de reconnaissance de produits pour Bysis, une plateforme e-commerce tunisienne.
+Analyse l'image et retourne un JSON avec:
+- productType: catégorie principale en français (ex: "Robe", "Chaussures", "Téléphone")
+- colors: tableau des couleurs dominantes en français
+- keywords: tableau de 3-6 mots-clés de recherche en français et arabe
+- estimatedPrice: prix estimé en TND si visible, sinon null
+- confidence: score de confiance 0-1
+- platform: "shein"|"aliexpress"|"temu"|null
+Retourne UNIQUEMENT du JSON valide, sans markdown.`,
+            },
+            {
+              role: "user",
+              content: [
+                { type: "image_url", image_url: { url: input.imageBase64, detail: "high" } },
+                { type: "text", text: "Analyse ce produit et retourne le JSON." },
+              ],
+            },
+          ],
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "lens_analysis",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  productType: { type: "string" },
+                  colors: { type: "array", items: { type: "string" } },
+                  keywords: { type: "array", items: { type: "string" } },
+                  estimatedPrice: { type: ["number", "null"] },
+                  confidence: { type: "number" },
+                  platform: { type: ["string", "null"] },
+                },
+                required: ["productType", "colors", "keywords", "estimatedPrice", "confidence", "platform"],
+                additionalProperties: false,
+              },
+            },
+          },
+        });
+
+        const raw = aiResponse.choices?.[0]?.message?.content ?? "{}";
+        let analysis: { productType: string; colors: string[]; keywords: string[]; estimatedPrice: number | null; confidence: number; platform: string | null };
+        try {
+          analysis = JSON.parse(typeof raw === "string" ? raw : JSON.stringify(raw));
+        } catch {
+          analysis = { productType: "Produit", colors: [], keywords: [], estimatedPrice: null, confidence: 0.5, platform: null };
+        }
+
+        const results = await searchProductsByKeywords(analysis.keywords, 12);
+
+        await saveLensSearch({
+          userId: input.userId,
+          sessionId: input.sessionId,
+          queryType: "image",
+          imageUrl,
+          aiAnalysis: {
+            productType: analysis.productType,
+            colors: analysis.colors,
+            keywords: analysis.keywords,
+            estimatedPrice: analysis.estimatedPrice ?? undefined,
+            confidence: analysis.confidence,
+            platform: analysis.platform ?? undefined,
+          },
+          resultCount: results.length,
+        }).catch(() => {});
+
+        return { analysis, results, imageUrl };
+      }),
+
+    // Text search
+    searchText: publicProcedure
+      .input(z.object({ query: z.string().min(1).max(200), sessionId: z.string().optional() }))
+      .query(async ({ input }) => {
+        const results = await searchProductsByText(input.query, 12);
+        await saveLensSearch({ sessionId: input.sessionId, queryType: "text", queryText: input.query, resultCount: results.length }).catch(() => {});
+        return { results };
+      }),
+
+    // Barcode search
+    searchBarcode: publicProcedure
+      .input(z.object({ barcode: z.string(), sessionId: z.string().optional() }))
+      .query(async ({ input }) => {
+        const results = await searchProductsByText(input.barcode, 8);
+        await saveLensSearch({ sessionId: input.sessionId, queryType: "barcode", queryText: input.barcode, resultCount: results.length }).catch(() => {});
+        return { results };
+      }),
+
+    // Trending products (empty state)
+    trending: publicProcedure.query(async () => getTrendingProducts(8)),
+
+    // Search history
+    history: publicProcedure
+      .input(z.object({ sessionId: z.string() }))
+      .query(async ({ input }) => getLensHistory(input.sessionId, 10)),
   }),
 
   // ===== Push Notifications =====

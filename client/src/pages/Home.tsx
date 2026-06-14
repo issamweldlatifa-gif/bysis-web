@@ -7,9 +7,10 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useChatContext } from "@/App";
+import LensSheet from "@/components/LensSheet";
 
 // ─── Bottom Nav ───────────────────────────────────────────────────────────────
-function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen }: { accentColor: string; primaryColor: string; onOpenChat: () => void; chatOpen: boolean }) {
+function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen, onOpenLens, lensOpen }: { accentColor: string; primaryColor: string; onOpenChat: () => void; chatOpen: boolean; onOpenLens: () => void; lensOpen: boolean }) {
   return (
     <nav style={{
       position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 1000,
@@ -17,7 +18,7 @@ function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen }: { accent
       display: "flex", justifyContent: "space-around", alignItems: "center",
       padding: "10px 0 calc(10px + env(safe-area-inset-bottom))",
     }}>
-      <Link href="/scanner" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, textDecoration: "none" }}>
+      <button onClick={onOpenLens} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, background: "none", border: "none", cursor: "pointer", padding: 0, opacity: lensOpen ? 1 : 0.85 }}>
         <img
           src="/manus-storage/lens-icon-final_394b0a96.png"
           alt="Lens"
@@ -29,8 +30,8 @@ function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen }: { accent
             imageRendering: "crisp-edges",
           }}
         />
-        <span style={{ color: "#F2F2F7", fontSize: 10, letterSpacing: "0.05em" }}>Lens</span>
-      </Link>
+        <span style={{ color: lensOpen ? accentColor : "#F2F2F7", fontSize: 10, letterSpacing: "0.05em" }}>Lens</span>
+      </button>
       <Link href="/arrivage" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, textDecoration: "none" }}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F2F2F7" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
@@ -84,6 +85,8 @@ function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen }: { accent
 export default function Home() {
   const { openChat, closeChat, chatOpen } = useChatContext();
   const toggleChat = useCallback(() => { chatOpen ? closeChat() : openChat(); }, [chatOpen, openChat, closeChat]);
+  const [lensOpen, setLensOpen] = useState(false);
+  const toggleLens = useCallback(() => setLensOpen((v) => !v), []);
   const { data: homepageData, isLoading } = trpc.homepage.getData.useQuery();
 
   const heroVideoRef = useRef<HTMLVideoElement>(null);
@@ -446,7 +449,8 @@ export default function Home() {
       </footer>
 
       {/* ── BOTTOM NAV ─────────────────────────────────────────────────────── */}
-      <BottomNav accentColor={accentColor} primaryColor={primaryColor} onOpenChat={toggleChat} chatOpen={chatOpen} />
+      <BottomNav accentColor={accentColor} primaryColor={primaryColor} onOpenChat={toggleChat} chatOpen={chatOpen} onOpenLens={toggleLens} lensOpen={lensOpen} />
+      <LensSheet isOpen={lensOpen} onClose={() => setLensOpen(false)} />
     </div>
   );
 }

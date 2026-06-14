@@ -508,3 +508,27 @@ export const homepageStores = mysqlTable("homepage_stores", {
 });
 export type HomepageStore = typeof homepageStores.$inferSelect;
 export type InsertHomepageStore = typeof homepageStores.$inferInsert;
+
+/**
+ * Lens Search History - AI visual search queries and results
+ */
+export const lensHistory = mysqlTable("lens_history", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: varchar("userId", { length: 128 }),
+  sessionId: varchar("sessionId", { length: 128 }),
+  queryType: mysqlEnum("queryType", ["image", "text", "barcode"]).notNull().default("image"),
+  queryText: text("queryText"),
+  imageUrl: text("imageUrl"),
+  aiAnalysis: json("aiAnalysis").$type<{
+    productType: string;
+    colors: string[];
+    keywords: string[];
+    estimatedPrice?: number;
+    confidence: number;
+    platform?: string;
+  }>(),
+  resultCount: int("resultCount").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type LensHistory = typeof lensHistory.$inferSelect;
+export type InsertLensHistory = typeof lensHistory.$inferInsert;
