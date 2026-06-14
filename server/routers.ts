@@ -1757,6 +1757,7 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         logoUrl: z.string().optional(),
         linkUrl: z.string().optional(),
         backgroundColor: z.string().optional(),
+        textColor: z.string().optional(),
         isDark: z.number().optional(),
         displayOrder: z.number().optional(),
       }))
@@ -1773,6 +1774,7 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         logoUrl: z.string().optional(),
         linkUrl: z.string().optional(),
         backgroundColor: z.string().optional(),
+        textColor: z.string().optional(),
         isDark: z.number().optional(),
         displayOrder: z.number().optional(),
         isActive: z.number().optional(),

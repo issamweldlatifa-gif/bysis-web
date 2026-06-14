@@ -544,3 +544,8 @@
 - [x] Mettre à jour routers.ts pour les nouveaux champs (bgColor, textColor, image)
 - [x] AdminHomepage : color picker bg + text, champ image URL + aperçu live style Meta
 - [x] Home.tsx : redesign bandes horizontales (image droite, texte gauche, flèche, couleur bg)
+
+## Magasins style Amazon (bandes horizontales) — Juin 2026
+- [x] Vérifier/ajouter textColor + logoUrl dans stores schema + DB
+- [x] AdminHomepage Magasins : color picker bgColor + textColor + image + aperçu style Amazon
+- [x] Home.tsx : afficher stores en bandes horizontales (texte gauche, image droite, flèche)

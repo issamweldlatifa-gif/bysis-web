@@ -525,6 +525,7 @@ export const homepageStores = mysqlTable("homepage_stores", {
   logoUrl: text("logoUrl"),
   linkUrl: varchar("linkUrl", { length: 512 }).default("/"),
   backgroundColor: varchar("backgroundColor", { length: 7 }).default("#F5F5F0"),
+  textColor: varchar("textColor", { length: 32 }).default("#FFFFFF"),
   isDark: tinyint("isDark").default(0).notNull(), // dark text on light bg or vice versa
   displayOrder: int("displayOrder").default(0).notNull(),
   isActive: tinyint("isActive").default(1).notNull(),

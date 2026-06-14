@@ -572,17 +572,18 @@ export default function Home() {
                   <span style={{
                     fontWeight: 800, fontSize: "clamp(16px, 4vw, 22px)",
                     letterSpacing: "0.05em",
-                    color: store.isDark ? "#fff" : "#1C2B33",
+                    color: (store as any).textColor || (store.isDark ? "#fff" : "#1C2B33"),
                   }}>
                     {store.name}
                   </span>
-                  {store.logoUrl ? (
-                    <img src={store.logoUrl} alt={store.name} style={{ height: 48, objectFit: "contain" }} loading="lazy" />
-                  ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={store.isDark ? "#fff" : "#1C2B33"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    {store.logoUrl && (
+                      <img src={store.logoUrl} alt={store.name} style={{ height: 52, width: 52, objectFit: "contain", borderRadius: 8 }} loading="lazy" />
+                    )}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={(store as any).textColor || (store.isDark ? "#fff" : "#1C2B33")} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="9 18 15 12 9 6"/>
                     </svg>
-                  )}
+                  </div>
                 </div>
               </Link>
             ))}

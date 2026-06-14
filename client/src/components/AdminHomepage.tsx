@@ -82,7 +82,7 @@ export default function AdminHomepage() {
   // Store form
   const [storeDialog, setStoreDialog] = useState(false);
   const [editingStore, setEditingStore] = useState<any>(null);
-  const [storeForm, setStoreForm] = useState({ name: "", logoUrl: "", linkUrl: "/", backgroundColor: "#F5F5F0", isDark: 0, displayOrder: 0 });
+  const [storeForm, setStoreForm] = useState({ name: "", logoUrl: "", linkUrl: "/", backgroundColor: "#F5F5F0", textColor: "#FFFFFF", isDark: 0, displayOrder: 0 });
 
   // ── Settings ──────────────────────────────────────────────────────────────
   const saveSettings = async () => {
@@ -177,10 +177,10 @@ export default function AdminHomepage() {
   const openStoreDialog = (store?: any) => {
     if (store) {
       setEditingStore(store);
-      setStoreForm({ name: store.name, logoUrl: store.logoUrl ?? "", linkUrl: store.linkUrl ?? "/", backgroundColor: store.backgroundColor ?? "#F5F5F0", isDark: store.isDark ?? 0, displayOrder: store.displayOrder ?? 0 });
+      setStoreForm({ name: store.name, logoUrl: store.logoUrl ?? "", linkUrl: store.linkUrl ?? "/", backgroundColor: store.backgroundColor ?? "#F5F5F0", textColor: (store as any).textColor ?? "#FFFFFF", isDark: store.isDark ?? 0, displayOrder: store.displayOrder ?? 0 });
     } else {
       setEditingStore(null);
-      setStoreForm({ name: "", logoUrl: "", linkUrl: "/", backgroundColor: "#F5F5F0", isDark: 0, displayOrder: adminStores.length + 1 });
+      setStoreForm({ name: "", logoUrl: "", linkUrl: "/", backgroundColor: "#F5F5F0", textColor: "#FFFFFF", isDark: 0, displayOrder: adminStores.length + 1 });
     }
     setStoreDialog(true);
   };
@@ -657,18 +657,25 @@ export default function AdminHomepage() {
                 <Input value={storeForm.backgroundColor} onChange={e => setStoreForm(p => ({ ...p, backgroundColor: e.target.value }))} className="font-mono" />
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Switch checked={!!storeForm.isDark} onCheckedChange={v => setStoreForm(p => ({ ...p, isDark: v ? 1 : 0 }))} />
-              <label className="text-sm">Texte blanc (fond sombre)</label>
+            <div>
+              <label className="text-sm font-medium">Couleur du texte</label>
+              <div className="flex gap-2 mt-1">
+                <input type="color" value={storeForm.textColor} onChange={e => setStoreForm(p => ({ ...p, textColor: e.target.value }))} className="w-10 h-10 rounded cursor-pointer border" />
+                <Input value={storeForm.textColor} onChange={e => setStoreForm(p => ({ ...p, textColor: e.target.value }))} className="font-mono" placeholder="#FFFFFF" />
+              </div>
             </div>
             <div>
               <label className="text-sm font-medium">Ordre</label>
               <Input type="number" value={storeForm.displayOrder} onChange={e => setStoreForm(p => ({ ...p, displayOrder: Number(e.target.value) }))} />
             </div>
             {/* Preview */}
-            <div className="p-4 rounded-xl flex items-center justify-between" style={{ background: storeForm.backgroundColor }}>
-              <span className="font-semibold text-lg" style={{ color: storeForm.isDark ? "#fff" : "#1C2B33" }}>{storeForm.name || "Nom"}</span>
-              {storeForm.logoUrl && <img src={storeForm.logoUrl} alt="" className="h-12 object-contain" />}
+            {/* Preview — Amazon style band */}
+            <div style={{ background: storeForm.backgroundColor, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 16px", height: 72, borderRadius: 10, overflow: "hidden" }}>
+              <span style={{ color: storeForm.textColor || "#FFFFFF", fontWeight: 700, fontSize: 15 }}>{storeForm.name || "Nom du magasin"}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {storeForm.logoUrl && <img src={storeForm.logoUrl} alt="" style={{ width: 56, height: 56, objectFit: "contain", borderRadius: 8 }} />}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={storeForm.textColor || "#FFFFFF"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+              </div>
             </div>
             <div className="flex gap-2">
               <Button className="flex-1" onClick={saveStore} disabled={createStoreMut.isPending || updateStoreMut.isPending}>
