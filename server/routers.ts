@@ -1665,13 +1665,12 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
     }),
 
     // Admin: get settings
-    getSettings: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+    getSettings: customAdminProcedure.query(async ({ ctx }) => {
       return getHomepageSettings();
     }),
 
     // Admin: update settings
-    updateSettings: protectedProcedure
+    updateSettings: customAdminProcedure
       .input(z.object({
         heroButtonText: z.string().optional(),
         heroButtonLink: z.string().optional(),
@@ -1694,18 +1693,16 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         card4Label: z.string().optional(), card4Video: z.string().optional(), card4Image: z.string().optional(), card4BgColor: z.string().optional(), card4TextColor: z.string().optional(), card4Link: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
         return updateHomepageSettings(input);
       }),
 
     // Admin: get all videos
-    getVideos: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+    getVideos: customAdminProcedure.query(async ({ ctx }) => {
       return getAllHomepageVideos();
     }),
 
     // Admin: create video
-    createVideo: protectedProcedure
+    createVideo: customAdminProcedure
       .input(z.object({
         type: z.enum(["hero", "slider"]),
         title: z.string(),
@@ -1714,12 +1711,11 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         displayOrder: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
         return createHomepageVideo({ ...input, isActive: 1 });
       }),
 
     // Admin: update video
-    updateVideo: protectedProcedure
+    updateVideo: customAdminProcedure
       .input(z.object({
         id: z.number(),
         type: z.enum(["hero", "slider"]).optional(),
@@ -1730,28 +1726,25 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         isActive: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
         const { id, ...data } = input;
         return updateHomepageVideo(id, data);
       }),
 
     // Admin: delete video
-    deleteVideo: protectedProcedure
+    deleteVideo: customAdminProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
         await deleteHomepageVideo(input.id);
         return { success: true };
       }),
 
     // Admin: get all stores
-    getStores: protectedProcedure.query(async ({ ctx }) => {
-      if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
+    getStores: customAdminProcedure.query(async ({ ctx }) => {
       return getAllHomepageStores();
     }),
 
     // Admin: create store
-    createStore: protectedProcedure
+    createStore: customAdminProcedure
       .input(z.object({
         name: z.string(),
         logoUrl: z.string().optional(),
@@ -1762,12 +1755,11 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         displayOrder: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
         return createHomepageStore({ ...input, isActive: 1 });
       }),
 
     // Admin: update store
-    updateStore: protectedProcedure
+    updateStore: customAdminProcedure
       .input(z.object({
         id: z.number(),
         name: z.string().optional(),
@@ -1780,16 +1772,14 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         isActive: z.number().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
         const { id, ...data } = input;
         return updateHomepageStore(id, data);
       }),
 
     // Admin: delete store
-    deleteStore: protectedProcedure
+    deleteStore: customAdminProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ ctx, input }) => {
-        if (ctx.user.role !== "admin") throw new TRPCError({ code: "FORBIDDEN" });
         await deleteHomepageStore(input.id);
         return { success: true };
       }),
