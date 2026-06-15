@@ -151,7 +151,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                       className={`max-w-xs px-3 py-2 rounded-lg ${
                         msg.role === 'user'
                           ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-900'
+                          : 'bg-white text-gray-900'
                       }`}
                     >
                       {msg.isTyping ? (
@@ -171,7 +171,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
               )}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-gray-100 px-3 py-2 rounded-lg">
+                  <div className="bg-white px-3 py-2 rounded-lg">
                     <TypingDots />
                   </div>
                 </div>
