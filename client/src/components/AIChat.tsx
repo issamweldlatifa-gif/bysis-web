@@ -113,11 +113,11 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
 
           {/* Chat Panel - White & Clean */}
           <motion.div
-            initial={{ y: 'calc(100% + 64px)' }}
+            initial={{ y: '-100%' }}
             animate={{ y: 0 }}
-            exit={{ y: 'calc(100% + 64px)' }}
+            exit={{ y: '-100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-16 left-0 right-0 z-50 h-[calc(100dvh-80px)] bg-white rounded-t-2xl flex flex-col shadow-2xl"
+            className="fixed inset-0 z-50 bg-white flex flex-col shadow-2xl"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
@@ -180,7 +180,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
             </div>
 
             {/* Input Area - Fixed at Bottom */}
-            <div className="border-t border-gray-200 px-4 py-3 bg-white rounded-b-2xl">
+            <div className="border-t border-gray-200 px-4 py-3 bg-white">
               <div className="flex gap-2">
                 <input
                   type="text"
