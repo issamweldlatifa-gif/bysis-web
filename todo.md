@@ -549,3 +549,43 @@
 - [x] Vérifier/ajouter textColor + logoUrl dans stores schema + DB
 - [x] AdminHomepage Magasins : color picker bgColor + textColor + image + aperçu style Amazon
 - [x] Home.tsx : afficher stores en bandes horizontales (texte gauche, image droite, flèche)
+
+
+## Phase: AI Chat Redesign (Manus-Style Interface - June 2026)
+- [x] Rebuild AIChat.tsx: sidebar + main chat area + bottom input
+  - [x] Left sidebar: conversation history list (last 10 chats)
+  - [x] Main area: messages with user/assistant bubbles
+  - [x] Bottom input: text field + image upload + macro buttons + send
+- [x] Add welcome message on first load
+- [x] Add macro/quick suggestion buttons (e.g., "Price?", "Available?", "Best image?")
+- [x] Implement image upload with preview
+- [x] Add conversation history navigation (click to switch between old chats)
+- [x] Persist conversations in localStorage with timestamps
+- [x] Add new chat button to clear history
+- [ ] Test all features and verify streaming still works
+
+
+## Phase: Video & CRM Fixes + AI Chat Redesign (June 2026)
+- [x] Fix video playback in Hero section
+  - [x] Check Hero component for video element issues
+  - [x] Upload provided video to S3 storage
+  - [x] Update Hero to use correct video URL
+  - [x] Test video autoplay and controls
+- [x] Ensure CRM accepts video uploads
+  - [x] Check if CRM form supports file uploads
+  - [x] Add video file type validation (mp4, webm, etc.)
+  - [x] Test video upload to database
+  - [x] Verify video storage and retrieval
+- [x] Redesign AI Chat with professional Manus-style UI
+  - [x] Dark theme with glassmorphism cards
+  - [x] Neon gradient colors (purple, blue, pink)
+  - [x] Smooth animations and transitions
+  - [x] Animated AI orb during thinking state
+  - [x] Modern typography
+  - [x] Distinct background color from main app
+  - [x] Sidebar with conversation history
+  - [x] Clear input field at bottom
+  - [x] Macro/quick suggestion buttons
+  - [x] Welcome message on new chat
+- [x] Test all features end-to-end
+- [ ] Create checkpoint

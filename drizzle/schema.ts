@@ -66,6 +66,7 @@ export const orders = mysqlTable("orders", {
   gouvernorat: varchar("gouvernorat", { length: 64 }),
   screenshotUrl: text("screenshotUrl"),
   paymentReceiptUrl: text("paymentReceiptUrl"),
+  videoUrl: text("videoUrl"),
   paymentMethod: varchar("paymentMethod", { length: 32 }),
   notes: text("notes"),
   adminNotes: text("adminNotes"),
