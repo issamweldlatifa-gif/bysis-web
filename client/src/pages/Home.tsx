@@ -255,10 +255,10 @@ export default function Home() {
   const storesSectionTitle = s?.storesSectionTitle ?? "نشريو منهم مباشرة ليك ••";
   // Quick-access cards
   const cards = [
-    { label: s?.card1Label, video: s?.card1Video, image: s?.card1Image, bgColor: s?.card1BgColor ?? "#1A1A1A", textColor: s?.card1TextColor ?? "#FFFFFF", link: s?.card1Link },
-    { label: s?.card2Label, video: s?.card2Video, image: s?.card2Image, bgColor: s?.card2BgColor ?? "#1A1A1A", textColor: s?.card2TextColor ?? "#FFFFFF", link: s?.card2Link },
-    { label: s?.card3Label, video: s?.card3Video, image: s?.card3Image, bgColor: s?.card3BgColor ?? "#1A1A1A", textColor: s?.card3TextColor ?? "#FFFFFF", link: s?.card3Link },
-    { label: s?.card4Label, video: s?.card4Video, image: s?.card4Image, bgColor: s?.card4BgColor ?? "#1A1A1A", textColor: s?.card4TextColor ?? "#FFFFFF", link: s?.card4Link },
+    { label: s?.card1Label, video: s?.card1Video, bgColor: s?.card1BgColor ?? "#1A1A1A", textColor: s?.card1TextColor ?? "#FFFFFF", link: s?.card1Link },
+    { label: s?.card2Label, video: s?.card2Video, bgColor: s?.card2BgColor ?? "#1A1A1A", textColor: s?.card2TextColor ?? "#FFFFFF", link: s?.card2Link },
+    { label: s?.card3Label, video: s?.card3Video, bgColor: s?.card3BgColor ?? "#1A1A1A", textColor: s?.card3TextColor ?? "#FFFFFF", link: s?.card3Link },
+    { label: s?.card4Label, video: s?.card4Video, bgColor: s?.card4BgColor ?? "#1A1A1A", textColor: s?.card4TextColor ?? "#FFFFFF", link: s?.card4Link },
   ].filter(c => c.label || c.link);
 
   // ── Header scroll effect ──────────────────────────────────────────────────
@@ -450,15 +450,9 @@ export default function Home() {
                 }}>
                   {card.label}
                 </span>
-                {/* Right: image/video + chevron */}
+                {/* Right: video + chevron */}
                 <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, zIndex: 1 }}>
-                  {card.image ? (
-                    <img
-                      src={card.image}
-                      alt={card.label ?? ""}
-                      style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8 }}
-                    />
-                  ) : card.video ? (
+                  {card.video ? (
                     <video
                       src={card.video}
                       autoPlay
