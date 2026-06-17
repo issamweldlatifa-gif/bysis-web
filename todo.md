@@ -589,3 +589,26 @@
   - [x] Welcome message on new chat
 - [x] Test all features end-to-end
 - [x] Create checkpoint
+
+
+## Phase: Admin Dashboard for Video Management (June 2026)
+- [x] Create Admin Dashboard page for video management
+  - [x] Build video list with hero/slider tabs
+  - [x] Display video thumbnails and metadata
+  - [x] Add edit/delete buttons for each video
+- [x] Add direct video upload feature
+  - [x] Create file upload input with drag-and-drop
+  - [x] Add video preview before upload
+  - [x] Implement upload progress indicator
+  - [x] Auto-convert video to MP4 if needed
+- [x] Implement backend video upload endpoint
+  - [x] Accept video files from frontend
+  - [x] Validate video format and size
+  - [x] Upload to S3 automatically
+  - [x] Return storage URL
+- [x] Add video management UI
+  - [x] Form to add new video (type, title, order)
+  - [x] Edit existing video metadata
+  - [x] Delete video with confirmation
+  - [x] Reorder videos by drag-and-drop
+- [x] Test and save checkpoint

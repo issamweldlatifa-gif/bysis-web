@@ -37,6 +37,7 @@ const Panier = lazy(() => import("./pages/Panier"));
 const Scanner = lazy(() => import("./pages/Scanner"));
 const Catalogue = lazy(() => import("./pages/Catalogue"));
 const ProduitDetail = lazy(() => import("./pages/ProduitDetail"));
+const AdminVideos = lazy(() => import("./pages/AdminVideos"));
 
 // Lazy load AIChat (only loaded when needed)
 const AIChatLazy = lazy(() => import("./components/AIChat"));
@@ -69,6 +70,7 @@ function Router() {
           <Route path={"/confirmation"} component={OrderConfirmation} />
           <Route path={"/arrivage"} component={Arrivage} />
           <Route path={"/admin/arrivage"} component={AdminArrivage} />
+          <Route path={"/admin/videos"} component={AdminVideos} />
           <Route path={"/admin/shipmaster"} component={ShipMasterDashboard} />
           <Route path={"/parametres"} component={Parametres} />
           <Route path={"/panier"} component={Panier} />
