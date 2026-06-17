@@ -562,7 +562,7 @@
 - [x] Add conversation history navigation (click to switch between old chats)
 - [x] Persist conversations in localStorage with timestamps
 - [x] Add new chat button to clear history
-- [ ] Test all features and verify streaming still works
+- [x] Test all features and verify streaming still works
 
 
 ## Phase: Video & CRM Fixes + AI Chat Redesign (June 2026)
@@ -588,4 +588,4 @@
   - [x] Macro/quick suggestion buttons
   - [x] Welcome message on new chat
 - [x] Test all features end-to-end
-- [ ] Create checkpoint
+- [x] Create checkpoint
