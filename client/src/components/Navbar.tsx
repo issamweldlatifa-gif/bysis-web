@@ -6,6 +6,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Menu, Settings, LogOut, Package as PackageIcon, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useChatContext } from "@/App";
+import { Sparkles } from "lucide-react";
 import {
   ShoppingCart,
   Calculator,
@@ -21,6 +23,7 @@ export default function Navbar() {
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { openChat } = useChatContext();
 
   useEffect(() => {
     // Check if already installed (standalone mode)
@@ -101,6 +104,21 @@ export default function Navbar() {
 
         {/* CTA + Install + Mobile */}
         <div className="flex items-center gap-2">
+          {/* AI Chat Button */}
+          <button
+            onClick={() => openChat()}
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 active:scale-[0.97]"
+            style={{
+              background: "rgba(168,85,247,0.1)",
+              border: "1px solid rgba(168,85,247,0.25)",
+              color: "#a855f7",
+            }}
+            title="Ouvrir l'assistant IA"
+          >
+            <Sparkles size={14} />
+            IA
+          </button>
+
           {/* Install PWA button — desktop */}
           {installPrompt && !isInstalled && (
             <button

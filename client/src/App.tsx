@@ -40,7 +40,7 @@ const ProduitDetail = lazy(() => import("./pages/ProduitDetail"));
 const AdminVideos = lazy(() => import("./pages/AdminVideos"));
 
 // Lazy load AIChat (only loaded when needed)
-const AIChatLazy = lazy(() => import("./components/AIChat"));
+const AIChat = lazy(() => import("./components/AIChat"));
 
 // Import LoadingScreen
 import LoadingScreen from "./components/LoadingScreen";
@@ -90,7 +90,7 @@ function Router() {
 function AIChatWrapper({ chatOpen, setChatOpen }: { chatOpen: boolean; setChatOpen: (v: boolean) => void }) {
   return (
     <Suspense fallback={null}>
-      <AIChatLazy isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+      <AIChat isOpen={chatOpen} onClose={() => setChatOpen(false)} />
     </Suspense>
   );
 }

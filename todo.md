@@ -612,3 +612,13 @@
   - [x] Delete video with confirmation
   - [x] Reorder videos by drag-and-drop
 - [x] Test and save checkpoint
+
+
+## Phase: AI Chat Fix & Integration (June 2026)
+- [x] Delete old FloatingChat and AIChatBox components
+- [x] Update App.tsx to use AIChat with ChatContext
+- [x] Update Navbar to add AI button and connect to ChatContext
+- [x] Apply black background with white text to AIChat
+- [x] Test AI Chat opening, macro buttons, and message sending
+- [x] Verify colors: black background with white text (light and clean)
+- [x] Save checkpoint

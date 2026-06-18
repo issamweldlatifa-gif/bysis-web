@@ -307,10 +307,10 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
       />
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-black">
+      <div className="flex-1 flex flex-col bg-black">
         {/* Header */}
         <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+          <h1 className="text-xl font-bold text-white">
             Assistant IA
           </h1>
           <button
@@ -349,7 +349,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
         </div>
 
         {/* Input Area */}
-        <div className="px-6 py-6 border-t border-white/10 bg-black/20 backdrop-blur-xl">
+        <div className="px-6 py-6 border-t border-white/10 bg-black backdrop-blur-xl">
           <div className="flex gap-3 items-end">
             {/* File Upload */}
             <button
@@ -375,7 +375,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && handleSendMessage()}
               placeholder="Posez une question..."
-              className="flex-1 px-4 py-3 bg-white/5 hover:bg-white/10 backdrop-blur-md border border-white/10 focus:border-purple-500/50 rounded-lg text-white placeholder-gray-500 focus:outline-none transition-all duration-300"
+              className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/15 backdrop-blur-md border border-white/20 focus:border-white/40 rounded-lg text-white placeholder-gray-400 focus:outline-none transition-all duration-300"
             />
 
             {/* Send Button */}
