@@ -85,25 +85,27 @@ export default function FloatingChat() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 z-40 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg transition-all duration-300 hover:scale-110"
+          className="fixed bottom-6 right-6 z-40 bg-black hover:bg-gray-900 text-white rounded-full p-4 shadow-lg transition-all duration-300 hover:scale-110"
         >
           <MessageCircle size={24} />
         </button>
       )}
 
       {isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 w-96 h-[600px] bg-white rounded-lg shadow-2xl flex flex-col border border-gray-300">
-          <div className="bg-blue-600 text-white p-4 rounded-t-lg flex justify-between items-center">
+        <div className="fixed bottom-6 right-6 z-50 w-96 h-[600px] bg-black rounded-lg shadow-2xl flex flex-col border border-gray-800">
+          {/* Header */}
+          <div className="bg-black text-white p-4 rounded-t-lg flex justify-between items-center border-b border-gray-800">
             <h3 className="font-semibold">مساعد Bysis</h3>
             <button
               onClick={() => setIsOpen(false)}
-              className="hover:bg-blue-700 p-1 rounded"
+              className="hover:bg-gray-900 p-1 rounded transition-colors"
             >
               <X size={20} />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-black">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -112,8 +114,8 @@ export default function FloatingChat() {
                 <div
                   className={`max-w-xs px-4 py-2 rounded-lg ${
                     msg.role === 'user'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-200 text-black'
+                      ? 'bg-white text-black'
+                      : 'bg-gray-900 text-white border border-gray-800'
                   }`}
                 >
                   <p className="text-sm">{msg.content}</p>
@@ -122,11 +124,11 @@ export default function FloatingChat() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-200 text-black px-4 py-2 rounded-lg">
+                <div className="bg-gray-900 text-white px-4 py-2 rounded-lg border border-gray-800">
                   <div className="flex space-x-2">
-                    <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
                 </div>
               </div>
@@ -134,15 +136,16 @@ export default function FloatingChat() {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Quick Questions */}
           {messages.length === 1 && (
-            <div className="px-4 py-2 bg-white border-t border-gray-200">
-              <p className="text-xs text-gray-600 mb-2">أسئلة سريعة:</p>
+            <div className="px-4 py-3 bg-black border-t border-gray-800">
+              <p className="text-xs text-gray-400 mb-2">أسئلة سريعة:</p>
               <div className="grid grid-cols-2 gap-2">
                 {quickQuestions.map((q) => (
                   <button
                     key={q.label}
                     onClick={() => setInput(q.text)}
-                    className="text-xs bg-gray-100 hover:bg-gray-200 text-black px-2 py-1 rounded"
+                    className="text-xs bg-gray-900 hover:bg-gray-800 text-white px-2 py-1 rounded border border-gray-700 transition-colors"
                   >
                     {q.label}
                   </button>
@@ -151,9 +154,10 @@ export default function FloatingChat() {
             </div>
           )}
 
+          {/* Input */}
           <form
             onSubmit={sendMessage}
-            className="border-t border-gray-200 p-4 bg-white rounded-b-lg flex gap-2"
+            className="border-t border-gray-800 p-4 bg-black rounded-b-lg flex gap-2"
           >
             <input
               type="text"
@@ -161,12 +165,12 @@ export default function FloatingChat() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="اكتب رسالتك..."
               disabled={isLoading}
-              className="flex-1 bg-gray-100 text-black placeholder-gray-500 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="flex-1 bg-gray-900 text-white placeholder-gray-500 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white border border-gray-800"
             />
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded p-2"
+              className="bg-white hover:bg-gray-200 text-black rounded p-2 transition-colors disabled:opacity-50"
             >
               <Send size={18} />
             </button>
