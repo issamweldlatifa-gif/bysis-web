@@ -39,8 +39,8 @@ const Catalogue = lazy(() => import("./pages/Catalogue"));
 const ProduitDetail = lazy(() => import("./pages/ProduitDetail"));
 const AdminVideos = lazy(() => import("./pages/AdminVideos"));
 
-// Lazy load AIChat (only loaded when needed)
-const AIChat = lazy(() => import("./components/AIChat"));
+// Lazy load FloatingChat (only loaded when needed)
+const FloatingChat = lazy(() => import("./components/FloatingChat"));
 
 // Import LoadingScreen
 import LoadingScreen from "./components/LoadingScreen";
@@ -87,10 +87,10 @@ function Router() {
   );
 }
 
-function AIChatWrapper({ chatOpen, setChatOpen }: { chatOpen: boolean; setChatOpen: (v: boolean) => void }) {
+function FloatingChatWrapper() {
   return (
     <Suspense fallback={null}>
-      <AIChat isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+      <FloatingChat />
     </Suspense>
   );
 }
@@ -107,7 +107,7 @@ function App() {
           <ChatContext.Provider value={{ openChat: () => setChatOpen(true), closeChat: () => setChatOpen(false), chatOpen }}>
             <Toaster />
             <Router />
-            <AIChatWrapper chatOpen={chatOpen} setChatOpen={setChatOpen} />
+            <FloatingChatWrapper />
           </ChatContext.Provider>
         </TooltipProvider>
         </CartProvider>
