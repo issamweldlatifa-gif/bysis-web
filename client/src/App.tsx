@@ -25,11 +25,11 @@ const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminConversations = lazy(() => import("@/pages/AdminConversations"));
 const TrackOrder = lazy(() => import("@/pages/TrackOrder"));
 const Arrivage = lazy(() => import("@/pages/Arrivage"));
-const AdminArrivage = lazy(() => import("@/pages/AdminArrivage"));
+// Removed: AdminArrivage
 const History = lazy(() => import("./pages/History"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Settings = lazy(() => import("./pages/Settings"));
-const Chat = lazy(() => import("./pages/Chat"));
+// Removed: Chat
 const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
 const ShipMasterDashboard = lazy(() => import("./pages/ShipMasterDashboard"));
 const Parametres = lazy(() => import("./pages/Parametres"));
@@ -61,7 +61,7 @@ function Router() {
           <Route path={"/history"} component={History} />
           <Route path={"/orders"} component={Orders} />
           <Route path={"/settings"} component={Settings} />
-          <Route path={"/chat"} component={Chat} />
+          {/* Removed: /chat route */}
           <Route path={"/admin"} component={AdminDashboard} />
           <Route path={"/admin/login"} component={AdminLogin} />
           <Route path={"/admin/conversations"} component={AdminConversations} />
@@ -69,7 +69,7 @@ function Router() {
           <Route path={"/suivi"} component={TrackOrder} />
           <Route path={"/confirmation"} component={OrderConfirmation} />
           <Route path={"/arrivage"} component={Arrivage} />
-          <Route path={"/admin/arrivage"} component={AdminArrivage} />
+          {/* Removed: /admin/arrivage route */}
           <Route path={"/admin/videos"} component={AdminVideos} />
           <Route path={"/admin/shipmaster"} component={ShipMasterDashboard} />
           <Route path={"/parametres"} component={Parametres} />

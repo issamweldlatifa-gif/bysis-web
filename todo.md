@@ -622,3 +622,14 @@
 - [x] Test AI Chat opening, macro buttons, and message sending
 - [x] Verify colors: black background with white text (light and clean)
 - [x] Save checkpoint
+
+## Phase: Project Cleanup & Refactoring (June 2026)
+- [x] Delete 7 unused/duplicate pages (ComponentShowcase, Chat, AdminAiOrders, AdminArrivage, AdminCategories, AdminProducts, AdminSlides)
+- [x] Remove imports from App.tsx and ShipMasterDashboard.tsx
+- [x] Remove routes from App.tsx
+- [x] Create useImageUpload hook (extract duplicate code)
+- [x] Create useSearch hook (extract duplicate code)
+- [x] Update ShipMasterDashboard to remove deleted page references
+- [x] Verify build and TypeScript compilation
+- [x] Test all remaining pages
+- [x] Save checkpoint

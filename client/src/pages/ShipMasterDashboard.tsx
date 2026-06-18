@@ -21,17 +21,11 @@ import {
   Clock, CreditCard, Warehouse, XCircle, Filter, Download, Menu, Tag, Bot,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import AdminSlides from "./AdminSlides";
-import AdminProducts from "./AdminProducts";
-import AdminCategories from "./AdminCategories";
-import AdminAiOrders from "./AdminAiOrders";
+// Removed deleted pages imports
 import AdminHomepage from "@/components/AdminHomepage";
 import AdminSliders from "@/components/AdminSliders";
 
 // Wrapper components for lazy rendering
-function SlidesTabWrapper() { return <AdminSlides />; }
-function ProductsTabWrapper() { return <AdminProducts />; }
-function CategoriesTabWrapper() { return <AdminCategories />; }
 function HomepageTabWrapper() { return <div className="space-y-8"><AdminHomepage /></div>; }
 
 // ─── Color constants (light theme matching mockup) ────────────────────────────
@@ -418,17 +412,7 @@ export default function ShipMasterDashboard() {
             {/* ═══════════════ AUDIT ═══════════════ */}
             {tab === "audit" && <AuditTab logs={auditLogs} />}
 
-            {/* ═══════════════ SLIDES ═══════════════ */}
-            {tab === "slides" && <SlidesTabWrapper />}
-
-            {/* ═══════════════ PRODUCTS ═══════════════ */}
-            {tab === "products" && <ProductsTabWrapper />}
-
-            {/* ═══════════════ CATEGORIES ═══════════════ */}
-            {tab === "categories" && <CategoriesTabWrapper />}
-
-            {/* ═══════════════ AI ORDERS ═══════════════ */}
-            {tab === "ai_orders" && <AdminAiOrders />}
+            {/* Removed deleted tabs: slides, products, categories, ai_orders */}
 
             {/* ═══════════════ SETTINGS ═══════════════ */}
             {tab === "settings" && <SettingsTab />}
