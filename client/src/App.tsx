@@ -17,6 +17,7 @@ export function useChatContext() { return useContext(ChatContext); }
 import Home from "./pages/Home";
 import NotFound from "@/pages/NotFound";
 
+
 // Lazy loaded (non-critical, reduces initial bundle)
 const Calculator = lazy(() => import("./pages/Calculator"));
 const OrderForm = lazy(() => import("./pages/OrderForm"));
@@ -37,6 +38,7 @@ const Panier = lazy(() => import("./pages/Panier"));
 const Scanner = lazy(() => import("./pages/Scanner"));
 const Catalogue = lazy(() => import("./pages/Catalogue"));
 const ProduitDetail = lazy(() => import("./pages/ProduitDetail"));
+
 
 // Lazy load AIChat (only loaded when needed)
 const AIChatLazy = lazy(() => import("./components/AIChat"));
@@ -76,6 +78,7 @@ function Router() {
           <Route path={"/catalogue"} component={Catalogue} />
           <Route path={"/commander"} component={Catalogue} />
           <Route path={"/produit/:id"} component={ProduitDetail} />
+
           <Route path={"/admin/panel"} component={() => { window.location.replace("/admin/shipmaster"); return null; }} />
           <Route path={"/404"} component={NotFound} />
           <Route component={NotFound} />

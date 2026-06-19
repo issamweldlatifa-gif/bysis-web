@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Menu, Settings, LogOut, Package as PackageIcon, User } from "lucide-react";
 import { useState, useEffect } from "react";
+import LoginDialog from "./LoginDialog";
 import { useAuth } from "@/_core/hooks/useAuth";
 import {
   ShoppingCart,
@@ -18,6 +19,7 @@ import {
 export default function Navbar() {
   const [location] = useLocation();
   const [open, setOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
@@ -119,6 +121,14 @@ export default function Navbar() {
           )}
 
           {/* User Profile Avatar (desktop) */}
+          {!isAuthenticated && (
+            <button
+              onClick={() => setLoginOpen(true)}
+              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white hover:bg-white/10 transition-all duration-200 active:scale-[0.97]"
+            >
+              <User size={18} />
+            </button>
+          )}
           {isAuthenticated && user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -260,6 +270,7 @@ export default function Navbar() {
           </Sheet>
         </div>
       </div>
+      <LoginDialog open={loginOpen} onOpenChange={setLoginOpen} />
     </header>
   );
 }
