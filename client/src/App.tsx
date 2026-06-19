@@ -25,11 +25,11 @@ const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminConversations = lazy(() => import("@/pages/AdminConversations"));
 const TrackOrder = lazy(() => import("@/pages/TrackOrder"));
 const Arrivage = lazy(() => import("@/pages/Arrivage"));
-// Removed: AdminArrivage
+const AdminArrivage = lazy(() => import("@/pages/AdminArrivage"));
 const History = lazy(() => import("./pages/History"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Settings = lazy(() => import("./pages/Settings"));
-// Removed: Chat
+const Chat = lazy(() => import("./pages/Chat"));
 const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
 const ShipMasterDashboard = lazy(() => import("./pages/ShipMasterDashboard"));
 const Parametres = lazy(() => import("./pages/Parametres"));
@@ -37,10 +37,9 @@ const Panier = lazy(() => import("./pages/Panier"));
 const Scanner = lazy(() => import("./pages/Scanner"));
 const Catalogue = lazy(() => import("./pages/Catalogue"));
 const ProduitDetail = lazy(() => import("./pages/ProduitDetail"));
-const AdminVideos = lazy(() => import("./pages/AdminVideos"));
 
-// Lazy load FloatingChat (only loaded when needed)
-const FloatingChat = lazy(() => import("./components/FloatingChat"));
+// Lazy load AIChat (only loaded when needed)
+const AIChatLazy = lazy(() => import("./components/AIChat"));
 
 // Import LoadingScreen
 import LoadingScreen from "./components/LoadingScreen";
@@ -61,7 +60,7 @@ function Router() {
           <Route path={"/history"} component={History} />
           <Route path={"/orders"} component={Orders} />
           <Route path={"/settings"} component={Settings} />
-          {/* Removed: /chat route */}
+          <Route path={"/chat"} component={Chat} />
           <Route path={"/admin"} component={AdminDashboard} />
           <Route path={"/admin/login"} component={AdminLogin} />
           <Route path={"/admin/conversations"} component={AdminConversations} />
@@ -69,8 +68,7 @@ function Router() {
           <Route path={"/suivi"} component={TrackOrder} />
           <Route path={"/confirmation"} component={OrderConfirmation} />
           <Route path={"/arrivage"} component={Arrivage} />
-          {/* Removed: /admin/arrivage route */}
-          <Route path={"/admin/videos"} component={AdminVideos} />
+          <Route path={"/admin/arrivage"} component={AdminArrivage} />
           <Route path={"/admin/shipmaster"} component={ShipMasterDashboard} />
           <Route path={"/parametres"} component={Parametres} />
           <Route path={"/panier"} component={Panier} />
@@ -87,10 +85,10 @@ function Router() {
   );
 }
 
-function FloatingChatWrapper() {
+function AIChatWrapper({ chatOpen, setChatOpen }: { chatOpen: boolean; setChatOpen: (v: boolean) => void }) {
   return (
     <Suspense fallback={null}>
-      <FloatingChat />
+      <AIChatLazy isOpen={chatOpen} onClose={() => setChatOpen(false)} />
     </Suspense>
   );
 }
@@ -107,7 +105,7 @@ function App() {
           <ChatContext.Provider value={{ openChat: () => setChatOpen(true), closeChat: () => setChatOpen(false), chatOpen }}>
             <Toaster />
             <Router />
-            <FloatingChatWrapper />
+            <AIChatWrapper chatOpen={chatOpen} setChatOpen={setChatOpen} />
           </ChatContext.Provider>
         </TooltipProvider>
         </CartProvider>
