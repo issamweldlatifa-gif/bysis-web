@@ -549,3 +549,87 @@
 - [x] Vérifier/ajouter textColor + logoUrl dans stores schema + DB
 - [x] AdminHomepage Magasins : color picker bgColor + textColor + image + aperçu style Amazon
 - [x] Home.tsx : afficher stores en bandes horizontales (texte gauche, image droite, flèche)
+
+
+## Phase: AI Chat Redesign (Manus-Style Interface - June 2026)
+- [x] Rebuild AIChat.tsx: sidebar + main chat area + bottom input
+  - [x] Left sidebar: conversation history list (last 10 chats)
+  - [x] Main area: messages with user/assistant bubbles
+  - [x] Bottom input: text field + image upload + macro buttons + send
+- [x] Add welcome message on first load
+- [x] Add macro/quick suggestion buttons (e.g., "Price?", "Available?", "Best image?")
+- [x] Implement image upload with preview
+- [x] Add conversation history navigation (click to switch between old chats)
+- [x] Persist conversations in localStorage with timestamps
+- [x] Add new chat button to clear history
+- [x] Test all features and verify streaming still works
+
+
+## Phase: Video & CRM Fixes + AI Chat Redesign (June 2026)
+- [x] Fix video playback in Hero section
+  - [x] Check Hero component for video element issues
+  - [x] Upload provided video to S3 storage
+  - [x] Update Hero to use correct video URL
+  - [x] Test video autoplay and controls
+- [x] Ensure CRM accepts video uploads
+  - [x] Check if CRM form supports file uploads
+  - [x] Add video file type validation (mp4, webm, etc.)
+  - [x] Test video upload to database
+  - [x] Verify video storage and retrieval
+- [x] Redesign AI Chat with professional Manus-style UI
+  - [x] Dark theme with glassmorphism cards
+  - [x] Neon gradient colors (purple, blue, pink)
+  - [x] Smooth animations and transitions
+  - [x] Animated AI orb during thinking state
+  - [x] Modern typography
+  - [x] Distinct background color from main app
+  - [x] Sidebar with conversation history
+  - [x] Clear input field at bottom
+  - [x] Macro/quick suggestion buttons
+  - [x] Welcome message on new chat
+- [x] Test all features end-to-end
+- [x] Create checkpoint
+
+
+## Phase: Admin Dashboard for Video Management (June 2026)
+- [x] Create Admin Dashboard page for video management
+  - [x] Build video list with hero/slider tabs
+  - [x] Display video thumbnails and metadata
+  - [x] Add edit/delete buttons for each video
+- [x] Add direct video upload feature
+  - [x] Create file upload input with drag-and-drop
+  - [x] Add video preview before upload
+  - [x] Implement upload progress indicator
+  - [x] Auto-convert video to MP4 if needed
+- [x] Implement backend video upload endpoint
+  - [x] Accept video files from frontend
+  - [x] Validate video format and size
+  - [x] Upload to S3 automatically
+  - [x] Return storage URL
+- [x] Add video management UI
+  - [x] Form to add new video (type, title, order)
+  - [x] Edit existing video metadata
+  - [x] Delete video with confirmation
+  - [x] Reorder videos by drag-and-drop
+- [x] Test and save checkpoint
+
+
+## Phase: AI Chat Fix & Integration (June 2026)
+- [x] Delete old FloatingChat and AIChatBox components
+- [x] Update App.tsx to use AIChat with ChatContext
+- [x] Update Navbar to add AI button and connect to ChatContext
+- [x] Apply black background with white text to AIChat
+- [x] Test AI Chat opening, macro buttons, and message sending
+- [x] Verify colors: black background with white text (light and clean)
+- [x] Save checkpoint
+
+## Phase: Project Cleanup & Refactoring (June 2026)
+- [x] Delete 7 unused/duplicate pages (ComponentShowcase, Chat, AdminAiOrders, AdminArrivage, AdminCategories, AdminProducts, AdminSlides)
+- [x] Remove imports from App.tsx and ShipMasterDashboard.tsx
+- [x] Remove routes from App.tsx
+- [x] Create useImageUpload hook (extract duplicate code)
+- [x] Create useSearch hook (extract duplicate code)
+- [x] Update ShipMasterDashboard to remove deleted page references
+- [x] Verify build and TypeScript compilation
+- [x] Test all remaining pages
+- [x] Save checkpoint

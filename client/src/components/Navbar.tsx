@@ -5,8 +5,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Menu, Settings, LogOut, Package as PackageIcon, User } from "lucide-react";
 import { useState, useEffect } from "react";
-import LoginDialog from "./LoginDialog";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useChatContext } from "@/App";
+import { Sparkles } from "lucide-react";
 import {
   ShoppingCart,
   Calculator,
@@ -19,10 +20,10 @@ import {
 export default function Navbar() {
   const [location] = useLocation();
   const [open, setOpen] = useState(false);
-  const [loginOpen, setLoginOpen] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { openChat } = useChatContext();
 
   useEffect(() => {
     // Check if already installed (standalone mode)
@@ -103,6 +104,21 @@ export default function Navbar() {
 
         {/* CTA + Install + Mobile */}
         <div className="flex items-center gap-2">
+          {/* AI Chat Button */}
+          <button
+            onClick={() => openChat()}
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 active:scale-[0.97]"
+            style={{
+              background: "rgba(168,85,247,0.1)",
+              border: "1px solid rgba(168,85,247,0.25)",
+              color: "#a855f7",
+            }}
+            title="Ouvrir l'assistant IA"
+          >
+            <Sparkles size={14} />
+            IA
+          </button>
+
           {/* Install PWA button — desktop */}
           {installPrompt && !isInstalled && (
             <button
@@ -121,14 +137,6 @@ export default function Navbar() {
           )}
 
           {/* User Profile Avatar (desktop) */}
-          {!isAuthenticated && (
-            <button
-              onClick={() => setLoginOpen(true)}
-              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white hover:bg-white/10 transition-all duration-200 active:scale-[0.97]"
-            >
-              <User size={18} />
-            </button>
-          )}
           {isAuthenticated && user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -270,7 +278,6 @@ export default function Navbar() {
           </Sheet>
         </div>
       </div>
-      <LoginDialog open={loginOpen} onOpenChange={setLoginOpen} />
     </header>
   );
 }

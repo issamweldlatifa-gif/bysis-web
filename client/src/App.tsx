@@ -17,7 +17,6 @@ export function useChatContext() { return useContext(ChatContext); }
 import Home from "./pages/Home";
 import NotFound from "@/pages/NotFound";
 
-
 // Lazy loaded (non-critical, reduces initial bundle)
 const Calculator = lazy(() => import("./pages/Calculator"));
 const OrderForm = lazy(() => import("./pages/OrderForm"));
@@ -26,11 +25,11 @@ const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const AdminConversations = lazy(() => import("@/pages/AdminConversations"));
 const TrackOrder = lazy(() => import("@/pages/TrackOrder"));
 const Arrivage = lazy(() => import("@/pages/Arrivage"));
-const AdminArrivage = lazy(() => import("@/pages/AdminArrivage"));
+// Removed: AdminArrivage
 const History = lazy(() => import("./pages/History"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Settings = lazy(() => import("./pages/Settings"));
-const Chat = lazy(() => import("./pages/Chat"));
+// Removed: Chat
 const OrderConfirmation = lazy(() => import("./pages/OrderConfirmation"));
 const ShipMasterDashboard = lazy(() => import("./pages/ShipMasterDashboard"));
 const Parametres = lazy(() => import("./pages/Parametres"));
@@ -38,10 +37,10 @@ const Panier = lazy(() => import("./pages/Panier"));
 const Scanner = lazy(() => import("./pages/Scanner"));
 const Catalogue = lazy(() => import("./pages/Catalogue"));
 const ProduitDetail = lazy(() => import("./pages/ProduitDetail"));
+const AdminVideos = lazy(() => import("./pages/AdminVideos"));
 
-
-// Lazy load AIChat (only loaded when needed)
-const AIChatLazy = lazy(() => import("./components/AIChat"));
+// Lazy load FloatingChat (only loaded when needed)
+const FloatingChat = lazy(() => import("./components/FloatingChat"));
 
 // Import LoadingScreen
 import LoadingScreen from "./components/LoadingScreen";
@@ -62,7 +61,7 @@ function Router() {
           <Route path={"/history"} component={History} />
           <Route path={"/orders"} component={Orders} />
           <Route path={"/settings"} component={Settings} />
-          <Route path={"/chat"} component={Chat} />
+          {/* Removed: /chat route */}
           <Route path={"/admin"} component={AdminDashboard} />
           <Route path={"/admin/login"} component={AdminLogin} />
           <Route path={"/admin/conversations"} component={AdminConversations} />
@@ -70,7 +69,8 @@ function Router() {
           <Route path={"/suivi"} component={TrackOrder} />
           <Route path={"/confirmation"} component={OrderConfirmation} />
           <Route path={"/arrivage"} component={Arrivage} />
-          <Route path={"/admin/arrivage"} component={AdminArrivage} />
+          {/* Removed: /admin/arrivage route */}
+          <Route path={"/admin/videos"} component={AdminVideos} />
           <Route path={"/admin/shipmaster"} component={ShipMasterDashboard} />
           <Route path={"/parametres"} component={Parametres} />
           <Route path={"/panier"} component={Panier} />
@@ -78,7 +78,6 @@ function Router() {
           <Route path={"/catalogue"} component={Catalogue} />
           <Route path={"/commander"} component={Catalogue} />
           <Route path={"/produit/:id"} component={ProduitDetail} />
-
           <Route path={"/admin/panel"} component={() => { window.location.replace("/admin/shipmaster"); return null; }} />
           <Route path={"/404"} component={NotFound} />
           <Route component={NotFound} />
@@ -88,10 +87,10 @@ function Router() {
   );
 }
 
-function AIChatWrapper({ chatOpen, setChatOpen }: { chatOpen: boolean; setChatOpen: (v: boolean) => void }) {
+function FloatingChatWrapper() {
   return (
     <Suspense fallback={null}>
-      <AIChatLazy isOpen={chatOpen} onClose={() => setChatOpen(false)} />
+      <FloatingChat />
     </Suspense>
   );
 }
@@ -108,7 +107,7 @@ function App() {
           <ChatContext.Provider value={{ openChat: () => setChatOpen(true), closeChat: () => setChatOpen(false), chatOpen }}>
             <Toaster />
             <Router />
-            <AIChatWrapper chatOpen={chatOpen} setChatOpen={setChatOpen} />
+            <FloatingChatWrapper />
           </ChatContext.Provider>
         </TooltipProvider>
         </CartProvider>

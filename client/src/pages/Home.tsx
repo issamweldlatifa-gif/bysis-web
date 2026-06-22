@@ -330,9 +330,24 @@ export default function Home() {
           <video
             ref={heroVideoRef}
             src={heroVideo.videoUrl}
-            autoPlay muted loop playsInline
+            autoPlay
+            muted
+            loop
+            playsInline
             preload="metadata"
-            style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.85 }}
+            controls={false}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              opacity: 0.85,
+              display: "block",
+            }}
+            onError={(e) => {
+              console.error("Hero video error:", e);
+              const video = e.currentTarget;
+              video.style.display = "none";
+            }}
           />
         ) : (
           <div style={{ width: "100%", height: "100%", background: `linear-gradient(135deg, ${primaryColor} 0%, #2d4a5a 100%)` }} />
@@ -459,7 +474,19 @@ export default function Home() {
                       muted
                       loop
                       playsInline
-                      style={{ width: 56, height: 56, objectFit: "cover", borderRadius: 8 }}
+                      preload="auto"
+                      style={{
+                        width: 56,
+                        height: 56,
+                        objectFit: "cover",
+                        borderRadius: 8,
+                        display: "block",
+                      }}
+                      onError={(e) => {
+                        console.error("Card video error:", e);
+                        const video = e.currentTarget;
+                        video.style.display = "none";
+                      }}
                     />
                   ) : null}
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={card.textColor || "#FFFFFF"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -504,9 +531,21 @@ export default function Home() {
                   <video
                     src={video.videoUrl}
                     autoPlay={i === currentSlide}
-                    muted loop playsInline
+                    muted
+                    loop
+                    playsInline
                     preload={i === currentSlide ? "auto" : "none"}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
+                    }}
+                    onError={(e) => {
+                      console.error("Slider video error:", e);
+                      const video = e.currentTarget;
+                      video.style.backgroundColor = "#ddd";
+                    }}
                   />
                   <div style={{
                     position: "absolute", bottom: 0, left: 0, right: 0,
