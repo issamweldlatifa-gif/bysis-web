@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send } from 'lucide-react';
+import { MessageCircle, X, Send, Loader } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Message {
@@ -122,11 +122,15 @@ export default function FloatingChat() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gray-200 text-black px-4 py-2 rounded-lg">
-                  <div className="flex space-x-2">
-                    <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="bg-gradient-to-r from-blue-50 to-blue-100 text-black px-4 py-3 rounded-lg border border-blue-200 shadow-sm">
+                  <div className="flex items-center space-x-2">
+                    <Loader size={16} className="text-blue-600 animate-spin" />
+                    <span className="text-sm text-gray-700 font-medium">جاري التحضير...</span>
+                  </div>
+                  <div className="flex space-x-1 mt-2">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
                 </div>
               </div>
