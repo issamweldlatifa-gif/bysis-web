@@ -1,10 +1,10 @@
 /**
- * Home.tsx — Bysis Homepage V3.0 (Master V23 Integration)
+ * Home.tsx — Bysis Homepage V3.0 (Master V23 Only)
  * Design: Bysis Master Final V23 integrated into React
  * Data: loaded from DB via trpc.homepage.getData
  */
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useChatContext } from "@/App";
 import LensSheet from "@/components/LensSheet";
@@ -21,10 +21,8 @@ import "@/styles/bysis-master-v23.css";
 function UserHeaderButton({ headerScrolled, primaryColor, accentColor }: { headerScrolled: boolean; primaryColor: string; accentColor: string }) {
   const { user, isAuthenticated, logout } = useAuth();
   const [open, setOpen] = useState(false);
-  const [, navigate] = useLocation();
   const ref = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -33,7 +31,6 @@ function UserHeaderButton({ headerScrolled, primaryColor, accentColor }: { heade
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const iconColor = headerScrolled ? primaryColor : "#fff";
   const initials = user?.name ? user.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase() : "?";
 
   return (
@@ -69,14 +66,13 @@ function UserHeaderButton({ headerScrolled, primaryColor, accentColor }: { heade
             fontSize: 13, fontWeight: 700, color: primaryColor, letterSpacing: "0.05em",
           }}>{initials}</div>
         ) : (
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={headerScrolled ? primaryColor : "#fff"} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>
           </svg>
         )}
       </button>
 
-      {/* Dropdown */}
       {open && isAuthenticated && (
         <div style={{
           position: "absolute", top: "calc(100% + 10px)", right: 0,
@@ -85,7 +81,6 @@ function UserHeaderButton({ headerScrolled, primaryColor, accentColor }: { heade
           border: "1px solid rgba(0,0,0,0.07)",
           minWidth: 220, overflow: "hidden", zIndex: 2000,
         }}>
-          {/* User info */}
           <div style={{ padding: "16px 18px", borderBottom: "1px solid #f0f0f0", display: "flex", alignItems: "center", gap: 12 }}>
             {user?.avatarUrl ? (
               <img src={user.avatarUrl} alt="" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }} />
@@ -102,7 +97,6 @@ function UserHeaderButton({ headerScrolled, primaryColor, accentColor }: { heade
               <p style={{ margin: 0, fontSize: 11, color: "#888", marginTop: 2 }}>{user?.role === "admin" ? "Administrateur" : "Client"}</p>
             </div>
           </div>
-          {/* Menu items */}
           {([
             { label: "Profil", href: "/profile" },
             { label: "Commandes", href: "/orders" },
@@ -125,7 +119,6 @@ function UserHeaderButton({ headerScrolled, primaryColor, accentColor }: { heade
               </button>
             </Link>
           ))}
-          {/* Logout */}
           <button
             onClick={() => { logout(); setOpen(false); }}
             style={{
@@ -147,7 +140,6 @@ function UserHeaderButton({ headerScrolled, primaryColor, accentColor }: { heade
 
 // ─── Bottom Navigation ───────────────────────────────────────────────────────
 function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen, onOpenLens, lensOpen }: any) {
-  // const { data: cartCount } = trpc.cart.getCount.useQuery();
   const cartCount = 0;
 
   return (
@@ -173,12 +165,13 @@ function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen, onOpenLens
             gap: 4, color: item.active ? accentColor : "#666",
             fontSize: 24,
             transition: "color 0.2s",
+            position: "relative",
           }}
           onMouseEnter={e => !item.active && (e.currentTarget.style.color = primaryColor)}
           onMouseLeave={e => !item.active && (e.currentTarget.style.color = "#666")}
         >
           <span>{item.icon}</span>
-          {item.badge && (
+          {item.badge ? (
             <span style={{
               position: "absolute", top: 8, right: 8,
               background: accentColor, color: primaryColor,
@@ -188,7 +181,7 @@ function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen, onOpenLens
             }}>
               {item.badge}
             </span>
-          )}
+          ) : null}
           <span style={{ fontSize: 10, fontWeight: 600 }}>{item.label}</span>
         </button>
       ))}
@@ -223,7 +216,7 @@ export default function Home() {
   const accentColor = s?.accentColor ?? "#D4AF37";
   const fontFamily = s?.fontFamily ?? "Inter, sans-serif";
 
-  // ── Header scroll effect ──────────────────────────────────────────────────
+  // Header scroll effect
   useEffect(() => {
     const handleScroll = () => setHeaderScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll, { passive: true });
