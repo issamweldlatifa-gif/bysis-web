@@ -7,8 +7,6 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
 import { registerGoogleAuthRoutes } from "../googleAuth";
-import { priceCheckHandler } from "../pricecheckHandler";
-
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -54,9 +52,6 @@ async function startServer() {
   registerStorageProxy(app);
   registerOAuthRoutes(app);
   registerGoogleAuthRoutes(app);
-
-  // Heartbeat scheduled handlers — must be before tRPC and Vite fallthrough
-  app.post("/api/scheduled/priceCheck", priceCheckHandler);
   
   // Cache control for static assets
   app.use((req, res, next) => {

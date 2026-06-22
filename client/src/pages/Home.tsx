@@ -1,326 +1,155 @@
 /**
- * Home.tsx — Bysis Homepage V3.0 (Master V23 Only)
- * Design: Bysis Master Final V23 integrated into React
- * Data: loaded from DB via trpc.homepage.getData
+ * Home — Bysis Homepage V2.0 with Hero Video, Card Stack, and Stores Grid
  */
-import { useRef, useState, useEffect, useCallback } from "react";
-import { Link } from "wouter";
-import { trpc } from "@/lib/trpc";
-import { useChatContext } from "@/App";
-import LensSheet from "@/components/LensSheet";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
-import HeroSectionV23 from "@/components/HeroSectionV23";
-import BrandStatementV23 from "@/components/BrandStatementV23";
-import VideoSliderV23 from "@/components/VideoSliderV23";
-import StoresSectionV23 from "@/components/StoresSectionV23";
-import FooterV23 from "@/components/FooterV23";
-import "@/styles/bysis-master-v23.css";
+import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
+import { Package, ShoppingBag } from 'lucide-react';
+import VideoSlider from '@/components/VideoSlider';
+import StoreSlider from '@/components/StoreSlider';
 
-// ─── User Header Button ──────────────────────────────────────────────────────
-function UserHeaderButton({ headerScrolled, primaryColor, accentColor }: { headerScrolled: boolean; primaryColor: string; accentColor: string }) {
-  const { user, isAuthenticated, logout } = useAuth();
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  const initials = user?.name ? user.name.split(" ").map((w: string) => w[0]).join("").slice(0, 2).toUpperCase() : "?";
+export default function Home() {
+  const [, navigate] = useLocation();
+  const [isPaused, setIsPaused] = useState(false);
+  const [cards] = useState([
+    { id: 1, title: 'Arrivage Europe ••', link: '/arrivage', order: 1 },
+    { id: 2, title: 'Bysis Garantie ••', link: '/garantie', order: 2 },
+    { id: 3, title: 'Wifi Dinar ••', link: '/wifidinar', order: 3 },
+    { id: 4, title: 'Livraison 48H ••', link: '/livraison', order: 4 },
+  ]);
+  const [stores] = useState([
+    { name: 'SHEIN', emoji: '🛍️' },
+    { name: 'Amazon', emoji: '📦' },
+    { name: 'Zara', emoji: '👗' },
+    { name: 'Nike', emoji: '👟' },
+    { name: 'H&M', emoji: '🎽' },
+    { name: 'Pieuvre', emoji: '🐙' },
+  ]);
 
   return (
-    <div ref={ref} style={{ position: "relative" }}>
-      <button
-        onClick={() => {
-          if (!isAuthenticated) {
-            window.location.href = getLoginUrl();
-          } else {
-            setOpen((v) => !v);
-          }
-        }}
-        style={{
-          background: "none", border: "none", cursor: "pointer", padding: 4,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          transition: "transform 0.16s ease-out",
-        }}
-        onMouseDown={e => (e.currentTarget.style.transform = "scale(0.9)")}
-        onMouseUp={e => (e.currentTarget.style.transform = "scale(1)")}
-        aria-label="Compte utilisateur"
-      >
-        {isAuthenticated && user?.avatarUrl ? (
-          <img
-            src={user.avatarUrl}
-            alt={user.name ?? ""}
-            style={{ width: 34, height: 34, borderRadius: "50%", objectFit: "cover", border: `2px solid ${accentColor}` }}
-          />
-        ) : isAuthenticated ? (
-          <div style={{
-            width: 34, height: 34, borderRadius: "50%",
-            background: `linear-gradient(135deg, ${accentColor} 0%, #B8962E 100%)`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 13, fontWeight: 700, color: primaryColor, letterSpacing: "0.05em",
-          }}>{initials}</div>
-        ) : (
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={headerScrolled ? primaryColor : "#fff"} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-        )}
-      </button>
+    <div className="bg-white">
+      {/* HERO VIDEO SECTION */}
+      <section className="relative h-screen overflow-hidden">
+        {/* Video Background */}
+        <video
+          autoPlay={!isPaused}
+          muted
+          loop
+          playsInline
+          className="absolute top-1/2 left-1/2 w-full h-full min-w-full min-h-full object-cover transform -translate-x-1/2 -translate-y-1/2 z-0"
+        >
+          <source src="https://via.placeholder.com/1920x1080/1a1a1a/ffffff" type="video/mp4" />
+        </video>
 
-      {open && isAuthenticated && (
-        <div style={{
-          position: "absolute", top: "calc(100% + 10px)", right: 0,
-          background: "#fff", borderRadius: 16,
-          boxShadow: "0 8px 40px rgba(0,0,0,0.15)",
-          border: "1px solid rgba(0,0,0,0.07)",
-          minWidth: 220, overflow: "hidden", zIndex: 2000,
-        }}>
-          <div style={{ padding: "16px 18px", borderBottom: "1px solid #f0f0f0", display: "flex", alignItems: "center", gap: 12 }}>
-            {user?.avatarUrl ? (
-              <img src={user.avatarUrl} alt="" style={{ width: 40, height: 40, borderRadius: "50%", objectFit: "cover" }} />
-            ) : (
-              <div style={{
-                width: 40, height: 40, borderRadius: "50%",
-                background: `linear-gradient(135deg, ${accentColor} 0%, #B8962E 100%)`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 15, fontWeight: 700, color: primaryColor,
-              }}>{initials}</div>
-            )}
-            <div>
-              <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: "#1C2B33" }}>{user?.name ?? "Client"}</p>
-              <p style={{ margin: 0, fontSize: 11, color: "#888", marginTop: 2 }}>{user?.role === "admin" ? "Administrateur" : "Client"}</p>
-            </div>
-          </div>
-          {([
-            { label: "Profil", href: "/profile" },
-            { label: "Commandes", href: "/orders" },
-            { label: "Paramètres", href: "/settings" },
-          ] as const).map(item => (
-            <Link key={item.href} href={item.href} style={{ textDecoration: "none", display: "block" }}>
-              <button
-                onClick={() => setOpen(false)}
-                style={{
-                  width: "100%", padding: "12px 18px", border: "none",
-                  background: "transparent", color: "#1C2B33",
-                  fontSize: 14, textAlign: "left", cursor: "pointer",
-                  borderBottom: "1px solid #f0f0f0",
-                  transition: "background 0.15s",
-                }}
-                onMouseEnter={e => (e.currentTarget.style.background = "#f8f8f8")}
-                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
-              >
-                {item.label}
-              </button>
-            </Link>
-          ))}
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/30 z-10"></div>
+
+        {/* Hero Content */}
+        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center text-white px-5">
+          <h1 className="text-5xl font-bold mb-3 tracking-tight">DESTOCKAGE EUROPE ••</h1>
+          <p className="text-lg opacity-90 mb-8">Qualité Française, Prix Tunisien</p>
           <button
-            onClick={() => { logout(); setOpen(false); }}
-            style={{
-              width: "100%", padding: "12px 18px", border: "none",
-              background: "transparent", color: "#d32f2f",
-              fontSize: 14, textAlign: "left", cursor: "pointer",
-              transition: "background 0.15s",
-            }}
-            onMouseEnter={e => (e.currentTarget.style.background = "#ffebee")}
-            onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+            onClick={() => navigate('/arrivage')}
+            className="bg-yellow-500 hover:bg-yellow-600 text-black px-8 py-3 rounded-lg font-bold text-base transition-all duration-200 transform hover:scale-105"
           >
-            Déconnexion
+            DÉCOUVRIR ••
           </button>
         </div>
-      )}
-    </div>
-  );
-}
 
-// ─── Bottom Navigation ───────────────────────────────────────────────────────
-function BottomNav({ accentColor, primaryColor, onOpenChat, chatOpen, onOpenLens, lensOpen }: any) {
-  const cartCount = 0;
-
-  return (
-    <nav style={{
-      position: "fixed", bottom: 0, left: 0, right: 0,
-      height: 64, background: "#fff", borderTop: "1px solid #e0e0e0",
-      display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr 1fr",
-      zIndex: 1000,
-    }}>
-      {[
-        { icon: "🔍", label: "Lens", onClick: onOpenLens, active: lensOpen },
-        { icon: "📦", label: "Arrivage", onClick: () => window.location.href = "/arrivage" },
-        { icon: "🛒", label: "Commander", onClick: () => window.location.href = "/commander", badge: cartCount },
-        { icon: "📋", label: "Suivi", onClick: () => window.location.href = "/suivi" },
-        { icon: "🤖", label: "AI", onClick: onOpenChat, active: chatOpen },
-      ].map((item, i) => (
+        {/* Pause Button */}
         <button
-          key={i}
-          onClick={item.onClick}
-          style={{
-            border: "none", background: "transparent", cursor: "pointer",
-            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-            gap: 4, color: item.active ? accentColor : "#666",
-            fontSize: 24,
-            transition: "color 0.2s",
-            position: "relative",
-          }}
-          onMouseEnter={e => !item.active && (e.currentTarget.style.color = primaryColor)}
-          onMouseLeave={e => !item.active && (e.currentTarget.style.color = "#666")}
+          onClick={() => setIsPaused(!isPaused)}
+          className="absolute bottom-24 right-5 z-30 bg-black/50 hover:bg-black/70 text-white w-10 h-10 rounded-full text-xs transition-all duration-200 flex items-center justify-center"
         >
-          <span>{item.icon}</span>
-          {item.badge ? (
-            <span style={{
-              position: "absolute", top: 8, right: 8,
-              background: accentColor, color: primaryColor,
-              borderRadius: "50%", width: 18, height: 18,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 10, fontWeight: 700,
-            }}>
-              {item.badge}
-            </span>
-          ) : null}
-          <span style={{ fontSize: 10, fontWeight: 600 }}>{item.label}</span>
+          {isPaused ? '▶' : '▌▌'}
         </button>
-      ))}
-    </nav>
-  );
-}
+      </section>
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-export default function Home() {
-  const { openChat, closeChat, chatOpen } = useChatContext();
-  const toggleChat = useCallback(() => {
-    if (chatOpen) {
-      closeChat();
-    } else {
-      openChat();
-    }
-  }, [chatOpen, openChat, closeChat]);
+      {/* CARD STACK */}
+      <main className="bg-white pt-5 pb-24">
+        <section className="px-4">
+          {cards.map((card) => (
+            <a
+              key={card.id}
+              href={card.link}
+              className="block w-full h-44 rounded-2xl overflow-hidden relative mb-3 hover:opacity-90 transition-opacity duration-200"
+            >
+              {/* Card Video Background */}
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover"
+              >
+                <source src="https://via.placeholder.com/400x180/2a2a2a/ffffff" type="video/mp4" />
+              </video>
 
-  const [lensOpen, setLensOpen] = useState(false);
-  const toggleLens = useCallback(() => setLensOpen((v) => !v), []);
-  const { data: homepageData, isLoading } = trpc.homepage.getData.useQuery();
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/0 flex items-center pl-6">
+                <h2 className="text-white text-2xl font-bold">{card.title}</h2>
+              </div>
+            </a>
+          ))}
+        </section>
 
-  const [headerScrolled, setHeaderScrolled] = useState(false);
+        {/* STORES GRID */}
+        <section className="px-4 py-8">
+          <h2 className="text-center text-2xl font-bold mb-6 text-black">نشريو منهم مباشرة ليك ••</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {stores.map((store) => (
+              <div
+                key={store.name}
+                className="aspect-square rounded-2xl bg-gray-100 flex items-center justify-center text-5xl hover:bg-gray-200 transition-colors duration-200"
+              >
+                {store.emoji}
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
 
-  // Defaults
-  const s = homepageData?.settings;
-  const heroVideo = homepageData?.heroVideo;
-  const sliderVideos = homepageData?.sliderVideos ?? [];
-  const stores = homepageData?.stores ?? [];
+      {/* FOOTER */}
+      <footer className="bg-gray-100 px-4 py-8 text-black">
+        <div className="grid grid-cols-3 gap-6 mb-6">
+          {/* Column 1 */}
+          <div>
+            <h3 className="font-bold text-sm mb-3">BYSIS ••</h3>
+            <a href="#" className="text-xs text-gray-600 block mb-2 hover:text-black transition-colors">
+              من نحن ••
+            </a>
+            <a href="#" className="text-xs text-gray-600 block hover:text-black transition-colors">
+              Pieuvre SAS ••
+            </a>
+          </div>
 
-  const primaryColor = s?.primaryColor ?? "#1C2B33";
-  const accentColor = s?.accentColor ?? "#D4AF37";
-  const fontFamily = s?.fontFamily ?? "Inter, sans-serif";
+          {/* Column 2 */}
+          <div>
+            <h3 className="font-bold text-sm mb-3">الامان ••</h3>
+            <a href="#" className="text-xs text-gray-600 block mb-2 hover:text-black transition-colors">
+              سياسة الخصوصية ••
+            </a>
+            <a href="#" className="text-xs text-gray-600 block hover:text-black transition-colors">
+              Bysis Garantie ••
+            </a>
+          </div>
 
-  // Header scroll effect
-  useEffect(() => {
-    const handleScroll = () => setHeaderScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+          {/* Column 3 */}
+          <div>
+            <h3 className="font-bold text-sm mb-3">تواصل ••</h3>
+            <a href="mailto:support@bysis.shop" className="text-xs text-gray-600 block mb-2 hover:text-black transition-colors">
+              support@bysis.shop
+            </a>
+            <a href="#" className="text-xs text-gray-600 block hover:text-black transition-colors">
+              لمطة، المنستير ••
+            </a>
+          </div>
+        </div>
 
-  if (isLoading) {
-    return (
-      <div style={{ minHeight: "100vh", background: "#1C2B33", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ color: "#D4AF37", fontSize: 24, letterSpacing: "0.2em", fontWeight: 900 }}>BYSIS ••</div>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ fontFamily, background: "#fff", minHeight: "100vh", overflowX: "hidden", paddingBottom: 64 }}>
-
-      {/* ── HEADER ─────────────────────────────────────────────────────────── */}
-      <header style={{
-        position: "fixed", top: 0, left: 0, right: 0, zIndex: 999,
-        padding: "16px 20px",
-        background: headerScrolled ? "rgba(255,255,255,0.96)" : "transparent",
-        backdropFilter: headerScrolled ? "blur(20px)" : "none",
-        borderBottom: headerScrolled ? "1px solid rgba(0,0,0,0.08)" : "none",
-        transition: "all 0.3s cubic-bezier(0.23,1,0.32,1)",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-      }}>
-        <Link href="/" style={{ textDecoration: "none" }}>
-          <span style={{
-            fontWeight: 900, fontSize: 22, letterSpacing: "0.15em",
-            color: headerScrolled ? primaryColor : "#fff",
-            transition: "color 0.3s",
-          }}>BYSIS ••</span>
-        </Link>
-        <UserHeaderButton headerScrolled={headerScrolled} primaryColor={primaryColor} accentColor={accentColor} />
-      </header>
-
-      {/* ── HERO SECTION (V23) ─────────────────────────────────────────────── */}
-      <HeroSectionV23
-        title="Bysis"
-        subtitle="Découvrez une nouvelle façon de magasiner"
-        ctaText={s?.heroButtonText || "DÉCOUVRIR"}
-        ctaLink={s?.heroButtonLink || "/arrivage"}
-        videoUrl={heroVideo?.videoUrl}
-        backgroundColor={primaryColor}
-      />
-
-      {/* ── BRAND STATEMENT (V23) ──────────────────────────────────────────── */}
-      <BrandStatementV23
-        text={s?.adminHeadline || "Empower Your Style"}
-        subtext="Découvrez les meilleures marques au meilleur prix"
-      />
-
-      {/* ── VIDEO SLIDER (V23) ─────────────────────────────────────────────── */}
-      <VideoSliderV23
-        title="Nos Dernières Vidéos"
-        sectionNote="Voir tout"
-        videos={sliderVideos.map((v: any) => ({
-          id: v.id,
-          title: v.title,
-          videoUrl: v.videoUrl,
-          backgroundColor: v.backgroundColor,
-        }))}
-      />
-
-      {/* ── STORES SECTION (V23) ───────────────────────────────────────────── */}
-      <StoresSectionV23
-        title={s?.storesSectionTitle || "Nos Boutiques"}
-        stores={stores.map((store: any) => ({
-          id: store.id,
-          name: store.name,
-          backgroundColor: store.backgroundColor,
-          textColor: store.textColor,
-          logoUrl: store.logoUrl,
-          link: store.link,
-        }))}
-      />
-
-      {/* ── FOOTER (V23) ───────────────────────────────────────────────────── */}
-      <FooterV23
-        logo="BYSIS"
-        slogan="Votre destination shopping de confiance"
-        navLinks={[
-          { label: "Arrivage", href: "/arrivage" },
-          { label: "Commander", href: "/commander" },
-          { label: "Suivi", href: "/suivi" },
-          { label: "Garantie", href: "/garantie" },
-          { label: "Contact", href: "/contact" },
-        ]}
-        legalLinks={[
-          { label: "Conditions", href: "#" },
-          { label: "Confidentialité", href: "#" },
-          { label: "Cookies", href: "#" },
-        ]}
-        socialLinks={[
-          { icon: "f", href: s?.footerFacebook || "#", label: "Facebook" },
-          { icon: "📷", href: s?.footerInstagram || "#", label: "Instagram" },
-          { icon: "💬", href: s?.footerWhatsapp ? `https://wa.me/${s.footerWhatsapp}` : "#", label: "WhatsApp" },
-        ]}
-      />
-
-      {/* ── BOTTOM NAV ─────────────────────────────────────────────────────── */}
-      <BottomNav accentColor={accentColor} primaryColor={primaryColor} onOpenChat={toggleChat} chatOpen={chatOpen} onOpenLens={toggleLens} lensOpen={lensOpen} />
-      <LensSheet isOpen={lensOpen} onClose={() => setLensOpen(false)} />
+        {/* Footer Bottom */}
+        <div className="text-center pt-6 border-t border-gray-300 text-xs text-gray-600">
+          © 2026 Bysis Group •• All Rights Reserved
+        </div>
+      </footer>
     </div>
   );
 }

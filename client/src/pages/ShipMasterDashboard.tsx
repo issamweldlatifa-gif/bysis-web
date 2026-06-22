@@ -21,12 +21,15 @@ import {
   Clock, CreditCard, Warehouse, XCircle, Filter, Download, Menu, Tag, Bot,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
-// Removed deleted pages imports
-import AdminHomepage from "@/components/AdminHomepage";
-import AdminSliders from "@/components/AdminSliders";
+import AdminSlides from "./AdminSlides";
+import AdminProducts from "./AdminProducts";
+import AdminCategories from "./AdminCategories";
+import AdminAiOrders from "./AdminAiOrders";
 
 // Wrapper components for lazy rendering
-function HomepageTabWrapper() { return <div className="space-y-8"><AdminHomepage /></div>; }
+function SlidesTabWrapper() { return <AdminSlides />; }
+function ProductsTabWrapper() { return <AdminProducts />; }
+function CategoriesTabWrapper() { return <AdminCategories />; }
 
 // ─── Color constants (light theme matching mockup) ────────────────────────────
 const BG = "#F4F6F9";
@@ -63,7 +66,7 @@ const CLIENT_STATUS_CONFIG: Record<string, { label: string; color: string; bg: s
 
 const PIE_COLORS = ["#3B82F6", "#F59E0B", "#F97316", "#8B5CF6", "#10B981", "#00A651", "#EF4444"];
 
-type AdminTab = "dashboard" | "crm" | "orders" | "audit" | "settings" | "slides" | "products" | "categories" | "ai_orders" | "homepage";
+type AdminTab = "dashboard" | "crm" | "orders" | "audit" | "settings" | "slides" | "products" | "categories" | "ai_orders";
 
 // ─── Notification sound ───────────────────────────────────────────────────────
 function playNotificationSound() {
@@ -188,7 +191,6 @@ export default function ShipMasterDashboard() {
     { id: "dashboard", icon: LayoutDashboard, label: "Tableau de Bord" },
     { id: "crm",       icon: Users,           label: "CRM / Clients" },
     { id: "orders",    icon: ShoppingBag,     label: "Commandes", badge: newOrdersCount > 0 ? newOrdersCount : undefined },
-    { id: "homepage",  icon: LayoutDashboard, label: "Homepage & Contenu" },
     { id: "audit",      icon: Shield,          label: "Journal d'Audit" },
     { id: "slides",     icon: LayoutDashboard, label: "Slides Carousel" },
     { id: "products",   icon: Package,         label: "Produits" },
@@ -354,7 +356,6 @@ export default function ShipMasterDashboard() {
                 {tab === "dashboard"  && "Tableau de Bord"}
                 {tab === "crm"        && "CRM / Clients"}
                 {tab === "orders"     && "Gestion des Commandes"}
-                {tab === "homepage"   && "Homepage & Contenu"}
                 {tab === "audit"      && "Journal d'Audit"}
                 {tab === "slides"     && "Slides Carousel"}
                 {tab === "products"   && "Catalogue Produits"}
@@ -366,7 +367,6 @@ export default function ShipMasterDashboard() {
                 {tab === "dashboard"  && "Vue d'ensemble de votre activité"}
                 {tab === "crm"        && "Gérez vos clients et leur historique"}
                 {tab === "orders"     && "Suivez et mettez à jour les commandes"}
-                {tab === "homepage"   && "Vidéos, textes, couleurs et magasins de la page d'accueil"}
                 {tab === "audit"      && "Historique de toutes les actions admin"}
                 {tab === "slides"     && "Gérez les slides de la page d'accueil"}
                 {tab === "products"   && "Gérez votre catalogue de produits"}
@@ -407,12 +407,20 @@ export default function ShipMasterDashboard() {
               />
             )}
 
-            {/* ═══════════════ HOMEPAGE ═══════════════ */}
-            {tab === "homepage" && <HomepageTabWrapper />}
             {/* ═══════════════ AUDIT ═══════════════ */}
             {tab === "audit" && <AuditTab logs={auditLogs} />}
 
-            {/* Removed deleted tabs: slides, products, categories, ai_orders */}
+            {/* ═══════════════ SLIDES ═══════════════ */}
+            {tab === "slides" && <SlidesTabWrapper />}
+
+            {/* ═══════════════ PRODUCTS ═══════════════ */}
+            {tab === "products" && <ProductsTabWrapper />}
+
+            {/* ═══════════════ CATEGORIES ═══════════════ */}
+            {tab === "categories" && <CategoriesTabWrapper />}
+
+            {/* ═══════════════ AI ORDERS ═══════════════ */}
+            {tab === "ai_orders" && <AdminAiOrders />}
 
             {/* ═══════════════ SETTINGS ═══════════════ */}
             {tab === "settings" && <SettingsTab />}

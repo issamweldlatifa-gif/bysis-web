@@ -29,13 +29,6 @@ import {
 import {
   getActiveSliders, getAllSliders, getSliderById, createSlider, updateSlider, deleteSlider, toggleSliderActive,
 } from "./db-sliders";
-import {
-  getHomepageSettings, updateHomepageSettings,
-  getHeroVideo, getSliderVideos, getAllHomepageVideos,
-  createHomepageVideo, updateHomepageVideo, deleteHomepageVideo,
-  getActiveHomepageStores, getAllHomepageStores,
-  createHomepageStore, updateHomepageStore, deleteHomepageStore,
-} from "./db-homepage";
 import { invokeLLM } from "./_core/llm";
 import { notifyOwner } from "./_core/notification";
 import { transcribeAudio } from "./_core/voiceTranscription";
@@ -44,13 +37,6 @@ import { storagePut, storageGetSignedUrl } from "./storage";
 import { parse as parseCookieHeader } from "cookie";
 import crypto from "crypto";
 import { savePushSubscription, sendPushToPhone } from "./pushNotifications";
-import {
-  saveLensSearch, getLensHistory, searchProductsByKeywords,
-  searchProductsByText, getTrendingProducts,
-  addPriceTracking, getUserPriceTracking, removePriceTracking,
-  saveArTryOn, updateArTryOnResult, getArTryOnResult,
-} from "./db-lens";
-import { generateImage } from "./_core/imageGeneration";
 import { notifyAdminNewAiOrder, sendOrderConfirmationToAdmin, sendStatusUpdateToAdmin } from "./emailService";
 
 // Admin session cookie name (separate from Manus OAuth)
@@ -1157,28 +1143,28 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
           {
             id: 1, title: 'Organisez-vous', subtitle: 'Découvrez les meilleures ventes',
             bgColor: '#F5C518', textColor: '#1A1A1A', imageUrl: null,
-            card1Label: 'Commander', card1Video: null, card1Link: '/order',
-            card2Label: 'Arrivages', card2Video: null, card2Link: '/arrivage',
-            card3Label: 'Suivre', card3Video: null, card3Link: '/track',
-            card4Label: 'Calculer', card4Video: null, card4Link: '/calculator',
+            card1Label: 'Commander', card1Image: null, card1Link: '/order',
+            card2Label: 'Arrivages', card2Image: null, card2Link: '/arrivage',
+            card3Label: 'Suivre', card3Image: null, card3Link: '/track',
+            card4Label: 'Calculer', card4Image: null, card4Link: '/calculator',
             displayOrder: 1, isActive: true, createdAt: new Date(), updatedAt: new Date(),
           },
           {
             id: 2, title: 'Nos meilleurs arrivages', subtitle: 'Vêtements, chaussures, accessoires',
             bgColor: '#1A6B3C', textColor: '#FFFFFF', imageUrl: null,
-            card1Label: 'Mode', card1Video: null, card1Link: '/arrivage',
-            card2Label: 'Maison', card2Video: null, card2Link: '/arrivage',
-            card3Label: 'Accessoires', card3Video: null, card3Link: '/arrivage',
-            card4Label: 'Tout voir', card4Video: null, card4Link: '/arrivage',
+            card1Label: 'Mode', card1Image: null, card1Link: '/arrivage',
+            card2Label: 'Maison', card2Image: null, card2Link: '/arrivage',
+            card3Label: 'Accessoires', card3Image: null, card3Link: '/arrivage',
+            card4Label: 'Tout voir', card4Image: null, card4Link: '/arrivage',
             displayOrder: 2, isActive: true, createdAt: new Date(), updatedAt: new Date(),
           },
           {
             id: 3, title: 'Mode & Style', subtitle: 'Les tendances à petits prix',
             bgColor: '#E53E3E', textColor: '#FFFFFF', imageUrl: null,
-            card1Label: 'Femme', card1Video: null, card1Link: '/catalogue',
-            card2Label: 'Homme', card2Video: null, card2Link: '/catalogue',
-            card3Label: 'Enfant', card3Video: null, card3Link: '/catalogue',
-            card4Label: 'Catalogue', card4Video: null, card4Link: '/catalogue',
+            card1Label: 'Femme', card1Image: null, card1Link: '/catalogue',
+            card2Label: 'Homme', card2Image: null, card2Link: '/catalogue',
+            card3Label: 'Enfant', card3Image: null, card3Link: '/catalogue',
+            card4Label: 'Catalogue', card4Image: null, card4Link: '/catalogue',
             displayOrder: 3, isActive: true, createdAt: new Date(), updatedAt: new Date(),
           },
         ];
@@ -1197,10 +1183,10 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         bgColor: z.string().default("#E8192C"),
         textColor: z.string().default("#ffffff"),
         imageUrl: z.string().optional(),
-        card1Label: z.string().optional(), card1Video: z.string().optional(), card1Image: z.string().optional(), card1BgColor: z.string().optional(), card1TextColor: z.string().optional(), card1Link: z.string().optional(),
-        card2Label: z.string().optional(), card2Video: z.string().optional(), card2Image: z.string().optional(), card2BgColor: z.string().optional(), card2TextColor: z.string().optional(), card2Link: z.string().optional(),
-        card3Label: z.string().optional(), card3Video: z.string().optional(), card3Image: z.string().optional(), card3BgColor: z.string().optional(), card3TextColor: z.string().optional(), card3Link: z.string().optional(),
-        card4Label: z.string().optional(), card4Video: z.string().optional(), card4Image: z.string().optional(), card4BgColor: z.string().optional(), card4TextColor: z.string().optional(), card4Link: z.string().optional(),
+        card1Label: z.string().optional(), card1Image: z.string().optional(), card1Link: z.string().optional(),
+        card2Label: z.string().optional(), card2Image: z.string().optional(), card2Link: z.string().optional(),
+        card3Label: z.string().optional(), card3Image: z.string().optional(), card3Link: z.string().optional(),
+        card4Label: z.string().optional(), card4Image: z.string().optional(), card4Link: z.string().optional(),
         displayOrder: z.number().default(0),
         active: z.number().default(1),
       }))
@@ -1216,10 +1202,10 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         bgColor: z.string().optional(),
         textColor: z.string().optional(),
         imageUrl: z.string().optional(),
-        card1Label: z.string().optional(), card1Video: z.string().optional(), card1Image: z.string().optional(), card1BgColor: z.string().optional(), card1TextColor: z.string().optional(), card1Link: z.string().optional(),
-        card2Label: z.string().optional(), card2Video: z.string().optional(), card2Image: z.string().optional(), card2BgColor: z.string().optional(), card2TextColor: z.string().optional(), card2Link: z.string().optional(),
-        card3Label: z.string().optional(), card3Video: z.string().optional(), card3Image: z.string().optional(), card3BgColor: z.string().optional(), card3TextColor: z.string().optional(), card3Link: z.string().optional(),
-        card4Label: z.string().optional(), card4Video: z.string().optional(), card4Image: z.string().optional(), card4BgColor: z.string().optional(), card4TextColor: z.string().optional(), card4Link: z.string().optional(),
+        card1Label: z.string().optional(), card1Image: z.string().optional(), card1Link: z.string().optional(),
+        card2Label: z.string().optional(), card2Image: z.string().optional(), card2Link: z.string().optional(),
+        card3Label: z.string().optional(), card3Image: z.string().optional(), card3Link: z.string().optional(),
+        card4Label: z.string().optional(), card4Image: z.string().optional(), card4Link: z.string().optional(),
         displayOrder: z.number().optional(),
         active: z.number().optional(),
       }))
@@ -1649,477 +1635,6 @@ IMPORTANT: Always return the LARGEST price visible. price_in_eur must be already
         await toggleSliderActive(input.id);
         return { success: true };
       }),
-  }),
-
-  // ===== Homepage CMS =====
-  homepage: router({
-    // Public: get all homepage data in one call
-    getData: publicProcedure.query(async () => {
-      const [settings, heroVideo, sliderVideos, stores] = await Promise.all([
-        getHomepageSettings(),
-        getHeroVideo(),
-        getSliderVideos(),
-        getActiveHomepageStores(),
-      ]);
-      return { settings, heroVideo, sliderVideos, stores };
-    }),
-
-    // Admin: get settings
-    getSettings: customAdminProcedure.query(async ({ ctx }) => {
-      return getHomepageSettings();
-    }),
-
-    // Admin: update settings
-    updateSettings: customAdminProcedure
-      .input(z.object({
-        heroButtonText: z.string().optional(),
-        heroButtonLink: z.string().optional(),
-        heroButtonColor: z.string().optional(),
-        heroButtonTextColor: z.string().optional(),
-        adminHeadline: z.string().optional(),
-        adminButtonText: z.string().optional(),
-        adminButtonLink: z.string().optional(),
-        storesSectionTitle: z.string().optional(),
-        primaryColor: z.string().optional(),
-        accentColor: z.string().optional(),
-        fontFamily: z.string().optional(),
-        footerFacebook: z.string().optional(),
-        footerInstagram: z.string().optional(),
-        footerWhatsapp: z.string().optional(),
-        footerEmail: z.string().optional(),
-        card1Label: z.string().optional(), card1Video: z.string().optional(), card1Image: z.string().optional(), card1BgColor: z.string().optional(), card1TextColor: z.string().optional(), card1Link: z.string().optional(),
-        card2Label: z.string().optional(), card2Video: z.string().optional(), card2Image: z.string().optional(), card2BgColor: z.string().optional(), card2TextColor: z.string().optional(), card2Link: z.string().optional(),
-        card3Label: z.string().optional(), card3Video: z.string().optional(), card3Image: z.string().optional(), card3BgColor: z.string().optional(), card3TextColor: z.string().optional(), card3Link: z.string().optional(),
-        card4Label: z.string().optional(), card4Video: z.string().optional(), card4Image: z.string().optional(), card4BgColor: z.string().optional(), card4TextColor: z.string().optional(), card4Link: z.string().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        return updateHomepageSettings(input);
-      }),
-
-    // Admin: get all videos
-    getVideos: customAdminProcedure.query(async ({ ctx }) => {
-      return getAllHomepageVideos();
-    }),
-
-    // Admin: create video
-    createVideo: customAdminProcedure
-      .input(z.object({
-        type: z.enum(["hero", "slider"]),
-        title: z.string(),
-        videoUrl: z.string().url(),
-        linkUrl: z.string().optional(),
-        displayOrder: z.number().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        return createHomepageVideo({ ...input, isActive: 1 });
-      }),
-
-    // Admin: update video
-    updateVideo: customAdminProcedure
-      .input(z.object({
-        id: z.number(),
-        type: z.enum(["hero", "slider"]).optional(),
-        title: z.string().optional(),
-        videoUrl: z.string().optional(),
-        linkUrl: z.string().optional(),
-        displayOrder: z.number().optional(),
-        isActive: z.number().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        const { id, ...data } = input;
-        return updateHomepageVideo(id, data);
-      }),
-
-    // Admin: delete video
-    deleteVideo: customAdminProcedure
-      .input(z.object({ id: z.number() }))
-      .mutation(async ({ ctx, input }) => {
-        await deleteHomepageVideo(input.id);
-        return { success: true };
-      }),
-
-    // Admin: get all stores
-    getStores: customAdminProcedure.query(async ({ ctx }) => {
-      return getAllHomepageStores();
-    }),
-
-    // Admin: create store
-    createStore: customAdminProcedure
-      .input(z.object({
-        name: z.string(),
-        logoUrl: z.string().optional(),
-        linkUrl: z.string().optional(),
-        backgroundColor: z.string().optional(),
-        textColor: z.string().optional(),
-        isDark: z.number().optional(),
-        displayOrder: z.number().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        return createHomepageStore({ ...input, isActive: 1 });
-      }),
-
-    // Admin: update store
-    updateStore: customAdminProcedure
-      .input(z.object({
-        id: z.number(),
-        name: z.string().optional(),
-        logoUrl: z.string().optional(),
-        linkUrl: z.string().optional(),
-        backgroundColor: z.string().optional(),
-        textColor: z.string().optional(),
-        isDark: z.number().optional(),
-        displayOrder: z.number().optional(),
-        isActive: z.number().optional(),
-      }))
-      .mutation(async ({ ctx, input }) => {
-        const { id, ...data } = input;
-        return updateHomepageStore(id, data);
-      }),
-
-    // Admin: delete store
-    deleteStore: customAdminProcedure
-      .input(z.object({ id: z.number() }))
-      .mutation(async ({ ctx, input }) => {
-        await deleteHomepageStore(input.id);
-        return { success: true };
-      }),
-  }),
-
-  // ===== Lens AI Visual Search =====
-  lens: router({
-    // Analyze image with AI Vision
-    analyzeImage: publicProcedure
-      .input(z.object({
-        imageBase64: z.string(),
-        sessionId: z.string().optional(),
-        userId: z.string().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        // Upload image to storage
-        const base64Data = input.imageBase64.replace(/^data:image\/\w+;base64,/, "");
-        const buffer = Buffer.from(base64Data, "base64");
-        const mimeMatch = input.imageBase64.match(/^data:(image\/\w+);base64,/);
-        const mime = (mimeMatch?.[1] ?? "image/jpeg") as string;
-        const ext = mime.split("/")[1] ?? "jpg";
-        const key = `lens/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { url: imageUrl } = await storagePut(key, buffer, mime);
-
-        // Call AI Vision for product analysis
-        const aiResponse = await invokeLLM({
-          messages: [
-            {
-              role: "system",
-              content: `Tu es un moteur de reconnaissance de produits pour Bysis, une plateforme e-commerce tunisienne.
-Analyse l'image et retourne un JSON avec:
-- productType: catégorie principale en français (ex: "Robe", "Chaussures", "Téléphone")
-- colors: tableau des couleurs dominantes en français
-- keywords: tableau de 3-6 mots-clés de recherche en français et arabe
-- estimatedPrice: prix estimé en TND si visible, sinon null
-- confidence: score de confiance 0-1
-- platform: "shein"|"aliexpress"|"temu"|null
-Retourne UNIQUEMENT du JSON valide, sans markdown.`,
-            },
-            {
-              role: "user",
-              content: [
-                { type: "image_url", image_url: { url: input.imageBase64, detail: "high" } },
-                { type: "text", text: "Analyse ce produit et retourne le JSON." },
-              ],
-            },
-          ],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "lens_analysis",
-              strict: true,
-              schema: {
-                type: "object",
-                properties: {
-                  productType: { type: "string" },
-                  colors: { type: "array", items: { type: "string" } },
-                  keywords: { type: "array", items: { type: "string" } },
-                  estimatedPrice: { type: ["number", "null"] },
-                  confidence: { type: "number" },
-                  platform: { type: ["string", "null"] },
-                },
-                required: ["productType", "colors", "keywords", "estimatedPrice", "confidence", "platform"],
-                additionalProperties: false,
-              },
-            },
-          },
-        });
-
-        const raw = aiResponse.choices?.[0]?.message?.content ?? "{}";
-        let analysis: { productType: string; colors: string[]; keywords: string[]; estimatedPrice: number | null; confidence: number; platform: string | null };
-        try {
-          analysis = JSON.parse(typeof raw === "string" ? raw : JSON.stringify(raw));
-        } catch {
-          analysis = { productType: "Produit", colors: [], keywords: [], estimatedPrice: null, confidence: 0.5, platform: null };
-        }
-
-        const results = await searchProductsByKeywords(analysis.keywords, 12);
-
-        await saveLensSearch({
-          userId: input.userId,
-          sessionId: input.sessionId,
-          queryType: "image",
-          imageUrl,
-          aiAnalysis: {
-            productType: analysis.productType,
-            colors: analysis.colors,
-            keywords: analysis.keywords,
-            estimatedPrice: analysis.estimatedPrice ?? undefined,
-            confidence: analysis.confidence,
-            platform: analysis.platform ?? undefined,
-          },
-          resultCount: results.length,
-        }).catch(() => {});
-
-        return { analysis, results, imageUrl };
-      }),
-
-    // Text search
-    searchText: publicProcedure
-      .input(z.object({ query: z.string().min(1).max(200), sessionId: z.string().optional() }))
-      .query(async ({ input }) => {
-        const results = await searchProductsByText(input.query, 12);
-        await saveLensSearch({ sessionId: input.sessionId, queryType: "text", queryText: input.query, resultCount: results.length }).catch(() => {});
-        return { results };
-      }),
-
-    // Barcode search
-    searchBarcode: publicProcedure
-      .input(z.object({ barcode: z.string(), sessionId: z.string().optional() }))
-      .query(async ({ input }) => {
-        const results = await searchProductsByText(input.barcode, 8);
-        await saveLensSearch({ sessionId: input.sessionId, queryType: "barcode", queryText: input.barcode, resultCount: results.length }).catch(() => {});
-        return { results };
-      }),
-
-    // Trending products (empty state)
-    trending: publicProcedure.query(async () => getTrendingProducts(8)),
-
-    // Search history
-    history: publicProcedure
-      .input(z.object({ sessionId: z.string() }))
-      .query(async ({ input }) => getLensHistory(input.sessionId, 10)),
-
-    // Voice search: accept base64 audio, upload to storage, transcribe, then search products
-    voiceSearch: publicProcedure
-      .input(z.object({
-        audioBase64: z.string(), // base64 encoded audio (data:audio/webm;base64,...)
-        sessionId: z.string().optional(),
-        language: z.string().optional().default("fr"),
-      }))
-      .mutation(async ({ input }) => {
-        // Upload audio to storage to get a real URL for transcription
-        let audioUrl: string | null = null;
-        try {
-          const base64Data = input.audioBase64.replace(/^data:audio\/[^;]+;base64,/, "");
-          const buffer = Buffer.from(base64Data, "base64");
-          const result = await storagePut(`lens/audio-${Date.now()}.webm`, buffer, "audio/webm");
-          audioUrl = await storageGetSignedUrl(result.key);
-        } catch (e) {
-          console.error("[Lens] Audio upload error:", e);
-          return { query: "", results: [], transcription: "" };
-        }
-        const transcription = await transcribeAudio({
-          audioUrl,
-          language: input.language,
-          prompt: "Recherche de produit e-commerce",
-        });
-        const query = ("text" in transcription ? transcription.text : "")?.trim() ?? "";
-        if (!query) return { query: "", results: [], transcription: "" };
-        const results = await searchProductsByText(query, 12);
-        await saveLensSearch({
-          sessionId: input.sessionId,
-          queryType: "text",
-          queryText: query,
-          resultCount: results.length,
-        }).catch(() => {});
-        return { query, results, transcription: query };
-      }),
-
-    // Multimodal search: image + optional text query simultaneously
-    multimodalSearch: publicProcedure
-      .input(z.object({
-        imageBase64: z.string(),
-        textQuery: z.string().optional(),
-        sessionId: z.string().optional(),
-        userId: z.string().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        // Upload image
-        const base64Data = input.imageBase64.replace(/^data:image\/\w+;base64,/, "");
-        const buffer = Buffer.from(base64Data, "base64");
-        const mimeMatch = input.imageBase64.match(/^data:(image\/\w+);base64,/);
-        const mime = (mimeMatch?.[1] ?? "image/jpeg") as string;
-        const ext = mime.split("/")[1] ?? "jpg";
-        const key = `lens/multi-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { url: imageUrl } = await storagePut(key, buffer, mime);
-
-        // AI Vision analysis
-        const aiResponse = await invokeLLM({
-          messages: [
-            {
-              role: "system",
-              content: `Tu es un moteur de reconnaissance de produits pour Bysis.
-Analyse l'image${input.textQuery ? ` en tenant compte de la requête: "${input.textQuery}"` : ""}.
-Retourne un JSON avec productType, colors, keywords (3-6 mots-clés), estimatedPrice, confidence, platform, similarityScore (0-1).
-Retourne UNIQUEMENT du JSON valide.`,
-            },
-            {
-              role: "user",
-              content: [
-                { type: "image_url", image_url: { url: input.imageBase64, detail: "high" } },
-                { type: "text", text: input.textQuery ? `Requête: ${input.textQuery}` : "Analyse ce produit." },
-              ],
-            },
-          ],
-          response_format: {
-            type: "json_schema",
-            json_schema: {
-              name: "multimodal_analysis",
-              strict: true,
-              schema: {
-                type: "object",
-                properties: {
-                  productType: { type: "string" },
-                  colors: { type: "array", items: { type: "string" } },
-                  keywords: { type: "array", items: { type: "string" } },
-                  estimatedPrice: { type: ["number", "null"] },
-                  confidence: { type: "number" },
-                  platform: { type: ["string", "null"] },
-                  similarityScore: { type: "number" },
-                },
-                required: ["productType", "colors", "keywords", "estimatedPrice", "confidence", "platform", "similarityScore"],
-                additionalProperties: false,
-              },
-            },
-          },
-        });
-
-        const raw = aiResponse.choices?.[0]?.message?.content ?? "{}";
-        let analysis: { productType: string; colors: string[]; keywords: string[]; estimatedPrice: number | null; confidence: number; platform: string | null; similarityScore: number };
-        try {
-          analysis = JSON.parse(typeof raw === "string" ? raw : JSON.stringify(raw));
-        } catch {
-          analysis = { productType: "Produit", colors: [], keywords: [], estimatedPrice: null, confidence: 0.5, platform: null, similarityScore: 0.5 };
-        }
-
-        // Merge text query keywords with AI keywords
-        const allKeywords = [...analysis.keywords];
-        if (input.textQuery) {
-          allKeywords.push(...input.textQuery.split(/\s+/).filter(Boolean).slice(0, 3));
-        }
-
-        const results = await searchProductsByKeywords([...new Set(allKeywords)], 16);
-
-        await saveLensSearch({
-          userId: input.userId,
-          sessionId: input.sessionId,
-          queryType: "image",
-          imageUrl,
-          aiAnalysis: {
-            productType: analysis.productType,
-            colors: analysis.colors,
-            keywords: allKeywords,
-            estimatedPrice: analysis.estimatedPrice ?? undefined,
-            confidence: analysis.confidence,
-            platform: analysis.platform ?? undefined,
-          },
-          resultCount: results.length,
-        }).catch(() => {});
-
-        return { analysis, results, imageUrl };
-      }),
-
-    // Price tracking: add product to tracking list
-    trackPrice: publicProcedure
-      .input(z.object({
-        sessionId: z.string(),
-        userId: z.string().optional(),
-        productId: z.number().optional(),
-        productName: z.string(),
-        productUrl: z.string().optional(),
-        productImageUrl: z.string().optional(),
-        platform: z.string().optional(),
-        targetPrice: z.number().optional(),
-        currentPrice: z.number().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        await addPriceTracking(input);
-        return { success: true };
-      }),
-
-    // Get user's price tracking list
-    getPriceTracking: publicProcedure
-      .input(z.object({ sessionId: z.string() }))
-      .query(async ({ input }) => getUserPriceTracking(input.sessionId, 20)),
-
-    // Remove a price tracking entry
-    removePriceTracking: publicProcedure
-      .input(z.object({ id: z.number(), sessionId: z.string() }))
-      .mutation(async ({ input }) => {
-        await removePriceTracking(input.id, input.sessionId);
-        return { success: true };
-      }),
-
-    // AR Try-On: upload user photo + product image → AI generates merged result
-    arTryOn: publicProcedure
-      .input(z.object({
-        userPhotoBase64: z.string(),
-        productImageUrl: z.string(),
-        productName: z.string().optional(),
-        sessionId: z.string().optional(),
-        userId: z.string().optional(),
-      }))
-      .mutation(async ({ input }) => {
-        // Upload user photo
-        const base64Data = input.userPhotoBase64.replace(/^data:image\/\w+;base64,/, "");
-        const buffer = Buffer.from(base64Data, "base64");
-        const mimeMatch = input.userPhotoBase64.match(/^data:(image\/\w+);base64,/);
-        const mime = (mimeMatch?.[1] ?? "image/jpeg") as string;
-        const ext = mime.split("/")[1] ?? "jpg";
-        const key = `ar-tryon/user-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-        const { url: userPhotoUrl } = await storagePut(key, buffer, mime);
-
-        // Save initial record
-        const record = await saveArTryOn({
-          userId: input.userId,
-          sessionId: input.sessionId,
-          userPhotoUrl,
-          productImageUrl: input.productImageUrl,
-          productName: input.productName,
-        });
-
-        // Generate AR merge with AI (async - fire and forget, update DB when done)
-        const tryOnId = (record as any)?.insertId ?? 0;
-
-        // Run AI image generation in background
-        (async () => {
-          try {
-            const prompt = `Habille cette personne avec ce vêtement/produit: ${input.productName ?? "produit"}. Garde le visage et la posture de la personne, remplace seulement les vêtements. Style photo réaliste, haute qualité.`;
-            const { url: resultUrl } = await generateImage({
-              prompt,
-              originalImages: [
-                { url: userPhotoUrl, mimeType: mime as string },
-                { url: input.productImageUrl, mimeType: "image/jpeg" },
-              ],
-            });
-            if (tryOnId) await updateArTryOnResult(tryOnId, resultUrl ?? "", "done");
-          } catch {
-            if (tryOnId) await updateArTryOnResult(tryOnId, "", "failed");
-          }
-        })();
-
-        return { id: tryOnId, status: "processing" };
-      }),
-
-    // Poll AR Try-On result by ID
-    getArTryOnResult: publicProcedure
-      .input(z.object({ id: z.number() }))
-      .query(async ({ input }) => getArTryOnResult(input.id)),
   }),
 
   // ===== Push Notifications =====
