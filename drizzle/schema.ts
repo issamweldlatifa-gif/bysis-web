@@ -66,6 +66,7 @@ export const orders = mysqlTable("orders", {
   gouvernorat: varchar("gouvernorat", { length: 64 }),
   screenshotUrl: text("screenshotUrl"),
   paymentReceiptUrl: text("paymentReceiptUrl"),
+  videoUrl: text("videoUrl"),
   paymentMethod: varchar("paymentMethod", { length: 32 }),
   notes: text("notes"),
   adminNotes: text("adminNotes"),
@@ -441,3 +442,161 @@ export const sliders = mysqlTable("sliders", {
 
 export type Slider = typeof sliders.$inferSelect;
 export type InsertSlider = typeof sliders.$inferInsert;
+
+/**
+ * Homepage Settings - controls all text, colors, fonts for the homepage
+ * Single-row config table (id=1 always)
+ */
+export const homepageSettings = mysqlTable("homepage_settings", {
+  id: int("id").autoincrement().primaryKey(),
+  // Hero Section
+  heroButtonText: varchar("heroButtonText", { length: 128 }).default("DÉCOUVRIR ••"),
+  heroButtonLink: varchar("heroButtonLink", { length: 512 }).default("/arrivage"),
+  heroButtonColor: varchar("heroButtonColor", { length: 7 }).default("#D4AF37"),
+  heroButtonTextColor: varchar("heroButtonTextColor", { length: 7 }).default("#1C2B33"),
+  // Admin Section (below hero)
+  adminHeadline: text("adminHeadline").default("DESTOCKAGE EUROPE •• Qualité Française, Prix Tunisien"),
+  adminButtonText: varchar("adminButtonText", { length: 128 }).default("VOIR LES OFFRES ••"),
+  adminButtonLink: varchar("adminButtonLink", { length: 512 }).default("/arrivage"),
+  // Stores section title
+  storesSectionTitle: varchar("storesSectionTitle", { length: 255 }).default("نشريو منهم مباشرة ليك ••"),
+  // Global colors & fonts
+  primaryColor: varchar("primaryColor", { length: 7 }).default("#1C2B33"),
+  accentColor: varchar("accentColor", { length: 7 }).default("#D4AF37"),
+  fontFamily: varchar("fontFamily", { length: 128 }).default("Inter"),
+  // Footer
+  footerFacebook: varchar("footerFacebook", { length: 512 }).default("https://facebook.com/bysis"),
+  footerInstagram: varchar("footerInstagram", { length: 512 }).default("https://instagram.com/bysis"),
+  footerWhatsapp: varchar("footerWhatsapp", { length: 64 }).default("+21623868982"),
+  footerEmail: varchar("footerEmail", { length: 320 }).default("support@bysis.shop"),
+  // Quick-access cards (card1-4)
+  card1Label: varchar("card1Label", { length: 128 }),
+  card1Video: text("card1Video"),
+  card1Image: text("card1Image"),
+  card1BgColor: varchar("card1BgColor", { length: 32 }).default("#1A1A1A"),
+  card1TextColor: varchar("card1TextColor", { length: 32 }).default("#FFFFFF"),
+  card1Link: text("card1Link"),
+  card2Label: varchar("card2Label", { length: 128 }),
+  card2Video: text("card2Video"),
+  card2Image: text("card2Image"),
+  card2BgColor: varchar("card2BgColor", { length: 32 }).default("#1A1A1A"),
+  card2TextColor: varchar("card2TextColor", { length: 32 }).default("#FFFFFF"),
+  card2Link: text("card2Link"),
+  card3Label: varchar("card3Label", { length: 128 }),
+  card3Video: text("card3Video"),
+  card3Image: text("card3Image"),
+  card3BgColor: varchar("card3BgColor", { length: 32 }).default("#1A1A1A"),
+  card3TextColor: varchar("card3TextColor", { length: 32 }).default("#FFFFFF"),
+  card3Link: text("card3Link"),
+  card4Label: varchar("card4Label", { length: 128 }),
+  card4Video: text("card4Video"),
+  card4Image: text("card4Image"),
+  card4BgColor: varchar("card4BgColor", { length: 32 }).default("#1A1A1A"),
+  card4TextColor: varchar("card4TextColor", { length: 32 }).default("#FFFFFF"),
+  card4Link: text("card4Link"),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type HomepageSettings = typeof homepageSettings.$inferSelect;
+export type InsertHomepageSettings = typeof homepageSettings.$inferInsert;
+
+/**
+ * Homepage Videos - Hero video + Slider videos
+ * type: 'hero' | 'slider'
+ */
+export const homepageVideos = mysqlTable("homepage_videos", {
+  id: int("id").autoincrement().primaryKey(),
+  type: mysqlEnum("type", ["hero", "slider"]).notNull().default("slider"),
+  title: varchar("title", { length: 255 }).notNull(),
+  videoUrl: text("videoUrl").notNull(),
+  linkUrl: varchar("linkUrl", { length: 512 }).default("/"),
+  displayOrder: int("displayOrder").default(0).notNull(),
+  isActive: tinyint("isActive").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type HomepageVideo = typeof homepageVideos.$inferSelect;
+export type InsertHomepageVideo = typeof homepageVideos.$inferInsert;
+
+/**
+ * Homepage Stores - the store cards stack
+ */
+export const homepageStores = mysqlTable("homepage_stores", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 128 }).notNull(),
+  logoUrl: text("logoUrl"),
+  linkUrl: varchar("linkUrl", { length: 512 }).default("/"),
+  backgroundColor: varchar("backgroundColor", { length: 7 }).default("#F5F5F0"),
+  textColor: varchar("textColor", { length: 32 }).default("#FFFFFF"),
+  isDark: tinyint("isDark").default(0).notNull(), // dark text on light bg or vice versa
+  displayOrder: int("displayOrder").default(0).notNull(),
+  isActive: tinyint("isActive").default(1).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type HomepageStore = typeof homepageStores.$inferSelect;
+export type InsertHomepageStore = typeof homepageStores.$inferInsert;
+
+/**
+ * Lens Search History - AI visual search queries and results
+ */
+export const lensHistory = mysqlTable("lens_history", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: varchar("userId", { length: 128 }),
+  sessionId: varchar("sessionId", { length: 128 }),
+  queryType: mysqlEnum("queryType", ["image", "text", "barcode"]).notNull().default("image"),
+  queryText: text("queryText"),
+  imageUrl: text("imageUrl"),
+  aiAnalysis: json("aiAnalysis").$type<{
+    productType: string;
+    colors: string[];
+    keywords: string[];
+    estimatedPrice?: number;
+    confidence: number;
+    platform?: string;
+  }>(),
+  resultCount: int("resultCount").default(0),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type LensHistory = typeof lensHistory.$inferSelect;
+export type InsertLensHistory = typeof lensHistory.$inferInsert;
+
+/**
+ * Price Tracking - users track product prices for alerts
+ */
+export const priceTracking = mysqlTable("price_tracking", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: varchar("userId", { length: 128 }),
+  sessionId: varchar("sessionId", { length: 128 }),
+  productId: int("productId"),
+  productName: varchar("productName", { length: 256 }).notNull(),
+  productUrl: text("productUrl"),
+  productImageUrl: text("productImageUrl"),
+  platform: varchar("platform", { length: 64 }).default("bysis"),
+  targetPrice: decimal("targetPrice", { precision: 10, scale: 2 }),
+  currentPrice: decimal("currentPrice", { precision: 10, scale: 2 }),
+  lastCheckedAt: timestamp("lastCheckedAt"),
+  alertSent: tinyint("alertSent").default(0).notNull(),
+  isActive: tinyint("isActive").default(1).notNull(),
+  scheduleCronTaskUid: varchar("scheduleCronTaskUid", { length: 65 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+export type PriceTracking = typeof priceTracking.$inferSelect;
+export type InsertPriceTracking = typeof priceTracking.$inferInsert;
+
+/**
+ * AR Try-On Results - AI photo merge results
+ */
+export const arTryOnResults = mysqlTable("ar_try_on_results", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: varchar("userId", { length: 128 }),
+  sessionId: varchar("sessionId", { length: 128 }),
+  userPhotoUrl: text("userPhotoUrl").notNull(),
+  productImageUrl: text("productImageUrl").notNull(),
+  resultImageUrl: text("resultImageUrl"),
+  productName: varchar("productName", { length: 256 }),
+  status: mysqlEnum("status", ["pending", "processing", "done", "failed"]).default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type ArTryOnResult = typeof arTryOnResults.$inferSelect;
+export type InsertArTryOnResult = typeof arTryOnResults.$inferInsert;

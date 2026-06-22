@@ -2,8 +2,8 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from '@phosphor-icons/react';
-// Note: X icon is available from @phosphor-icons/react
 import { Button } from '@/components/ui/button';
+import OptimizedImage from './OptimizedImage';
 
 interface AboutPopupProps {
   isOpen: boolean;
@@ -47,7 +47,7 @@ export default function AboutPopup({ isOpen, onClose }: AboutPopupProps) {
               <div className="overflow-y-auto max-h-[80vh]">
                 {/* Image */}
                 <div className="relative w-full aspect-square overflow-hidden">
-                  <img
+                  <OptimizedImage
                     src="https://d2xsxph8kpxj0f.cloudfront.net/310519663681326913/gJ2Tct6mF3AgWWNReCWAjN/about-popup-35V5cBPcDgMgyBD8xGt4g9.webp"
                     alt="Bysis Smart Shopping"
                     className="w-full h-full object-cover"

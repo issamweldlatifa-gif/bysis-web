@@ -1,8 +1,9 @@
 /**
- * VideoSlider Component — Swiper carousel for video cards
+ * VideoSlider Component — Swiper carousel for video cards with lazy loading
  */
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
+import OptimizedVideo from './OptimizedVideo';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -38,7 +39,7 @@ export default function VideoSlider({ videos }: VideoSliderProps) {
         {videos.map((video) => (
           <SwiperSlide key={video.id}>
             <div className="relative h-48 rounded-2xl overflow-hidden group cursor-pointer">
-              <video
+              <OptimizedVideo
                 src={video.videoUrl}
                 className="w-full h-full object-cover"
                 autoPlay

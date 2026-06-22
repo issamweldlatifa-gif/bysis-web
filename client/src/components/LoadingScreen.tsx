@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import OptimizedImage from './OptimizedImage';
 
 export default function LoadingScreen() {
   const colors = ['#FF4444', '#4444FF', '#FF9900']; // أحمر، أزرق، برتقالي
@@ -46,10 +47,11 @@ export default function LoadingScreen() {
             />
 
             {/* Logo */}
-            <img
+            <OptimizedImage
               src="/manus-storage/BlackandWhiteMinimalistSimpleModernTechnologyAILogo_7e8b089f.png"
               alt="Bysis AI"
               className="w-12 h-12 object-contain"
+              priority
             />
           </div>
         </motion.div>
